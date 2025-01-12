@@ -1,0 +1,12 @@
+{
+  "recommendations": [
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "richie5um2.vscode-sort-json",
+    "naumovs.color-highlight",
+    "eamodio.gitlens",
+    "bradlc.vscode-tailwindcss",
+    "fabiospampinato.vscode-todo-plus",
+    "chakrounanas.turbo-console-log"
+  ]
+}
