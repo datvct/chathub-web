@@ -36,6 +36,7 @@ const SignInPage: React.FC = () => {
                     />
                     <div className="absolute inset-0 bg-gradient-to-r from-black to-transparent opacity-80" /> 
                 </div>
+
                 <div className="w-2/5 min-h-svh p-6 rounded-lg shadow-lg flex flex-col justify-center z-50">
                     <h1 className="text-[60px] text-center font-bold mb-10"> 
                         SIGN IN
@@ -59,7 +60,6 @@ const SignInPage: React.FC = () => {
                                 onChange={handlePhoneChange}
                                 className="w-full h-[50px] px-10 py-2 rounded-md bg-[#261046] border border-gray-600 text-[18px] text-white focus:outline-none focus:ring-2 focus:ring-primary"
                             />
-
                         </div>
 
                         <div className="relative w-3/4"> {/* Input mật khẩu */}
@@ -75,7 +75,6 @@ const SignInPage: React.FC = () => {
                             />
                         </div>
 
-
                         <div className="flex items-center justify-between w-3/4"> 
                             <div className="flex items-center">
                                 <input type="checkbox" id="remember" className="rounded bg-[#261046] text-primary focus:ring-primary" />
@@ -88,7 +87,6 @@ const SignInPage: React.FC = () => {
                             Sign In
                         </Button>
 
-
                         <div className="mt-5 h-[1px] w-3/4 bg-white"></div>
                         <div className="text-center mt-4"> 
                             <p className="text-[18px] text-[#B6B6B6]">
@@ -98,13 +96,9 @@ const SignInPage: React.FC = () => {
                                 </Link>
                             </p>
                         </div>
-
                     </div>
                 </div>
-
             </div>
-
-
         </>
     )
 }
