@@ -141,7 +141,7 @@ const SignUpPage: React.FC = () => {
                         <div className="text-center mt-4">
                             <p className="text-[18px] text-[#B6B6B6] font-semibold">
                                 HAVE AN ACCOUNT?
-                                <Link href="/sign-in" className="pl-2 font-extrabold text-white underline ml-2 hover:no-underline">
+                                <Link href="/sign-in" className="pl-2 font-extrabold text-white ml-2 hover:no-underline">
                                     SIGN IN
                                 </Link>
                             </p>
