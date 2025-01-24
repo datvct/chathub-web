@@ -115,7 +115,7 @@ const SignUpPage: React.FC = () => {
           />
         </div>
 
-        <div className="flex flex-col gap-2.5 mb-4">
+        <div className="w-full flex flex-col gap-2.5 mb-4">
           <div className="flex items-center">
             <input
               type="checkbox"
@@ -125,7 +125,7 @@ const SignUpPage: React.FC = () => {
               className="rounded text-pink-600 focus:ring-primary"
             />
             <label htmlFor="agreeTerms" className="ml-2 text-[14px] cursor-pointer text-white">
-              I agree to the terms of use <span className="text-[#489DA6]">terms of use</span>
+              I agree to the <span className="text-[#489DA6]">terms of use</span>
             </label>
           </div>
 
@@ -138,7 +138,7 @@ const SignUpPage: React.FC = () => {
               className="rounded bg-[#261046] text-primary focus:ring-primary"
             />
             <label htmlFor="agreeSocialTerms" className="ml-2 text-[14px] cursor-pointer text-white">
-              I agree to the social network terms <span className="text-[#489DA6]">social network terms</span>
+              I agree to the <span className="text-[#489DA6]">social network terms</span>
             </label>
           </div>
         </div>
