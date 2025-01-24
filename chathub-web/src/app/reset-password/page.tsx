@@ -6,7 +6,8 @@ import { Button } from "~/components/ui/button"
 import { Input } from "~/components/ui/input"
 import { Images } from "~/constants/images"
 import { toast, ToastContainer } from "react-toastify"
-const ForgotPasswordPage: React.FC = () => {
+
+const ResetPasswordPage: React.FC = () => {
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -20,6 +21,9 @@ const ForgotPasswordPage: React.FC = () => {
     console.log("Update password successfully")
     showToast()
   }
+
+  const isFormValid = password && confirmPassword
+
   const showToast = () => {
     toast.success("Change password successfully!", {
       position: "top-right",
@@ -32,67 +36,50 @@ const ForgotPasswordPage: React.FC = () => {
   }
 
   return (
-    <>
-      <div className="h-full w-full flex items-center justify-center bg-secondary text-white bg-gradient-to-r from-[#1A004C] to-[#160430]">
-        <div className=" w-3/5 max-h-svh">
-          <Image
-            src={Images.Background}
-            alt="background-image"
-            className="relative max-h-svh inset-0 w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-black to-transparent opacity-80" />
-        </div>
-        <div className="w-2/5 min-h-svh p-6 rounded-lg shadow-lg flex flex-col justify-center z-50">
-          <h1 className="text-[60px] text-center font-bold mb-10">Forgot Password</h1>
-          <div className="flex justify-center items-center flex-col gap-5 ">
-            <div className="relative w-3/4">
-              <Image
-                src={Images.IconPassword}
-                alt="icon-password"
-                width={20}
-                height={20}
-                className="absolute left-3 top-[33%]"
-              />
-              <Input
-                type="text"
-                id="phone"
-                placeholder="New password"
-                value={password}
-                onChange={handlePasswordChange}
-                className="w-full h-[50px] px-10 py-2 rounded-md bg-[#261046] border border-gray-600 text-[18px] text-white focus:outline-none focus:ring-2 focus:ring-primary"
-              />
-            </div>
+    <div className="h-screen w-full flex justify-center items-center bg-[#160430] relative">
+      <Image src={Images.Background} alt="background-image" layout="fill" objectFit="cover" />
+      <div className="absolute inset-0 bg-black opacity-50" />
 
-            <div className="relative w-3/4">
-              <Image
-                src={Images.IconPassword}
-                alt="icon-password"
-                width={20}
-                height={20}
-                className="absolute left-3 top-[33%]"
-              />
-              <Input
-                type="text"
-                id="phone"
-                placeholder="Re-enter new password"
-                value={confirmPassword}
-                onChange={handleConfirmPasswordChange}
-                className="w-full h-[50px] px-10 py-2 rounded-md bg-[#261046] border border-gray-600 text-[18px] text-white focus:outline-none focus:ring-2 focus:ring-primary"
-              />
-            </div>
-
-            <Button
-              onClick={handleSubmit}
-              className="w-3/4 h-[50px] py-2 bg-gradient-to-r from-[#501794] to-[#3E70A1] text-white text-[20px] rounded-md transition hover:bg-none hover:bg-[#5C3BFF]"
-            >
-              Confirm
-            </Button>
-            <ToastContainer />
+      <div className="z-20 bg-black bg-opacity-55 p-8 rounded-[20px] w-full max-w-md flex flex-col items-center justify-center">
+        <h2 className="text-[35px] font-bold text-white mb-3">Reset Password</h2>
+        <div className="w-full mb-5 relative">
+          <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
+            <Image src={Images.IconPassword} alt="password icon" width={22} height={22} />
           </div>
+          <Input
+            type="password"
+            value={password}
+            onChange={handlePasswordChange}
+            placeholder="New Password"
+            className="w-full py-[22px] pl-12 pr-4 text-lg text-black rounded-lg"
+          />
         </div>
+
+        <div className="w-full mb-4 relative">
+          <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
+            <Image src={Images.IconPassword} alt="password icon" width={22} height={22} />
+          </div>
+          <Input
+            type="password"
+            value={confirmPassword}
+            onChange={handleConfirmPasswordChange}
+            placeholder="Confirm Password"
+            className="w-full py-[22px] pl-12 pr-4 text-lg text-black rounded-lg"
+          />
+        </div>
+        <Button
+          onClick={handleSubmit}
+          className={`w-full py-4 text-lg text-white rounded-[12px] bg-gradient-to-r from-[#501794] to-[#3E70A1] hover:bg-gradient-to-l ${
+            !isFormValid ? "opacity-50 cursor-not-allowed" : ""
+          }`}
+          disabled={!isFormValid}
+        >
+          Reset
+        </Button>
+        <ToastContainer />
       </div>
-    </>
+    </div>
   )
 }
 
-export default ForgotPasswordPage
+export default ResetPasswordPage

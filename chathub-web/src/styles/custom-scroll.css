@@ -1,18 +1,19 @@
-/* Tùy chỉnh thanh cuộn */
-.custom-scrollbar {
-  scrollbar-width: thin; /* Thanh cuộn nhỏ */
-  scrollbar-color: #6b7280 #f3f4f6; /* Màu thanh cuộn: thumb và track */
-}
-
 .custom-scrollbar::-webkit-scrollbar {
-  width: 6px; /* Độ rộng của thanh cuộn */
-}
-
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: #6b7280; /* Màu của thumb */
-  border-radius: 10px; /* Bo tròn */
+  width: 8px; /* Set the width of the scrollbar */
 }
 
 .custom-scrollbar::-webkit-scrollbar-track {
-  background-color: #f3f4f6; /* Màu nền */
+  background: #1a1a1a; /* Dark background color for the track */
+  border-radius: 8px; /* Rounded corners */
+}
+
+/* Scrollbar handle (thumb) */
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #6b7280; /* Color of the scrollbar handle */
+  border-radius: 8px;
+  border: 2px solid #1a1a1a; /* Add border around the scrollbar thumb */
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: #145175; /* Change color on hover */
 }

@@ -1,4 +1,4 @@
-import Background from "../../public/images/background-Image.png"
+import Background from "../../public/images/background-Image.jpg"
 import IconCloseCircle from "../../public/images/close-circle.svg"
 import File from "../../public/images/file.svg"
 import Globe from "../../public/images/globe.svg"

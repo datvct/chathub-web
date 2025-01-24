@@ -11,6 +11,7 @@ import { Images } from "~/constants/images"
 const ForgotPasswordPage: React.FC = () => {
   const [phoneNumber, setPhoneNumber] = useState("")
   const [openModal, setOpenModal] = useState(false)
+
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPhoneNumber(e.target.value)
   }
@@ -20,57 +21,47 @@ const ForgotPasswordPage: React.FC = () => {
     setOpenModal(true)
   }
 
+  const isFormValid = phoneNumber !== ""
+
   return (
-    <>
-      <div className="h-full w-full flex items-center justify-center bg-secondary text-white bg-gradient-to-r from-[#1A004C] to-[#160430]">
-        <div className=" w-3/5 max-h-svh">
-          <Image
-            src={Images.Background}
-            alt="background-image"
-            className="relative max-h-svh inset-0 w-full h-full object-cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-black to-transparent opacity-80" />
-        </div>
-        <div className="w-2/5 min-h-svh p-6 rounded-lg shadow-lg flex flex-col justify-center z-50">
-          <h1 className="text-[60px] text-center font-bold mb-10">Forgot Password</h1>
-          <div className="flex justify-center items-center flex-col gap-5 ">
-            <div className="relative w-3/4">
-              <Image
-                src={Images.IconPhone}
-                alt="icon-close"
-                width={20}
-                height={20}
-                className="absolute left-3 top-[33%]"
-              />
-              <Input
-                type="text"
-                id="phone"
-                placeholder="Enter your phone number"
-                value={phoneNumber}
-                onChange={handlePhoneChange}
-                className="w-full h-[50px] px-10 py-2 rounded-md bg-[#261046] border border-gray-600 text-[18px] text-white focus:outline-none focus:ring-2 focus:ring-primary"
-              />
-            </div>
-            <Button
-              onClick={handleSubmit}
-              className="w-3/4 h-[50px] py-2 bg-gradient-to-r from-[#501794] to-[#3E70A1] text-white text-[20px] rounded-md transition hover:bg-none hover:bg-[#5C3BFF]"
-            >
-              Continue
-            </Button>
-            <div className="mt-5 h-[1px] w-3/4 bg-white"></div>
-            <div className="text-center mt-4">
-              <p className="text-[18px] text-[#B6B6B6]">
-                HAVE AN ACCOUNT?
-                <Link href="/sign-in" className="pl-2 font-semibold text-white">
-                  SIGN IN
-                </Link>
-              </p>
-            </div>
+    <div className="h-screen w-full flex justify-center items-center bg-[#160430] relative">
+      <Image src={Images.Background} alt="background-image" layout="fill" objectFit="cover" />
+      <div className="absolute inset-0 bg-black opacity-50" />
+
+      <div className="z-20 bg-black bg-opacity-55 p-8 rounded-[20px] w-full max-w-md flex flex-col items-center justify-center">
+        <h2 className="text-[35px] font-bold text-white mb-3">Forgot Password</h2>
+
+        <div className="w-full mb-5 relative">
+          <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
+            <Image src={Images.IconPhone} alt="phone icon" width={22} height={22} />
           </div>
+          <Input
+            type="tel"
+            value={phoneNumber}
+            onChange={handlePhoneChange}
+            placeholder="Phone Number"
+            className="w-full py-[22px] pl-12 pr-4 text-lg text-black rounded-lg"
+          />
+        </div>
+        <Button
+          onClick={handleSubmit}
+          className={`w-full py-4 text-lg text-white rounded-[12px] bg-gradient-to-r from-[#501794] to-[#3E70A1] hover:bg-gradient-to-l ${
+            !isFormValid ? "opacity-50 cursor-not-allowed" : ""
+          }`}
+          disabled={!isFormValid}
+        >
+          Continue
+        </Button>
+        <hr className="w-3/4 my-4 border-1 border-gray-500" />
+        <div className="text-white text-[14px] uppercase">
+          Have an account?{" "}
+          <Link href="/" className="text-[#3E70A1] hover:underline font-bold">
+            Sign In
+          </Link>
         </div>
       </div>
       {openModal && <ModalOTP isOpen={openModal} setIsOpen={setOpenModal} numberPhone={phoneNumber} />}
-    </>
+    </div>
   )
 }
 
