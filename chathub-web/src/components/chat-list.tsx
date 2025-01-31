@@ -1,6 +1,12 @@
+"use client"
+
+import React, { useState } from "react"
 import Image from "next/image"
 import { Images } from "../constants/images"
 import "../styles/custom-scroll.css"
+import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react"
+// import DropdownMenu from "./dropdown-menu"
+
 const ChatList = () => {
   const chats = [
     { id: 1, name: "Sweetie", message: "I love you so much!", time: "8:32 PM", type: "text", pinned: true },
@@ -18,10 +24,50 @@ const ChatList = () => {
   return (
     <div className="bg-[#202020] text-white w-1/4 h-screen p-4 relative">
       {/* Header */}
-      <div className="flex items-center justify-start gap-5 mb-4">
+      {/* <div className="flex items-center justify-start gap-5 mb-4">
         <Image src={Images.IconChatList} alt="Chat Icon" width={35} height={35} />
         <h1 className="text-[25px] font-bold">Chats</h1>
-      </div>
+      </div> */}
+
+      <Menu>
+        <MenuButton as="button" className="flex items-center justify-start gap-5 mb-4">
+          {" "}
+          <Image src={Images.IconChatList} alt="Chat Icon" width={35} height={35} />
+          <h1 className="text-[25px] font-bold">Chats</h1>
+        </MenuButton>
+
+        <MenuItems className="absolute top-14 left-2 bg-black border border-white border-opacity-30 w-55 p-4 rounded-lg shadow-md z-50 mt-2 text-left focus:outline-none">
+          {" "}
+          <MenuItem as="a" href="/profile">
+            <button className="group rounded-lg px-4 py-2 flex items-center cursor-pointer hover:text-[#0078D4]">
+              {" "}
+              <Image src={Images.IconProfile} alt="Profile" width={24} height={24} />
+              <span className="block ml-2 font-medium group-hover:text-[#0078D4] truncate">Profile</span>
+            </button>
+          </MenuItem>
+
+          <MenuItem as="a" href="/friend-list">
+            <button className="group rounded-lg px-4 py-2 flex items-center cursor-pointer hover:text-[#0078D4]">
+              <Image src={Images.IconContact} alt="Profile" width={24} height={24} />
+              <span className="ml-2 block font-medium group-hover:text-[#0078D4] truncate">Friend List</span>
+            </button>
+          </MenuItem>
+
+          <MenuItem as="a" href="/friend-requests">
+            <button className="group rounded-lg px-4 py-2 flex items-center cursor-pointer hover:text-[#0078D4]">
+              <Image src={Images.IconAddFriend} alt="Friend Requests" width={24} height={24} />
+              <span className="ml-2 block font-medium  group-hover:text-[#0078D4] truncate">Friend Requests</span>
+            </button>
+          </MenuItem>
+
+          <MenuItem as="a" href="/group-list">
+            <button className="group rounded-lg px-4 py-2 flex items-center cursor-pointer hover:text-[#0078D4]">
+              <Image src={Images.IconGroup} alt="Group List" width={24} height={24} />
+              <span className="ml-2 block font-medium group-hover:text-[#0078D4] truncate">Group List</span>
+            </button>
+          </MenuItem>
+        </MenuItems>
+      </Menu>
 
       {/* Search Bar */}
       <div className="relative mb-4">
@@ -67,9 +113,46 @@ const ChatList = () => {
       </ul>
 
       {/* Floating Button */}
-      <button className="absolute bottom-6 right-12 bg-white bg-opacity-30 p-4 rounded-full flex items-center justify-center rounded-[100px] text-white text-[30px]">
-        <Image src={Images.IconPlus} alt="Plus Icon" width={28} height={28} />
-      </button>
+      <Menu>
+        <MenuButton
+          as="button"
+          className="absolute bottom-6 right-12 bg-white bg-opacity-30 p-4 rounded-full flex items-center justify-center rounded-[100px] text-white text-[30px]"
+        >
+          <Image src={Images.IconPlus} alt="Plus Icon" width={28} height={28} />
+        </MenuButton>
+
+        <MenuItems className="absolute bottom-16 right-12 z-10 w-48 bg-[#202020] border border-gray-700 rounded-md shadow-lg">
+          <MenuItem as="a" href="/create-new-chat">
+            <button className="px-4 py-2 hover:bg-gray-600 cursor-pointer flex items-center">
+              <div>
+                <Image
+                  src={Images.CreateNewChat}
+                  alt="Create a new chat Icon"
+                  width={30}
+                  height={30}
+                  className="flex items-center justify-center"
+                />
+              </div>
+              <div className="ml-2 flex-1">Create a new chat</div>
+            </button>
+          </MenuItem>
+
+          <MenuItem as="a" href="/create-new-group-chat">
+            <button className="px-4 py-2 hover:bg-gray-600 cursor-pointer flex items-center">
+              <div>
+                <Image
+                  src={Images.CreateNewGroupChat}
+                  alt="Create a new group Icon"
+                  width={30}
+                  height={30}
+                  className="flex items-center justify-center"
+                />
+              </div>
+              <div className="ml-2 flex-1">Create a new group chat</div>
+            </button>
+          </MenuItem>
+        </MenuItems>
+      </Menu>
     </div>
   )
 }

@@ -11,6 +11,13 @@ import IconPhone from "../../public/images/lineicons_phone.svg"
 import Next from "../../public/images/next.svg"
 import Vercel from "../../public/images/vercel.svg"
 import Window from "../../public/images/window.svg"
+import CreateNewChat from "../../public/images/create-new-chat.png"
+import CreateNewGroupChat from "../../public/images/create-new-group-chat.png"
+import IconProfile from "../../public/images/icon-profile.svg"
+import IconAddFriend from "../../public/images/icon-add-friend.svg"
+import IconContact from "../../public/images/icon-contact.svg"
+import IconGroup from "../../public/images/icon-group.svg"
+
 export const Images = {
   File,
   Globe,
@@ -25,4 +32,10 @@ export const Images = {
   IconChatList,
   IconPin,
   IconPlus,
+  CreateNewChat,
+  CreateNewGroupChat,
+  IconProfile,
+  IconAddFriend,
+  IconContact,
+  IconGroup,
 }
