@@ -17,6 +17,16 @@ import IconProfile from "../../public/images/icon-profile.svg"
 import IconAddFriend from "../../public/images/icon-add-friend.svg"
 import IconContact from "../../public/images/icon-contact.svg"
 import IconGroup from "../../public/images/icon-group.svg"
+import GuyHawkins from "../../public/images/GuyHawkins.png"
+import RonaldRichards from "../../public/images/RonaldRichards.png"
+import EstherHoward from "../../public/images/EstherHoward.png"
+import AlbertFlores from "../../public/images/AlbertFlores.png"
+import MileyCyrus from "../../public/images/MileyCyrus.png"
+import ArleneMcCoy from "../../public/images/ArleneMcCoy.png"
+import CameronWilliamson from "../../public/images/CameronWilliamson.png"
+import IconCloseModal from "../../public/images/icon-close-modal.png"
+import IconSearch from "../../public/images/icon-search.png"
+import IconMore from "../../public/images/icon-more.png"
 
 export const Images = {
   File,
@@ -38,4 +48,14 @@ export const Images = {
   IconAddFriend,
   IconContact,
   IconGroup,
+  GuyHawkins,
+  RonaldRichards,
+  EstherHoward,
+  AlbertFlores,
+  MileyCyrus,
+  ArleneMcCoy,
+  CameronWilliamson,
+  IconCloseModal,
+  IconSearch,
+  IconMore,
 }
