@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog"
 import { Input } from "./ui/input"
+import Link from "next/link"
 
 interface ModalOTPProps {
   isOpen: boolean
@@ -95,12 +96,12 @@ const ModalOTP = ({ isOpen, setIsOpen, numberPhone }: ModalOTPProps) => {
           </button>
         </div>
 
-        <button
-          className="w-full py-3 bg-gradient-to-r from-purple-600 to-blue-500 text-white rounded-md hover:opacity-90"
-          onClick={handleSubmit}
+        <Link
+          href="/reset-password"
+          className="py-3 bg-gradient-to-r from-purple-600 to-blue-500 text-white rounded-md hover:opacity-90 mx-20 text-center"
         >
-          Verify OTP
-        </button>
+          <button onClick={handleSubmit}>Verify OTP</button>
+        </Link>
       </DialogContent>
     </Dialog>
   )
