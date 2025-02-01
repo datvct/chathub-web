@@ -92,7 +92,7 @@ const ModalCreateNewGroupChat: React.FC<ModalCreateNewGroupChatProps> = ({ isOpe
                       {users.map((user, index) => (
                         <li
                           key={index}
-                          className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer mb-2 bg-white hover:bg-gray-100 
+                          className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer mb-2 bg-white hover:bg-[#93C1D2]
                                                         ${selectedUsers.includes(index) ? "bg-gray-200" : ""}`}
                           onClick={() => handleUserSelect(index)}
                         >
