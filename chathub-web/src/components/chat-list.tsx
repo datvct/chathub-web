@@ -21,46 +21,43 @@ const ChatList = () => {
     { id: 9, name: "iceChat", message: "I reeeeally love this animation!", time: "Thu", unread: 57 },
     { id: 10, name: "iceDSGN", message: "Happy New Year! 🎉", time: "Thu" },
   ]
-  const [modalCreateChatOpen, setModalCreateNewChatOpen] = useState(false);
-  const [modalCreateGroupChatOpen, setModalCreateNewGroupChatOpen] = useState(false);
+  const [modalCreateChatOpen, setModalCreateNewChatOpen] = useState(false)
+  const [modalCreateGroupChatOpen, setModalCreateNewGroupChatOpen] = useState(false)
 
   return (
     <div className="bg-[#202020] text-white w-1/4 h-screen p-4 relative">
       <Menu>
         <MenuButton as="button" className="flex items-center justify-start gap-5 mb-4">
-          {" "}
           <Image src={Images.IconChatList} alt="Chat Icon" width={35} height={35} />
           <h1 className="text-[25px] font-bold">Chats</h1>
         </MenuButton>
 
-        <MenuItems className="absolute top-14 left-2 bg-black border border-white border-opacity-30 w-55 p-4 rounded-lg shadow-md z-50 mt-2 text-left focus:outline-none">
-          {" "}
+        <MenuItems className="absolute top-14 left-2 bg-black border border-white border-opacity-30 w-55 p-4 rounded-[20px] shadow-md z-50 mt-2 text-left focus:outline-none">
           <MenuItem as="a" href="/profile">
-            <button className="group rounded-lg px-4 py-2 flex items-center cursor-pointer hover:text-[#0078D4]">
-              {" "}
+            <button className="w-full group rounded-lg px-4 py-2 flex items-center cursor-pointer hover:bg-gray-600">
               <Image src={Images.IconProfile} alt="Profile" width={24} height={24} />
-              <span className="block ml-2 font-medium group-hover:text-[#0078D4] truncate">Profile</span>
+              <span className="block ml-3 font-medium truncate">Profile</span>
             </button>
           </MenuItem>
 
           <MenuItem as="a" href="/friend-list">
-            <button className="group rounded-lg px-4 py-2 flex items-center cursor-pointer hover:text-[#0078D4]">
+            <button className="w-full group rounded-lg px-4 py-2 flex items-center cursor-pointer hover:bg-gray-600">
               <Image src={Images.IconContact} alt="Profile" width={24} height={24} />
-              <span className="ml-2 block font-medium group-hover:text-[#0078D4] truncate">Friend List</span>
+              <span className="ml-3 block font-medium truncate">Friend List</span>
             </button>
           </MenuItem>
 
           <MenuItem as="a" href="/friend-requests">
-            <button className="group rounded-lg px-4 py-2 flex items-center cursor-pointer hover:text-[#0078D4]">
+            <button className="w-full group rounded-lg px-4 py-2 flex items-center cursor-pointer hover:bg-gray-600">
               <Image src={Images.IconAddFriend} alt="Friend Requests" width={24} height={24} />
-              <span className="ml-2 block font-medium  group-hover:text-[#0078D4] truncate">Friend Requests</span>
+              <span className="ml-3 block font-medium truncate">Friend Requests</span>
             </button>
           </MenuItem>
 
           <MenuItem as="a" href="/group-list">
-            <button className="group rounded-lg px-4 py-2 flex items-center cursor-pointer hover:text-[#0078D4]">
+            <button className="w-full group rounded-lg px-4 py-2 flex items-center cursor-pointer hover:bg-gray-600">
               <Image src={Images.IconGroup} alt="Group List" width={24} height={24} />
-              <span className="ml-2 block font-medium group-hover:text-[#0078D4] truncate">Group List</span>
+              <span className="ml-3 block font-medium truncate">Group List</span>
             </button>
           </MenuItem>
         </MenuItems>
@@ -118,38 +115,40 @@ const ChatList = () => {
           <Image src={Images.IconPlus} alt="Plus Icon" width={28} height={28} />
         </MenuButton>
 
-        <MenuItems className="absolute bottom-16 right-12 z-10 w-48 bg-[#202020] border border-gray-700 rounded-md shadow-lg">
+        <MenuItems className="text-[15px] absolute bottom-16 p-2 right-12 w-56 bg-black border border-white border-opacity-30 rounded-[10px] shadow-lg">
           <MenuItem>
-            <button 
-              className="px-4 py-2 hover:bg-gray-600 cursor-pointer flex items-center"
-              onClick={() => setModalCreateNewChatOpen(true)}>
-                <div>
-                  <Image
-                    src={Images.CreateNewChat}
-                    alt="Create a new chat Icon"
-                    width={30}
-                    height={30}
-                    className="flex items-center justify-center"
-                  />
-                </div>
-                <div className="ml-2 flex-1">Create a new chat</div>
+            <button
+              className="w-full px-2 py-2 hover:bg-gray-600 cursor-pointer flex items-center rounded-lg"
+              onClick={() => setModalCreateNewChatOpen(true)}
+            >
+              <div>
+                <Image
+                  src={Images.CreateNewChat}
+                  alt="Create a new chat Icon"
+                  width={32}
+                  height={30}
+                  className="flex items-center justify-center"
+                />
+              </div>
+              <div className="ml-2">Create new chat</div>
             </button>
           </MenuItem>
 
           <MenuItem>
-            <button 
-              className="px-4 py-2 hover:bg-gray-600 cursor-pointer flex items-center"
-              onClick={() => setModalCreateNewGroupChatOpen(true)}>
-                <div>
-                  <Image
-                    src={Images.CreateNewGroupChat}
-                    alt="Create a new group Icon"
-                    width={30}
-                    height={30}
-                    className="flex items-center justify-center"
-                  />
-                </div>
-                <div className="ml-2 flex-1">Create a new group chat</div>
+            <button
+              className="w-full px-2 py-2 hover:bg-gray-600 cursor-pointer flex items-center rounded-lg"
+              onClick={() => setModalCreateNewGroupChatOpen(true)}
+            >
+              <div>
+                <Image
+                  src={Images.CreateNewGroupChat}
+                  alt="Create a new group Icon"
+                  width={30}
+                  height={30}
+                  className="flex items-center justify-center"
+                />
+              </div>
+              <div className="ml-2">Create new group chat</div>
             </button>
           </MenuItem>
         </MenuItems>
