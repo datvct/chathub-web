@@ -75,6 +75,8 @@ const ModalCreateNewGroupChat: React.FC<ModalCreateNewGroupChatProps> = ({ isOpe
                                     </button>
                                 </DialogTitle>
 
+                                <hr className="w-full my-4 border-1 border-gray-500 mb-6" />
+
                                 <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
                                         <div className="relative mb-6">
