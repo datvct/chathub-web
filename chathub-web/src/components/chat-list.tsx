@@ -5,7 +5,8 @@ import Image from "next/image"
 import { Images } from "../constants/images"
 import "../styles/custom-scroll.css"
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react"
-import ModalCreateChat from "./modal-create-new-chat"
+import ModalCreateNewChat from "./modal-create-new-chat"
+import ModalCreateNewGroupChat from "./modal-create-new-group-chat"
 
 const ChatList = () => {
   const chats = [
@@ -20,16 +21,11 @@ const ChatList = () => {
     { id: 9, name: "iceChat", message: "I reeeeally love this animation!", time: "Thu", unread: 57 },
     { id: 10, name: "iceDSGN", message: "Happy New Year! 🎉", time: "Thu" },
   ]
-  const [modalCreateChatOpen, setModalCreateChatOpen] = useState(false);
+  const [modalCreateChatOpen, setModalCreateNewChatOpen] = useState(false);
+  const [modalCreateGroupChatOpen, setModalCreateNewGroupChatOpen] = useState(false);
 
   return (
     <div className="bg-[#202020] text-white w-1/4 h-screen p-4 relative">
-      {/* Header */}
-      {/* <div className="flex items-center justify-start gap-5 mb-4">
-        <Image src={Images.IconChatList} alt="Chat Icon" width={35} height={35} />
-        <h1 className="text-[25px] font-bold">Chats</h1>
-      </div> */}
-
       <Menu>
         <MenuButton as="button" className="flex items-center justify-start gap-5 mb-4">
           {" "}
@@ -126,7 +122,7 @@ const ChatList = () => {
           <MenuItem>
             <button 
               className="px-4 py-2 hover:bg-gray-600 cursor-pointer flex items-center"
-              onClick={() => setModalCreateChatOpen(true)}>
+              onClick={() => setModalCreateNewChatOpen(true)}>
                 <div>
                   <Image
                     src={Images.CreateNewChat}
@@ -141,24 +137,27 @@ const ChatList = () => {
           </MenuItem>
 
           <MenuItem>
-            <button className="px-4 py-2 hover:bg-gray-600 cursor-pointer flex items-center">
-              <div>
-                <Image
-                  src={Images.CreateNewGroupChat}
-                  alt="Create a new group Icon"
-                  width={30}
-                  height={30}
-                  className="flex items-center justify-center"
-                />
-              </div>
-              <div className="ml-2 flex-1">Create a new group chat</div>
+            <button 
+              className="px-4 py-2 hover:bg-gray-600 cursor-pointer flex items-center"
+              onClick={() => setModalCreateNewGroupChatOpen(true)}>
+                <div>
+                  <Image
+                    src={Images.CreateNewGroupChat}
+                    alt="Create a new group Icon"
+                    width={30}
+                    height={30}
+                    className="flex items-center justify-center"
+                  />
+                </div>
+                <div className="ml-2 flex-1">Create a new group chat</div>
             </button>
           </MenuItem>
         </MenuItems>
       </Menu>
 
       {/* Render the modal */}
-      <ModalCreateChat isOpen={modalCreateChatOpen} setIsOpen={setModalCreateChatOpen} />
+      <ModalCreateNewChat isOpen={modalCreateChatOpen} setIsOpen={setModalCreateNewChatOpen} />
+      <ModalCreateNewGroupChat isOpen={modalCreateGroupChatOpen} setIsOpen={setModalCreateNewGroupChatOpen} />
     </div>
   )
 }

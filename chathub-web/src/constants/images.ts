@@ -27,6 +27,9 @@ import CameronWilliamson from "../../public/images/CameronWilliamson.png"
 import IconCloseModal from "../../public/images/icon-close-modal.png"
 import IconSearch from "../../public/images/icon-search.png"
 import IconMore from "../../public/images/icon-more.png"
+import IconClosePurple from "../../public/images/icon-close-purple.png"
+import IconCamera from "../../public/images/icon-camera.png"
+
 
 export const Images = {
   File,
@@ -58,4 +61,6 @@ export const Images = {
   IconCloseModal,
   IconSearch,
   IconMore,
+  IconClosePurple,
+  IconCamera,
 }

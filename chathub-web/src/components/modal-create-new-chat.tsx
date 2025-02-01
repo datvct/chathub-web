@@ -8,12 +8,12 @@ import { Images } from '../constants/images';
 import { Dialog, DialogPanel, DialogTitle } from '@headlessui/react';
 import { Search, EllipsisVertical } from 'lucide-react';
 
-interface ModalCreateChatProps {
+interface ModalCreateNewChatProps {
     isOpen: boolean;
     setIsOpen: (open: boolean) => void;
 }
 
-const ModalCreateChat: React.FC<ModalCreateChatProps> = ({ isOpen, setIsOpen }) => {
+const ModalCreateNewChat: React.FC<ModalCreateNewChatProps> = ({ isOpen, setIsOpen }) => {
     const users = [
         { name: 'Guy Hawkins', phone: '0903112233', image: Images.GuyHawkins },
         { name: 'Ronald Richards', phone: '0902445566', image: Images.RonaldRichards },
@@ -39,11 +39,13 @@ const ModalCreateChat: React.FC<ModalCreateChatProps> = ({ isOpen, setIsOpen }) 
                         </button>
                     </DialogTitle>
 
+                    <hr className="w-full my-4 border-1 border-gray-500 mb-6" />
+
                     <div className="relative mb-6">
                         <Input
                             type="text"
                             placeholder="Search by phone number"
-                            className="w-full py-[22px] pl-12 pr-4 bg-[#fff] border border-[#545454] rounded-xl text-gray-900 focus:outline-none placeholder-[#828282]"
+                            className="w-full py-[22px] pl-12 pr-4 bg-[#fff] border border-[#545454] rounded-lg text-gray-900 focus:outline-none placeholder-[#828282]"
                         />
                         <Search className='absolute top-1/2 left-4 -translate-y-1/2 text-gray-500 pr-2' />
                     </div>
@@ -53,7 +55,7 @@ const ModalCreateChat: React.FC<ModalCreateChatProps> = ({ isOpen, setIsOpen }) 
                             <li
                                 key={index}
                                 className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer mb-3
-                                    ${selectedUser === index ? 'bg-[#7a99b8]' : ''}
+                                    ${selectedUser === index ? 'bg-[#7a99b8]/90' : ''}
                                     bg-[#fff]
                                     hover:bg-[#93C1D2]
                                 `}
@@ -90,4 +92,4 @@ const ModalCreateChat: React.FC<ModalCreateChatProps> = ({ isOpen, setIsOpen }) 
     );
 };
 
-export default ModalCreateChat;
+export default ModalCreateNewChat;
