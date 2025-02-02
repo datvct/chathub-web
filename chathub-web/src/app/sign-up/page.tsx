@@ -47,13 +47,7 @@ const SignUpPage: React.FC = () => {
     )
   }
 
-  const isFormValid =
-    phoneNumber &&
-    fullName &&
-    password &&
-    confirmPassword &&
-    agreeTerms &&
-    agreeSocialTerms
+  const isFormValid = phoneNumber && fullName && password && confirmPassword && agreeTerms && agreeSocialTerms
 
   return (
     <div className="h-screen w-full flex justify-center items-center bg-[#160430] relative">
@@ -145,8 +139,10 @@ const SignUpPage: React.FC = () => {
 
         <Button
           onClick={handleSubmit}
-          className={`w-full py-4 text-lg text-white rounded-[12px] bg-gradient-to-r from-[#501794] to-[#3E70A1] hover:bg-gradient-to-l ${!isFormValid ? 'opacity-50 cursor-not-allowed' : ''}`}
-          disabled={!isFormValid} 
+          className={`w-full py-4 text-lg text-white rounded-[12px] bg-gradient-to-r from-[#501794] to-[#3E70A1] hover:bg-gradient-to-l ${
+            !isFormValid ? "opacity-50 cursor-not-allowed" : ""
+          }`}
+          disabled={!isFormValid}
         >
           Sign Up
         </Button>
