@@ -36,7 +36,7 @@ const ModalCreateNewGroupChat: React.FC<ModalCreateNewGroupChatProps> = ({ isOpe
     }
   }
 
-  const isCreateButtonEnabled = selectedUsers.length >= 2
+  const isCreateButtonEnabled = selectedUsers.length >= 1
 
   return (
     <Transition appear show={isOpen} as={React.Fragment}>

@@ -65,10 +65,10 @@ const ModalCreateNewChat: React.FC<ModalCreateNewChatProps> = ({ isOpen, setIsOp
                 <li
                   key={index}
                   className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer mb-3
-                                    ${selectedUser === index ? "bg-[#7a99b8]/90" : ""}
-                                    bg-[#fff]
-                                    hover:bg-[#93C1D2]
-                                `}
+                              ${selectedUser === index ? "bg-[#7a99b8]/90" : ""}
+                              bg-[#fff]
+                              hover:bg-[#93C1D2]
+                            `}
                   onClick={() => setSelectedUser(index)}
                 >
                   <Image src={user.image} alt={user.name} width={40} height={40} className="rounded-full" />
