@@ -4,9 +4,11 @@ import React, { useState } from "react"
 import Image from "next/image"
 import { Images } from "../constants/images"
 import "../styles/custom-scroll.css"
+import { Button } from "./ui/button"
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react"
 import ModalCreateNewChat from "./modal-create-new-chat"
 import ModalCreateNewGroupChat from "./modal-create-new-group-chat"
+import ModalProfile from "./modal-profile"
 
 const ChatList = () => {
   const chats = [
@@ -23,6 +25,7 @@ const ChatList = () => {
   ]
   const [modalCreateChatOpen, setModalCreateNewChatOpen] = useState(false)
   const [modalCreateGroupChatOpen, setModalCreateNewGroupChatOpen] = useState(false)
+  const [modalProfileOpen, setModalProfileOpen] = useState(false)
 
   return (
     <div className="bg-[#202020] text-white w-1/4 h-screen p-4 relative">
@@ -33,28 +36,30 @@ const ChatList = () => {
         </MenuButton>
 
         <MenuItems className="absolute top-14 left-2 bg-black border border-white border-opacity-30 w-55 p-4 rounded-[20px] shadow-md z-50 mt-2 text-left focus:outline-none">
-          <MenuItem as="a" href="/profile">
-            <button className="w-full group rounded-lg px-4 py-2 flex items-center cursor-pointer hover:bg-gray-600">
-              <Image src={Images.IconProfile} alt="Profile" width={24} height={24} />
-              <span className="block ml-3 font-medium truncate">Profile</span>
+          <MenuItem>
+            <button 
+              className="w-full group rounded-lg px-4 py-2 flex items-center cursor-pointer hover:bg-gray-600"
+              onClick={() => setModalProfileOpen(true)}>
+                <Image src={Images.IconProfile} alt="Profile" width={24} height={24} />
+                <span className="block ml-3 font-medium truncate">Profile</span>
             </button>
           </MenuItem>
 
-          <MenuItem as="a" href="/friend-list">
+          <MenuItem>
             <button className="w-full group rounded-lg px-4 py-2 flex items-center cursor-pointer hover:bg-gray-600">
-              <Image src={Images.IconContact} alt="Profile" width={24} height={24} />
+              <Image src={Images.IconContact} alt="FriendList" width={24} height={24} />
               <span className="ml-3 block font-medium truncate">Friend List</span>
             </button>
           </MenuItem>
 
-          <MenuItem as="a" href="/friend-requests">
+          <MenuItem>
             <button className="w-full group rounded-lg px-4 py-2 flex items-center cursor-pointer hover:bg-gray-600">
               <Image src={Images.IconAddFriend} alt="Friend Requests" width={24} height={24} />
               <span className="ml-3 block font-medium truncate">Friend Requests</span>
             </button>
           </MenuItem>
 
-          <MenuItem as="a" href="/group-list">
+          <MenuItem>
             <button className="w-full group rounded-lg px-4 py-2 flex items-center cursor-pointer hover:bg-gray-600">
               <Image src={Images.IconGroup} alt="Group List" width={24} height={24} />
               <span className="ml-3 block font-medium truncate">Group List</span>
@@ -154,9 +159,12 @@ const ChatList = () => {
         </MenuItems>
       </Menu>
 
-      {/* Render the modal */}
+      {/* Render the modals */}
       <ModalCreateNewChat isOpen={modalCreateChatOpen} setIsOpen={setModalCreateNewChatOpen} />
       <ModalCreateNewGroupChat isOpen={modalCreateGroupChatOpen} setIsOpen={setModalCreateNewGroupChatOpen} />
+      <ModalProfile isOpen={modalProfileOpen} setIsOpen={setModalProfileOpen} />
+      
+
     </div>
   )
 }
