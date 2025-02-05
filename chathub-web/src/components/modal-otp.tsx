@@ -1,22 +1,26 @@
 "use client"
-
 import React, { useState, useEffect, useRef } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog"
 import { Input } from "./ui/input"
-import Link from "next/link"
+import { Button } from "./ui/button"
+import { ConfirmationResult } from "@firebase/auth"
+import { useRouter } from "next/navigation"
+import { toast } from "react-toastify"
 
 interface ModalOTPProps {
   isOpen: boolean
   setIsOpen: (isOpen: boolean) => void
   numberPhone: string
+  confirmationResult: ConfirmationResult
+  onResendOTP: () => void
 }
 
-const ModalOTP = ({ isOpen, setIsOpen, numberPhone }: ModalOTPProps) => {
+const ModalOTP = ({ isOpen, setIsOpen, numberPhone, confirmationResult, onResendOTP }: ModalOTPProps) => {
   const [otp, setOtp] = useState(Array(6).fill(""))
   const [timer, setTimer] = useState(60)
-  const timerRef = useRef<NodeJS.Timeout | null>(null) // Lưu trữ tham chiếu của bộ đếm
+  const timerRef = useRef<NodeJS.Timeout | null>(null)
+  const router = useRouter()
 
-  // Tự động giảm thời gian khi timer > 0
   useEffect(() => {
     if (timer > 0) {
       timerRef.current = setTimeout(() => setTimer(timer - 1), 1000)
@@ -24,7 +28,7 @@ const ModalOTP = ({ isOpen, setIsOpen, numberPhone }: ModalOTPProps) => {
 
     return () => {
       if (timerRef.current) {
-        clearTimeout(timerRef.current) // Xóa bộ đếm khi component unmount
+        clearTimeout(timerRef.current)
       }
     }
   }, [timer])
@@ -34,29 +38,44 @@ const ModalOTP = ({ isOpen, setIsOpen, numberPhone }: ModalOTPProps) => {
     newOtp[index] = value.slice(0, 1)
     setOtp(newOtp)
 
-    // Tự động chuyển sang input tiếp theo
     if (value && index < otp.length - 1) {
       inputRefs.current[index + 1]?.focus()
     }
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, index: number) => {
-    // Xử lý Backspace để quay lại ô trước
     if (e.key === "Backspace" && !otp[index] && index > 0) {
       inputRefs.current[index - 1]?.focus()
     }
   }
 
   const handleResendOTP = () => {
-    setTimer(60) // Reset lại timer
-    console.log("Resend OTP triggered!") // Xử lý logic gửi OTP ở đây
+    setTimer(60)
+    onResendOTP()
   }
 
-  const handleSubmit = () => {
-    console.log("OTP Submitted:", otp.join(""))
+  const handleSubmit = async () => {
+    const enteredOtp = otp.join("")
+
+    try {
+      const checkOTP = await confirmationResult.confirm(enteredOtp)
+      if (!checkOTP) {
+        toast.error("Invalid OTP! Please try again.")
+        return
+      }
+
+      toast.success("Confirm OTP successfully!")
+
+      setTimeout(() => {
+        router.replace("/reset-password")
+      }, 3000)
+    } catch (error) {
+      toast.error("Invalid OTP! Please try again.")
+      console.error("Invalid OTP:", error)
+    }
   }
 
-  const inputRefs = useRef<Array<HTMLInputElement | null>>([]) // Tham chiếu tới từng ô input
+  const inputRefs = useRef<Array<HTMLInputElement | null>>([])
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -87,21 +106,17 @@ const ModalOTP = ({ isOpen, setIsOpen, numberPhone }: ModalOTPProps) => {
 
         <div className="text-center mb-4 text-sm">
           <span>({timer}s) </span>
-          <button
-            className="text-[#362E71]  disabled:text-gray-400"
-            disabled={timer > 0} // Chỉ kích hoạt nếu timer = 0
-            onClick={handleResendOTP}
-          >
+          <button className="text-[#362E71]  disabled:text-gray-400" disabled={timer > 0} onClick={handleResendOTP}>
             <span className="font-medium">Resend OTP</span>
           </button>
         </div>
 
-        <Link
-          href="/reset-password"
-          className="py-3 bg-gradient-to-r from-purple-600 to-blue-500 text-white rounded-md hover:opacity-90 mx-20 text-center"
+        <Button
+          className="py-4 h-12 bg-gradient-to-r from-purple-600 to-blue-500 text-white rounded-md hover:opacity-90 mx-20 text-center"
+          onClick={handleSubmit}
         >
-          <button onClick={handleSubmit}>Verify OTP</button>
-        </Link>
+          Verify OTP
+        </Button>
       </DialogContent>
     </Dialog>
   )
