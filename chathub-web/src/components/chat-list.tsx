@@ -9,6 +9,7 @@ import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react"
 import ModalCreateNewChat from "./modal-create-new-chat"
 import ModalCreateNewGroupChat from "./modal-create-new-group-chat"
 import ModalProfile from "./modal-profile"
+import ChangePasswordModal from "./modal-change-password"
 
 const ChatList = () => {
   const chats = [
@@ -26,6 +27,7 @@ const ChatList = () => {
   const [modalCreateChatOpen, setModalCreateNewChatOpen] = useState(false)
   const [modalCreateGroupChatOpen, setModalCreateNewGroupChatOpen] = useState(false)
   const [modalProfileOpen, setModalProfileOpen] = useState(false)
+  const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false)
 
   return (
     <div className="bg-[#202020] text-white w-1/4 h-screen p-4 relative">
@@ -162,9 +164,9 @@ const ChatList = () => {
       {/* Render the modals */}
       <ModalCreateNewChat isOpen={modalCreateChatOpen} setIsOpen={setModalCreateNewChatOpen} />
       <ModalCreateNewGroupChat isOpen={modalCreateGroupChatOpen} setIsOpen={setModalCreateNewGroupChatOpen} />
-      <ModalProfile isOpen={modalProfileOpen} setIsOpen={setModalProfileOpen} />
-      
-
+      <ModalProfile isOpen={modalProfileOpen} setIsOpen={setModalProfileOpen} setIsChangePasswordModalOpen = {setIsChangePasswordModalOpen} />
+        {isChangePasswordModalOpen && (<ChangePasswordModal isOpen = {isChangePasswordModalOpen} setIsOpen = {setIsChangePasswordModalOpen} />
+        )}
     </div>
   )
 }

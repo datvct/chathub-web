@@ -9,6 +9,7 @@ import { Images } from "../constants/images"
 import { Camera, ChevronDown } from "lucide-react"
 import Calendar, { CalendarProps } from "react-calendar";
 import "react-calendar/dist/Calendar.css";
+import ChangePasswordModal from "./modal-change-password"
 
 interface ProfileData {
     displayName: string
@@ -16,7 +17,10 @@ interface ProfileData {
     gender: "Male" | "Female"
 }
 
-const ProfileModal: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) => void }> = ({ isOpen, setIsOpen }) => {
+// const ProfileModal: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) => void }> = ({ isOpen, setIsOpen }) => {
+const ProfileModal: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) => void; setIsChangePasswordModalOpen?: any }> = ({ 
+    isOpen, setIsOpen, setIsChangePasswordModalOpen }  
+) => {
     const [profileData, setProfileData] = useState<ProfileData>({
         displayName: "Miley Cyrus",
         dateOfBirth: new Date("1995-05-23"),
@@ -25,6 +29,11 @@ const ProfileModal: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) => vo
 
     const [selectedImage, setSelectedImage] = useState<string | null>(null)
     const [showCalendar, setShowCalendar] = useState(false)
+
+    const handleOpenChangePassword = () => {
+        setIsOpen(false);
+        setIsChangePasswordModalOpen(true);
+    };
 
     const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0]
@@ -47,8 +56,8 @@ const ProfileModal: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) => vo
         return `${day}/${month}/${year}`
     }
 
-    const handleDateChange: CalendarProps['onChange'] = (value) => {  
-        if (value instanceof Date) {   
+    const handleDateChange: CalendarProps['onChange'] = (value) => {
+        if (value instanceof Date) {
             handleChange("dateOfBirth", value);
         }
         setShowCalendar(false);
@@ -156,10 +165,10 @@ const ProfileModal: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) => vo
                                                 className="cursor-pointer block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
                                                         focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 appearance-none"
                                             />
-                                            <button 
-                                                onClick={() => setShowCalendar(!showCalendar)} 
+                                            <button
+                                                onClick={() => setShowCalendar(!showCalendar)}
                                                 className="bg-white w-full justify-between flex items-center">
-                                                    <ChevronDown className="h-5 w-5 text-black absolute right-3 top-1/2 transform -translate-y-1/2" />
+                                                <ChevronDown className="h-5 w-5 text-black absolute right-3 top-1/2 transform -translate-y-1/2" />
                                             </button>
                                         </div>
 
@@ -211,10 +220,7 @@ const ProfileModal: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) => vo
                                     </div>
 
                                     <button
-                                        onClick={() => {
-                                            console.log("clicked button")
-                                            setIsOpen(false)
-                                        }}
+                                        onClick={handleOpenChangePassword}
                                         className="bg-white w-full justify-between flex items-center border-[1px] rounded-lg px-3 h-[48px] hover:bg-slate-50 hover:text-gray-900 hover:border-[#93C1D2] border-[#D4D4D4] text-[#282828] mt-4"
                                     >
                                         <span>Change Password</span>
