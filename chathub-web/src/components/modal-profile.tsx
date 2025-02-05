@@ -17,7 +17,6 @@ interface ProfileData {
     gender: "Male" | "Female"
 }
 
-// const ProfileModal: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) => void }> = ({ isOpen, setIsOpen }) => {
 const ProfileModal: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) => void; setIsChangePasswordModalOpen?: any }> = ({ 
     isOpen, setIsOpen, setIsChangePasswordModalOpen }  
 ) => {

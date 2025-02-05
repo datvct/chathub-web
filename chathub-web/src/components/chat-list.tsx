@@ -10,6 +10,7 @@ import ModalCreateNewChat from "./modal-create-new-chat"
 import ModalCreateNewGroupChat from "./modal-create-new-group-chat"
 import ModalProfile from "./modal-profile"
 import ChangePasswordModal from "./modal-change-password"
+import ModalFriendList from "./modal-friend-list";
 
 const ChatList = () => {
   const chats = [
@@ -28,6 +29,7 @@ const ChatList = () => {
   const [modalCreateGroupChatOpen, setModalCreateNewGroupChatOpen] = useState(false)
   const [modalProfileOpen, setModalProfileOpen] = useState(false)
   const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false)
+  const [isFriendListModalOpen, setIsFriendListModalOpen] = useState(false);
 
   return (
     <div className="bg-[#202020] text-white w-1/4 h-screen p-4 relative">
@@ -48,9 +50,11 @@ const ChatList = () => {
           </MenuItem>
 
           <MenuItem>
-            <button className="w-full group rounded-lg px-4 py-2 flex items-center cursor-pointer hover:bg-gray-600">
-              <Image src={Images.IconContact} alt="FriendList" width={24} height={24} />
-              <span className="ml-3 block font-medium truncate">Friend List</span>
+            <button 
+              className="w-full group rounded-lg px-4 py-2 flex items-center cursor-pointer hover:bg-gray-600"
+              onClick={() => setIsFriendListModalOpen(true)}>
+                <Image src={Images.IconContact} alt="FriendList" width={24} height={24} />
+                <span className="ml-3 block font-medium truncate">Friend List</span>
             </button>
           </MenuItem>
 
@@ -167,6 +171,7 @@ const ChatList = () => {
       <ModalProfile isOpen={modalProfileOpen} setIsOpen={setModalProfileOpen} setIsChangePasswordModalOpen = {setIsChangePasswordModalOpen} />
         {isChangePasswordModalOpen && (<ChangePasswordModal isOpen = {isChangePasswordModalOpen} setIsOpen = {setIsChangePasswordModalOpen} />
         )}
+      <ModalFriendList isOpen={isFriendListModalOpen} setIsOpen={setIsFriendListModalOpen} />
     </div>
   )
 }
