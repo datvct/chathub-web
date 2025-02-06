@@ -66,12 +66,14 @@ const ModalFriendList: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) =>
                             leaveTo="opacity-0 scale-95"
                         >
                             <DialogPanel className="w-[500px] h-[800px] rounded-[30px] transform overflow-hidden bg-[#385068] p-6 text-left align-middle shadow-xl transition-all">
-                                <div className="flex items-center mb-8">
+                                <div className="flex items-center mb-2">
                                     <Image src={Images.IconChatList} alt="Chat Icon" width={40} height={40} />
                                     <DialogTitle className="text-2xl font-bold text-white ml-3 leading-6">
                                         <span className="text-[25px] font-bold">Friend List</span>
                                     </DialogTitle>
                                 </div>
+
+                                <hr className="w-full border-gray-500 p-2 mb-3" />
 
                                 <div className="relative mb-4 rounded-lg">
                                     <Input
@@ -88,7 +90,7 @@ const ModalFriendList: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) =>
                                     <button
                                         onClick={() => setActiveTab("all")}
                                         className={`px-4 py-2 rounded-lg text-white font-semibold 
-                                                    ${activeTab === "all" ? "bg-[#7746F5]" : "bg-[#404145] hover:bg-[#7746F5]"
+                                                    ${activeTab === "all" ? "bg-[#501794]" : "bg-[#404145] hover:bg-[#7746F5]"
                                                 }`}
                                     >
                                         All ({friends.length})
@@ -96,7 +98,7 @@ const ModalFriendList: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) =>
                                     <button
                                         onClick={() => setActiveTab("recent")}
                                         className={`px-4 py-2 rounded-lg text-white font-semibold 
-                                                    ${activeTab === "recent" ? "bg-[#7746F5]" : "bg-[#404145] hover:bg-[#7746F5]"
+                                                    ${activeTab === "recent" ? "bg-[#501794]" : "bg-[#404145] hover:bg-[#7746F5]"
                                                 }`}
                                     >
                                         Recently online ({friends.filter(friend => friend.online).length})
@@ -105,20 +107,20 @@ const ModalFriendList: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) =>
 
                                 <div className="h-[530px] overflow-y-auto custom-scrollbar pr-2">
                                     {friendsToDisplay.map((friend, index) => (
-                                        <div key={index} className="flex items-center bg-[#4C617A] rounded-lg p-3 mb-3 space-x-3">
+                                        <div key={index} className="flex items-center odd:bg-[#E4DEED] even:bg-[#AF9CC9] rounded-lg p-3 mb-3 space-x-3">
                                             <Image src={friend.image} alt={friend.name} width={45} height={45} className="rounded-full" />
 
                                             <div className="flex-1">
                                                 <div className="flex items-start justify-between">
-                                                    <p className="text-white font-medium">{friend.name}</p>
+                                                    <p className="text-black font-medium">{friend.name}</p>
                                                 </div>
-                                                <p className="text-[#8C8C8C] text-sm">{friend.phone}</p>
+                                                <p className="text-gray-600 text-sm">{friend.phone}</p>
                                             </div>
 
                                             <Button className="w-20 px-4 py-2 bg-[#7746f5] rounded-[12px] text-lg text-white bg-gradient-to-r from-[#501794] to-[#3E70A1] hover:bg-gradient-to-l">
                                                 Unfriend
                                             </Button>
-                                            <Ellipsis className="w-6 h-6 ml-2 text-[#8994A3] cursor-pointer hover:text-[#fff]" />
+                                            <Ellipsis className="w-6 h-6 ml-2 text-[#8994A3] cursor-pointer hover:text-[#3E70A1]" />
                                         </div>
                                     ))}
                                 </div>
