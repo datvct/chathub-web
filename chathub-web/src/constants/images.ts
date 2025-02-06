@@ -14,6 +14,7 @@ import Window from "../../public/images/window.svg"
 import CreateNewChat from "../../public/images/create-new-chat.svg"
 import CreateNewGroupChat from "../../public/images/create-new-group-chat.svg"
 import IconProfile from "../../public/images/icon-profile.svg"
+import IconMessage from "../../public/images/icon-message.svg"
 import IconAddFriend from "../../public/images/icon-add-friend.svg"
 import IconContact from "../../public/images/icon-contact.svg"
 import IconGroup from "../../public/images/icon-group.svg"
@@ -53,6 +54,7 @@ export const Images = {
   CreateNewChat,
   CreateNewGroupChat,
   IconProfile,
+  IconMessage,
   IconAddFriend,
   IconContact,
   IconGroup,

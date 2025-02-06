@@ -7,6 +7,7 @@ import { Images } from "../constants/images"
 import { Search, Ellipsis } from "lucide-react";
 import { Button } from "./ui/button"
 import { Input } from "./ui/input"
+import FriendListDialog from "./dialog-friend-list"
 
 interface Friend {
     name: string
@@ -28,6 +29,8 @@ const friends: Friend[] = [
 const ModalFriendList: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) => void }> = ({ isOpen, setIsOpen }) => {
     const [activeTab, setActiveTab] = useState("all")
     const [searchTerm, setSearchTerm] = useState("")
+    const [selectedFriend, setSelectedFriend] = useState<Friend | null>(null);
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
 
     const filteredFriends = friends.filter(friend => {
         if (searchTerm === "") {
@@ -107,22 +110,26 @@ const ModalFriendList: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) =>
 
                                 <div className="h-[530px] overflow-y-auto custom-scrollbar pr-2">
                                     {friendsToDisplay.map((friend, index) => (
-                                        <div key={index} className="flex items-center odd:bg-[#E4DEED] even:bg-[#AF9CC9] rounded-lg p-3 mb-3 space-x-3">
-                                            <Image src={friend.image} alt={friend.name} width={45} height={45} className="rounded-full" />
+                                        <div key={index} 
+                                            className="flex items-center odd:bg-[#E4DEED] even:bg-[#AF9CC9] rounded-lg p-3 mb-3 space-x-3"
+                                            onClick={() => {setSelectedFriend(friend); setIsDialogOpen(true)}}>
+                                                <Image src={friend.image} alt={friend.name} width={45} height={45} className="rounded-full" />
 
-                                            <div className="flex-1">
-                                                <div className="flex items-start justify-between">
-                                                    <p className="text-black font-medium">{friend.name}</p>
+                                                <div className="flex-1">
+                                                    <div className="flex items-start justify-between">
+                                                        <p className="text-black font-medium">{friend.name}</p>
+                                                    </div>
+                                                    <p className="text-gray-600 text-sm">{friend.phone}</p>
                                                 </div>
-                                                <p className="text-gray-600 text-sm">{friend.phone}</p>
-                                            </div>
 
-                                            <Button className="w-20 px-4 py-2 bg-[#7746f5] rounded-[12px] text-lg text-white bg-gradient-to-r from-[#501794] to-[#3E70A1] hover:bg-gradient-to-l">
-                                                Unfriend
-                                            </Button>
-                                            <Ellipsis className="w-6 h-6 ml-2 text-[#8994A3] cursor-pointer hover:text-[#3E70A1]" />
+                                                <Button className="w-20 px-4 py-2 bg-[#7746f5] rounded-[12px] text-lg text-white bg-gradient-to-r from-[#501794] to-[#3E70A1] hover:bg-gradient-to-l">
+                                                    Unfriend
+                                                </Button>
+                                                <Ellipsis className="w-6 h-6 ml-2 text-[#8994A3] cursor-pointer hover:text-[#3E70A1]" />
                                         </div>
                                     ))}
+
+                                    <FriendListDialog isOpen={isDialogOpen} setIsOpen={setIsDialogOpen} friend={selectedFriend!} /> 
                                 </div>
                             </DialogPanel>
                         </TransitionChild>
