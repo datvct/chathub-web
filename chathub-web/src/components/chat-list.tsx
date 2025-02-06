@@ -10,7 +10,8 @@ import ModalCreateNewChat from "./modal-create-new-chat"
 import ModalCreateNewGroupChat from "./modal-create-new-group-chat"
 import ModalProfile from "./modal-profile"
 import ChangePasswordModal from "./modal-change-password"
-import ModalFriendList from "./modal-friend-list";
+import ModalFriendList from "./modal-friend-list"
+import ModalFriendRequests from "./modal-friend-requests"
 
 const ChatList = () => {
   const chats = [
@@ -30,6 +31,7 @@ const ChatList = () => {
   const [modalProfileOpen, setModalProfileOpen] = useState(false)
   const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false)
   const [isFriendListModalOpen, setIsFriendListModalOpen] = useState(false);
+  const [isFriendRequestModalOpen, setIsFriendRequestModalOpen] = useState(false);
 
   return (
     <div className="bg-[#202020] text-white w-1/4 h-screen p-4 relative">
@@ -59,9 +61,11 @@ const ChatList = () => {
           </MenuItem>
 
           <MenuItem>
-            <button className="w-full group rounded-lg px-4 py-2 flex items-center cursor-pointer hover:bg-gray-600">
-              <Image src={Images.IconAddFriend} alt="Friend Requests" width={24} height={24} />
-              <span className="ml-3 block font-medium truncate">Friend Requests</span>
+            <button 
+              className="w-full group rounded-lg px-4 py-2 flex items-center cursor-pointer hover:bg-gray-600"
+              onClick={() => setIsFriendRequestModalOpen(true)}>
+                <Image src={Images.IconAddFriend} alt="Friend Requests" width={24} height={24} />
+                <span className="ml-3 block font-medium truncate">Friend Requests</span>
             </button>
           </MenuItem>
 
@@ -172,6 +176,7 @@ const ChatList = () => {
         {isChangePasswordModalOpen && (<ChangePasswordModal isOpen = {isChangePasswordModalOpen} setIsOpen = {setIsChangePasswordModalOpen} />
         )}
       <ModalFriendList isOpen={isFriendListModalOpen} setIsOpen={setIsFriendListModalOpen} />
+      <ModalFriendRequests isOpen={isFriendRequestModalOpen} setIsOpen={setIsFriendRequestModalOpen} />
     </div>
   )
 }
