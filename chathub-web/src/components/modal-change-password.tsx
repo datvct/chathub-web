@@ -21,20 +21,6 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ isOpen, setIs
         setIsOpen(false)
     }
 
-    // const handlePasswordChange = () => {
-    //     console.log("Old Password:", oldPassword)
-    //     console.log("New Password:", newPassword)
-    //     console.log("Confirm New Password:", confirmNewPassword)
-
-    //     setIsOpen(false)
-
-    //     if (newPassword !== confirmNewPassword) {
-    //         alert("New password and confirm password do not match.")
-    //         return
-    //     }
-    // }
-
-
     return (
         <Transition appear show={isOpen} as={Fragment}>
             <Dialog as="div" className="relative z-50" onClose={() => setIsOpen(false)}>

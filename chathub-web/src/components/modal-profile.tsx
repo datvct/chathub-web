@@ -120,7 +120,6 @@ const ProfileModal: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) => vo
                                                 />
                                             )}
 
-                                            {/*Positioning camera icon */}
                                             <span className="absolute bottom-[-10px] left-[55%] rounded-[50px] bg-[#F1F1F1] hover:bg-slate-300 rounded-full w-[37px] h-[37px] flex items-center justify-center">
                                                 <Camera className="text-[#797979] w-5 h-5" strokeWidth={1.5} />
                                             </span>
