@@ -88,7 +88,7 @@ const ProfileModal: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) => vo
                             leaveFrom="opacity-100 scale-100"
                             leaveTo="opacity-0 scale-95"
                         >
-                            <DialogPanel className="w-full max-w-lg transform overflow-hidden rounded-[5%] bg-white p-6 text-left align-middle shadow-xl transition-all">
+                            <DialogPanel className="w-full max-w-md transform overflow-hidden rounded-[5%] bg-white p-6 text-left align-middle shadow-xl transition-all">
                                 <DialogTitle
                                     as="h3"
                                     className="text-lg font-medium leading-6 text-gray-900 flex items-center justify-between"
@@ -191,7 +191,7 @@ const ProfileModal: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) => vo
                                                     id="male"
                                                     type="radio"
                                                     value="Male"
-                                                    className="w-4 h-4 text-[#6568FF] bg-gray-100 border-gray-300 focus:ring-[#6568FF] focus:ring-2"
+                                                    className="w-4 h-4 text-[#6568FF] bg-gray-100 border-gray-300"
                                                     checked={profileData.gender === "Male"}
                                                     onChange={() => handleChange("gender", "Male")}
                                                 />
@@ -206,7 +206,7 @@ const ProfileModal: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) => vo
                                                     id="female"
                                                     type="radio"
                                                     value="Female"
-                                                    className="w-4 h-4 text-[#6568FF] bg-gray-100 border-gray-300 focus:ring-[#6568FF] focus:ring-2"
+                                                    className="w-4 h-4 text-[#6568FF] bg-gray-100 border-gray-300"
                                                     checked={profileData.gender === "Female"}
                                                     onChange={() => handleChange("gender", "Female")}
                                                 />

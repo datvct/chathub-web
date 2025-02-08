@@ -17,18 +17,23 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ isOpen, setIs
     const [newPassword, setNewPassword] = useState("")
     const [confirmNewPassword, setConfirmNewPassword] = useState("")
 
-    const handlePasswordChange = () => {
-        console.log("Old Password:", oldPassword)
-        console.log("New Password:", newPassword)
-        console.log("Confirm New Password:", confirmNewPassword)
-
+    const handleClose = () => {
         setIsOpen(false)
-
-        if (newPassword !== confirmNewPassword) {
-            alert("New password and confirm password do not match.")
-            return
-        }
     }
+
+    // const handlePasswordChange = () => {
+    //     console.log("Old Password:", oldPassword)
+    //     console.log("New Password:", newPassword)
+    //     console.log("Confirm New Password:", confirmNewPassword)
+
+    //     setIsOpen(false)
+
+    //     if (newPassword !== confirmNewPassword) {
+    //         alert("New password and confirm password do not match.")
+    //         return
+    //     }
+    // }
+
 
     return (
         <Transition appear show={isOpen} as={Fragment}>
@@ -56,9 +61,9 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ isOpen, setIs
                             leaveFrom="opacity-100 scale-100"
                             leaveTo="opacity-0 scale-95"
                         >
-                            <DialogPanel className="w-full max-w-md rounded-[5%] transform overflow-hidden bg-white p-6 text-left align-middle shadow-xl transition-all">
+                            <DialogPanel className="w-full max-w-sm rounded-[5%] transform overflow-hidden bg-white p-6 text-left align-middle shadow-xl transition-all">
                                 <div className="absolute top-2 right-2">
-                                    <button onClick={() => setIsOpen(false)}>
+                                    <button onClick={handleClose}>
                                         <Image src={Images.IconClosePurple} alt="Close" width={24} height={24} />
                                     </button>
                                 </div>
@@ -83,7 +88,7 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ isOpen, setIs
                                         <button
                                             className="text-xs mt-2 text-blue-500 font-bold hover:underline float-right"
                                             onClick={() => {
-                                                alert("Please check your Email")
+                                                
                                             }}
                                         >
                                             Forgot Password?
@@ -118,7 +123,6 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ isOpen, setIs
                                         <Button
                                             type="button"
                                             className="w-30 px-4 py-2 bg-[#7746f5] rounded-[12px] text-lg text-white bg-gradient-to-r from-[#501794] to-[#3E70A1] hover:bg-gradient-to-l"
-                                            onClick={handlePasswordChange}
                                         >
                                             Change
                                         </Button>

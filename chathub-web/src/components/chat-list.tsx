@@ -29,9 +29,20 @@ const ChatList = () => {
   const [modalCreateChatOpen, setModalCreateNewChatOpen] = useState(false)
   const [modalCreateGroupChatOpen, setModalCreateNewGroupChatOpen] = useState(false)
   const [modalProfileOpen, setModalProfileOpen] = useState(false)
+  const [isModalProfileOpen, setIsProfileModalOpen] = useState(false)
   const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false)
   const [isFriendListModalOpen, setIsFriendListModalOpen] = useState(false);
   const [isFriendRequestModalOpen, setIsFriendRequestModalOpen] = useState(false);
+
+  const handleOpenChangePassword = () => {
+    setIsProfileModalOpen(false); 
+    setIsChangePasswordModalOpen(true);
+  };
+
+  const handleCloseChangePassword = () => {
+    setIsChangePasswordModalOpen(false);
+    setIsProfileModalOpen(true); 
+  };
 
   return (
     <div className="bg-[#202020] text-white w-1/4 h-screen p-4 relative">
@@ -173,7 +184,10 @@ const ChatList = () => {
       <ModalCreateNewChat isOpen={modalCreateChatOpen} setIsOpen={setModalCreateNewChatOpen} />
       <ModalCreateNewGroupChat isOpen={modalCreateGroupChatOpen} setIsOpen={setModalCreateNewGroupChatOpen} />
       <ModalProfile isOpen={modalProfileOpen} setIsOpen={setModalProfileOpen} setIsChangePasswordModalOpen = {setIsChangePasswordModalOpen} />
-        {isChangePasswordModalOpen && (<ChangePasswordModal isOpen = {isChangePasswordModalOpen} setIsOpen = {setIsChangePasswordModalOpen} />
+        {isChangePasswordModalOpen ? (
+          <ChangePasswordModal isOpen={isChangePasswordModalOpen} setIsOpen={handleCloseChangePassword} />
+        ) : (
+          <ModalProfile isOpen={isModalProfileOpen} setIsOpen={setIsProfileModalOpen} setIsChangePasswordModalOpen={handleOpenChangePassword} />
         )}
       <ModalFriendList isOpen={isFriendListModalOpen} setIsOpen={setIsFriendListModalOpen} />
       <ModalFriendRequests isOpen={isFriendRequestModalOpen} setIsOpen={setIsFriendRequestModalOpen} />
