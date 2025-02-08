@@ -1,7 +1,8 @@
 "use client"
 
 import { Dialog, DialogPanel, DialogTitle, Transition, TransitionChild } from "@headlessui/react"
-import { Fragment, useState } from "react"
+import React, { Fragment, useState } from "react"
+import Link from "next/link"
 import { Images } from "../constants/images"
 import Image from "next/image"
 import { Input } from "./ui/input"
@@ -71,14 +72,14 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ isOpen, setIs
                                             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                                         />
 
-                                        <button
-                                            className="text-xs mt-2 text-blue-500 font-bold hover:underline float-right"
-                                            onClick={() => {
-                                                
-                                            }}
-                                        >
-                                            Forgot Password?
-                                        </button>
+                                        <Link href="/forgot-password" legacyBehavior>
+                                            <button
+                                                className="text-xs mt-2 text-blue-500 font-bold hover:underline float-right"
+                                                onClick={() => setIsOpen(false)}
+                                            >
+                                                Forgot Password?
+                                            </button>
+                                        </Link>
                                     </div>
                                     <div className="mb-4">
                                         <label htmlFor="new-password" className="block text-sm font-medium text-gray-700">
