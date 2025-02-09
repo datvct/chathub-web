@@ -1,15 +1,17 @@
 "use client"
 
 import React, { useState } from "react"
+import { format } from "date-fns"
+import { Camera, CalendarIcon, ChevronDown } from "lucide-react"
 import Image from "next/image"
+import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover"
+import { Calendar } from "./ui/calendar"
 import { Dialog, DialogPanel, DialogTitle, Transition, TransitionChild } from "@headlessui/react"
 import { Input } from "./ui/input"
 import { Button } from "./ui/button"
 import { Images } from "../constants/images"
-import { Camera, ChevronDown } from "lucide-react"
-import Calendar, { CalendarProps } from "react-calendar";
-import "react-calendar/dist/Calendar.css";
 import ChangePasswordModal from "./modal-change-password"
+import { DateTimePicker } from "./ui/datetime-picker"
 
 interface ProfileData {
     displayName: string
@@ -17,8 +19,8 @@ interface ProfileData {
     gender: "Male" | "Female"
 }
 
-const ProfileModal: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) => void; setIsChangePasswordModalOpen?: any }> = ({ 
-    isOpen, setIsOpen, setIsChangePasswordModalOpen }  
+const ProfileModal: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) => void; setIsChangePasswordModalOpen?: any }> = ({
+    isOpen, setIsOpen, setIsChangePasswordModalOpen }
 ) => {
     const [profileData, setProfileData] = useState<ProfileData>({
         displayName: "Miley Cyrus",
@@ -27,7 +29,6 @@ const ProfileModal: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) => vo
     })
 
     const [selectedImage, setSelectedImage] = useState<string | null>(null)
-    const [showCalendar, setShowCalendar] = useState(false)
 
     const handleOpenChangePassword = () => {
         setIsOpen(false);
@@ -48,18 +49,20 @@ const ProfileModal: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) => vo
         setProfileData(prev => ({ ...prev, [field]: value }))
     }
 
-    const formatDate = (date: Date): string => {
-        const day = date.getDate().toString().padStart(2, "0")
-        const month = (date.getMonth() + 1).toString().padStart(2, "0")
-        const year = date.getFullYear()
-        return `${day}/${month}/${year}`
-    }
+    const [date, setDate] = useState<Date>(profileData.dateOfBirth);
 
-    const handleDateChange: CalendarProps['onChange'] = (value) => {
-        if (value instanceof Date) {
-            handleChange("dateOfBirth", value);
-        }
-        setShowCalendar(false);
+    const handleDateOfBirth = (newDate: Date | undefined) => {
+        setDate(newDate || new Date())
+
+        setProfileData(prev => ({
+            ...prev,
+            dateOfBirth: newDate || prev.dateOfBirth
+        }))
+    };
+
+    const formatDate = (date: Date): string => {
+        if (!date) return '';
+        return format(date, "dd/MM/yyyy");
     }
 
     return (
@@ -155,30 +158,18 @@ const ProfileModal: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) => vo
                                             Date of Birth
                                         </label>
 
-                                        <div className="mt-1 relative">
-                                            <Input
-                                                id="date-of-birth"
-                                                value={formatDate(profileData.dateOfBirth)}
-                                                readOnly
-                                                className="cursor-pointer block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400
-                                                        focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 appearance-none"
-                                            />
-                                            <button
-                                                onClick={() => setShowCalendar(!showCalendar)}
-                                                className="bg-white w-full justify-between flex items-center">
-                                                <ChevronDown className="h-5 w-5 text-black absolute right-3 top-1/2 transform -translate-y-1/2" />
-                                            </button>
-                                        </div>
-
-                                        {showCalendar && (
-                                            <div className="absolute z-40 top-12">
-                                                <Calendar
-                                                    onChange={handleDateChange}
-                                                    value={profileData.dateOfBirth}
-                                                    className="max-w-[500px] border border-gray-300 rounded-[5%] p-1 shadow-md"
-                                                />
-                                            </div>
-                                        )}
+                                        <DateTimePicker
+                                            id="date-of-birth"
+                                            value={date}
+                                            onChange={handleDateOfBirth}
+                                            className="w-full mt-2.5"
+                                            renderTrigger={({ value, open, setOpen }) => (
+                                                <div className="flex gap-2 w-full items-center px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500">
+                                                    <CalendarIcon className="w-[19px] h-[19px]" strokeWidth={2} /> {formatDate(value as Date)}
+                                                    <ChevronDown className="w-5 h-5 transition-transform duration-300 ease-in-out text-black ml-auto group-data-[state=open]:rotate-180" />
+                                                </div>
+                                            )}
+                                        />
                                     </div>
 
                                     <div className="mt-4">
@@ -228,9 +219,6 @@ const ProfileModal: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) => vo
                                     <div className="flex items-end justify-end gap-4 mt-9 w-full">
                                         <Button
                                             onClick={() => {
-                                                // Access and submit form values here for persistence
-                                                console.log("Form values submitted:", profileData)
-                                                // Add update logic before or after close
                                                 setIsOpen(false)
                                             }}
                                             className="w-30 px-4 py-2 bg-[#7746f5] rounded-[12px] text-lg text-white bg-gradient-to-r from-[#501794] to-[#3E70A1] hover:bg-gradient-to-l"
