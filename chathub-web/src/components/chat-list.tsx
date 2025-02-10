@@ -7,6 +7,7 @@ import "../styles/custom-scroll.css"
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react"
 import ModalCreateNewChat from "./modal-create-new-chat"
 import ModalCreateNewGroupChat from "./modal-create-new-group-chat"
+import ModalListGroup from "./modal-list-group"
 
 const ChatList = () => {
   const chats = [
@@ -23,6 +24,7 @@ const ChatList = () => {
   ]
   const [modalCreateChatOpen, setModalCreateNewChatOpen] = useState(false)
   const [modalCreateGroupChatOpen, setModalCreateNewGroupChatOpen] = useState(false)
+  const [modalListGroup,setModalListGroup] = useState(false)
 
   return (
     <div className="bg-[#202020] text-white w-1/4 h-screen p-4 relative">
@@ -54,8 +56,9 @@ const ChatList = () => {
             </button>
           </MenuItem>
 
-          <MenuItem as="a" href="/group-list">
-            <button className="w-full group rounded-lg px-4 py-2 flex items-center cursor-pointer hover:bg-gray-600">
+          <MenuItem>
+            <button className="w-full group rounded-lg px-4 py-2 flex items-center cursor-pointer hover:bg-gray-600"
+                    onClick={()=>setModalListGroup(true)}>
               <Image src={Images.IconGroup} alt="Group List" width={24} height={24} />
               <span className="ml-3 block font-medium truncate">Group List</span>
             </button>
@@ -157,6 +160,7 @@ const ChatList = () => {
       {/* Render the modal */}
       <ModalCreateNewChat isOpen={modalCreateChatOpen} setIsOpen={setModalCreateNewChatOpen} />
       <ModalCreateNewGroupChat isOpen={modalCreateGroupChatOpen} setIsOpen={setModalCreateNewGroupChatOpen} />
+      <ModalListGroup isOpen={modalListGroup} setIsOpen={setModalListGroup} isAdmin={true}/>
     </div>
   )
 }
