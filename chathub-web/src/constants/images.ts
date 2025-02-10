@@ -29,7 +29,7 @@ import IconSearch from "../../public/images/icon-search.png"
 import IconMore from "../../public/images/icon-more.png"
 import IconClosePurple from "../../public/images/icon-close-purple.png"
 import IconCamera from "../../public/images/icon-camera.png"
-
+import AvatarDefault from "../../public/images/default-avatar.jpg"
 
 export const Images = {
   File,
@@ -63,4 +63,5 @@ export const Images = {
   IconMore,
   IconClosePurple,
   IconCamera,
+  AvatarDefault,
 }

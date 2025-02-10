@@ -8,7 +8,8 @@ import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react"
 import ModalCreateNewChat from "./modal-create-new-chat"
 import ModalCreateNewGroupChat from "./modal-create-new-group-chat"
 
-const ChatList = () => {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const ChatList = ({ setSelectedChat }: { setSelectedChat: (id: number) => void }) => {
   const chats = [
     { id: 1, name: "Sweetie", message: "I love you so much!", time: "8:32 PM", type: "text", pinned: true },
     { id: 2, name: "Jane Cooper", message: "Photo", time: "3:27 PM", type: "photo", pinned: true },
@@ -68,7 +69,7 @@ const ChatList = () => {
         <input
           type="text"
           placeholder="Search"
-          className="w-full p-2 rounded pl-4 bg-white bg-opacity-15 text-white placeholder-gray-400 rounded-lg"
+          className="w-full p-2 pl-4 bg-white bg-opacity-15 text-white placeholder-gray-400 rounded-lg"
         />
       </div>
 
@@ -77,13 +78,12 @@ const ChatList = () => {
         {chats.map(chat => (
           <li
             key={chat.id}
-            className={`flex items-center gap-3 p-2 rounded-lg 
+            className={`flex items-center gap-3 p-2 rounded-lg hover:cursor-pointer
             `}
+            onClick={() => setSelectedChat(chat.id)}
           >
             {/* Avatar */}
-            <div className="w-12 h-12 rounded-full bg-gray-500 flex items-center justify-center rounded-[100px]">
-              {chat.name[0]}
-            </div>
+            <div className="w-12 h-12 rounded-full bg-gray-500 flex items-center justify-center">{chat.name[0]}</div>
             {/* Details */}
             <div className="flex-1">
               <div className="flex items-center justify-between">
@@ -110,7 +110,7 @@ const ChatList = () => {
       <Menu>
         <MenuButton
           as="button"
-          className="absolute bottom-6 right-12 bg-white bg-opacity-30 p-4 rounded-full flex items-center justify-center rounded-[100px] text-white text-[30px]"
+          className="absolute bottom-6 right-12 bg-white bg-opacity-30 p-4 rounded-full flex items-center justify-center text-white text-[30px]"
         >
           <Image src={Images.IconPlus} alt="Plus Icon" width={28} height={28} />
         </MenuButton>
