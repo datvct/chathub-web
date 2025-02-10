@@ -2,16 +2,18 @@
 
 import React, { useState } from "react"
 import { format } from "date-fns"
-import { Camera, CalendarIcon, ChevronDown } from "lucide-react"
+import { Camera } from "lucide-react"
 import Image from "next/image"
-import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover"
-import { Calendar } from "./ui/calendar"
 import { Dialog, DialogPanel, DialogTitle, Transition, TransitionChild } from "@headlessui/react"
 import { Input } from "./ui/input"
 import { Button } from "./ui/button"
 import { Images } from "../constants/images"
 import ChangePasswordModal from "./modal-change-password"
-import { DateTimePicker } from "./ui/datetime-picker"
+
+import { DemoContainer } from '@mui/x-date-pickers/internals/demo'
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider'
+import { DatePicker } from '@mui/x-date-pickers/DatePicker'
 
 interface ProfileData {
     displayName: string
@@ -59,11 +61,6 @@ const ProfileModal: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) => vo
             dateOfBirth: newDate || prev.dateOfBirth
         }))
     };
-
-    const formatDate = (date: Date): string => {
-        if (!date) return '';
-        return format(date, "dd/MM/yyyy");
-    }
 
     return (
         <Transition appear show={isOpen} as={React.Fragment}>
@@ -158,18 +155,14 @@ const ProfileModal: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) => vo
                                             Date of Birth
                                         </label>
 
-                                        <DateTimePicker
-                                            id="date-of-birth"
-                                            value={date}
-                                            onChange={handleDateOfBirth}
-                                            className="w-full mt-2.5"
-                                            renderTrigger={({ value, open, setOpen }) => (
-                                                <div className="flex gap-2 w-full items-center px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500">
-                                                    <CalendarIcon className="w-[19px] h-[19px]" strokeWidth={2} /> {formatDate(value as Date)}
-                                                    <ChevronDown className="w-5 h-5 transition-transform duration-300 ease-in-out text-black ml-auto group-data-[state=open]:rotate-180" />
-                                                </div>
-                                            )}
-                                        />
+                                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                            <DemoContainer components={['DatePicker']}>
+                                                <DatePicker 
+                                                    label="mm/dd/yyyy"
+                                                    className="w-full block bg-white border border-slate-300" 
+                                                />
+                                            </DemoContainer>
+                                        </LocalizationProvider>
                                     </div>
 
                                     <div className="mt-4">
