@@ -1,30 +1,82 @@
 "use client"
 
+import { ConfirmationResult, RecaptchaVerifier } from "@firebase/auth"
 import Image from "next/image"
 import Link from "next/link"
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
+import { toast, ToastContainer } from "react-toastify"
 import ModalOTP from "~/components/modal-otp"
 import { Button } from "~/components/ui/button"
 import { Input } from "~/components/ui/input"
 import { Images } from "~/constants/images"
+import { auth, signInWithPhoneNumber } from "~/lib/firebase"
 
 const ForgotPasswordPage: React.FC = () => {
   const [phoneNumber, setPhoneNumber] = useState("")
   const [openModal, setOpenModal] = useState(false)
+  const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult>()
+  const [recaptchaVerifier, setRecaptchaVerifier] = useState<RecaptchaVerifier | null>(null)
+
+  useEffect(() => {
+    if (!recaptchaVerifier) {
+      const verifier = new RecaptchaVerifier(auth, "recaptcha-container", {
+        size: "invisible",
+        callback: (response: any) => {
+          console.log("reCAPTCHA verified successfully", response)
+        },
+        "expired-callback": () => {
+          console.log("reCAPTCHA expired")
+        },
+      })
+      setRecaptchaVerifier(verifier)
+      console.log("RecaptchaVerifier initialized:", verifier) // Check if it's initialized
+    }
+  }, [recaptchaVerifier])
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setPhoneNumber(e.target.value)
+    let value = e.target.value.replace(/\s/g, "")
+    if (!value.startsWith("+84")) {
+      value = "+84" + value.replace(/^0/, "")
+    }
+    setPhoneNumber(value)
   }
 
-  const handleSubmit = () => {
-    console.log("Phone number submitted:", phoneNumber)
-    setOpenModal(true)
+  const handleSubmit = async () => {
+    if (!recaptchaVerifier) {
+      console.error("RecaptchaVerifier is not initialized")
+      return
+    }
+
+    try {
+      const confirmation = await signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier)
+      setOpenModal(true)
+      setConfirmationResult(confirmation)
+    } catch (error) {
+      console.error("Error sending OTP:", error)
+    }
+  }
+
+  const handleResendOTP = async () => {
+    if (!recaptchaVerifier) {
+      console.error("RecaptchaVerifier is not initialized")
+      return
+    }
+
+    try {
+      const confirmation = await signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier)
+      setConfirmationResult(confirmation)
+      toast.success("OTP sent successfully!")
+    } catch (error) {
+      toast.success("Error resending OTP! Please try again.")
+      console.error("Error resending OTP:", error)
+    }
   }
 
   const isFormValid = phoneNumber !== ""
 
   return (
     <div className="h-screen w-full flex justify-center items-center bg-[#160430] relative">
+      <ToastContainer position="top-center" autoClose={3000} closeOnClick />
       <Image src={Images.Background} alt="background-image" layout="fill" objectFit="cover" />
       <div className="absolute inset-0 bg-black opacity-50" />
 
@@ -60,7 +112,17 @@ const ForgotPasswordPage: React.FC = () => {
           </Link>
         </div>
       </div>
-      {openModal && <ModalOTP isOpen={openModal} setIsOpen={setOpenModal} numberPhone={phoneNumber} />}
+      {openModal && (
+        <ModalOTP
+          isOpen={openModal}
+          setIsOpen={setOpenModal}
+          numberPhone={phoneNumber}
+          confirmationResult={confirmationResult}
+          onResendOTP={handleResendOTP}
+        />
+      )}
+
+      <div id="recaptcha-container"></div>
     </div>
   )
 }
