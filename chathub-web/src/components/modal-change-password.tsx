@@ -1,7 +1,8 @@
 "use client"
 
 import { Dialog, DialogPanel, DialogTitle, Transition, TransitionChild } from "@headlessui/react"
-import { Fragment, useState } from "react"
+import React, { Fragment, useState } from "react"
+import Link from "next/link"
 import { Images } from "../constants/images"
 import Image from "next/image"
 import { Input } from "./ui/input"
@@ -17,17 +18,8 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ isOpen, setIs
     const [newPassword, setNewPassword] = useState("")
     const [confirmNewPassword, setConfirmNewPassword] = useState("")
 
-    const handlePasswordChange = () => {
-        console.log("Old Password:", oldPassword)
-        console.log("New Password:", newPassword)
-        console.log("Confirm New Password:", confirmNewPassword)
-
+    const handleClose = () => {
         setIsOpen(false)
-
-        if (newPassword !== confirmNewPassword) {
-            alert("New password and confirm password do not match.")
-            return
-        }
     }
 
     return (
@@ -56,9 +48,9 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ isOpen, setIs
                             leaveFrom="opacity-100 scale-100"
                             leaveTo="opacity-0 scale-95"
                         >
-                            <DialogPanel className="w-full max-w-md rounded-[5%] transform overflow-hidden bg-white p-6 text-left align-middle shadow-xl transition-all">
+                            <DialogPanel className="w-full max-w-sm rounded-[5%] transform overflow-hidden bg-white p-6 text-left align-middle shadow-xl transition-all">
                                 <div className="absolute top-2 right-2">
-                                    <button onClick={() => setIsOpen(false)}>
+                                    <button onClick={handleClose}>
                                         <Image src={Images.IconClosePurple} alt="Close" width={24} height={24} />
                                     </button>
                                 </div>
@@ -80,14 +72,14 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ isOpen, setIs
                                             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                                         />
 
-                                        <button
-                                            className="text-xs mt-2 text-blue-500 font-bold hover:underline float-right"
-                                            onClick={() => {
-                                                alert("Please check your Email")
-                                            }}
-                                        >
-                                            Forgot Password?
-                                        </button>
+                                        <Link href="/forgot-password" legacyBehavior>
+                                            <button
+                                                className="text-xs mt-2 text-blue-500 font-bold hover:underline float-right"
+                                                onClick={() => setIsOpen(false)}
+                                            >
+                                                Forgot Password?
+                                            </button>
+                                        </Link>
                                     </div>
                                     <div className="mb-4">
                                         <label htmlFor="new-password" className="block text-sm font-medium text-gray-700">
@@ -118,7 +110,6 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ isOpen, setIs
                                         <Button
                                             type="button"
                                             className="w-30 px-4 py-2 bg-[#7746f5] rounded-[12px] text-lg text-white bg-gradient-to-r from-[#501794] to-[#3E70A1] hover:bg-gradient-to-l"
-                                            onClick={handlePasswordChange}
                                         >
                                             Change
                                         </Button>
