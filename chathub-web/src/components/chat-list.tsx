@@ -4,7 +4,6 @@ import React, { useState } from "react"
 import Image from "next/image"
 import { Images } from "../constants/images"
 import "../styles/custom-scroll.css"
-import { Button } from "./ui/button"
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react"
 import ModalCreateNewChat from "./modal-create-new-chat"
 import ModalCreateNewGroupChat from "./modal-create-new-group-chat"
@@ -12,6 +11,7 @@ import ModalProfile from "./modal-profile"
 import ChangePasswordModal from "./modal-change-password"
 import ModalFriendList from "./modal-friend-list"
 import ModalFriendRequests from "./modal-friend-requests"
+import ModalListGroup from "./modal-list-group"
 
 const ChatList = () => {
   const chats = [
@@ -43,6 +43,8 @@ const ChatList = () => {
     setIsChangePasswordModalOpen(false);
     setIsProfileModalOpen(true); 
   };
+
+  const [modalListGroup,setModalListGroup] = useState(false)
 
   return (
     <div className="bg-[#202020] text-white w-1/4 h-screen p-4 relative">
@@ -81,7 +83,8 @@ const ChatList = () => {
           </MenuItem>
 
           <MenuItem>
-            <button className="w-full group rounded-lg px-4 py-2 flex items-center cursor-pointer hover:bg-gray-600">
+            <button className="w-full group rounded-lg px-4 py-2 flex items-center cursor-pointer hover:bg-gray-600"
+                    onClick={()=>setModalListGroup(true)}>
               <Image src={Images.IconGroup} alt="Group List" width={24} height={24} />
               <span className="ml-3 block font-medium truncate">Group List</span>
             </button>
@@ -191,6 +194,7 @@ const ChatList = () => {
         )}
       <ModalFriendList isOpen={isFriendListModalOpen} setIsOpen={setIsFriendListModalOpen} />
       <ModalFriendRequests isOpen={isFriendRequestModalOpen} setIsOpen={setIsFriendRequestModalOpen} />
+      <ModalListGroup isOpen={modalListGroup} setIsOpen={setModalListGroup} isAdmin={true}/>
     </div>
   )
 }

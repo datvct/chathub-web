@@ -61,13 +61,16 @@ const ModalFriendRequests: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean
                             leaveFrom="opacity-100 scale-100"
                             leaveTo="opacity-0 scale-95"
                         >
-                            <DialogPanel className="bg-[#385068] rounded-[5%] w-[30%] h-[40%] max-w-md max-h-screen transform overflow-hidden p-6 text-left align-middle shadow-xl transition-all">
-                                <div className="flex items-center mb-2">
-                                    <Image src={Images.IconChatList} alt="Chat Icon" width={40} height={40} />
-                                    <DialogTitle className="text-2xl font-bold text-white ml-3 leading-6">
-                                        <span className="text-[25px] font-bold">Friend Requests</span>
-                                    </DialogTitle>
-                                </div>
+                            <DialogPanel className="bg-[#385068] rounded-[5%] w-[80%] h-[95%] max-w-md max-h-screen  transform overflow-hidden p-6 text-left align-middle shadow-xl transition-all">
+                                <DialogTitle className="text-xl font-bold mb-4 flex items-center justify-between text-white leading-6">
+                                    <div className="flex items-center gap-x-2">
+                                        <Image src={Images.IconChatList} alt="Chat Icon" width={40} height={40} />
+                                        <span className="text-[25px] font-bold">Friend Request</span>
+                                     </div>
+                                    <button onClick={() => setIsOpen(false)}>
+                                        <Image src={Images.IconCloseModal} alt="close modal" width={40} height={40} />
+                                    </button>
+                                </DialogTitle>
 
                                 <hr className="w-full border-gray-500 p-2 mb-3" />
 
