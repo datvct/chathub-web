@@ -1,18 +1,18 @@
-import React, { useState, useRef } from "react";
-import Image from "next/image";
-import { Button } from "./ui/button";
-import { Input } from "./ui/input";
-import { Images } from "../constants/images";
-import { Dialog, DialogPanel, DialogTitle, TransitionChild } from "@headlessui/react";
-import { Search, EllipsisVertical } from "lucide-react";
-import "../styles/custom-scroll.css";
-import { LogOut } from 'lucide-react';
-import { CircleX } from 'lucide-react';
+import React, { useState, useRef } from "react"
+import Image from "next/image"
+import { Button } from "./ui/button"
+import { Input } from "./ui/input"
+import { Images } from "../constants/images"
+import { Dialog, DialogPanel, DialogTitle, TransitionChild } from "@headlessui/react"
+import { Search, EllipsisVertical } from "lucide-react"
+import "../styles/custom-scroll.css"
+import { LogOut } from "lucide-react"
+import { CircleX } from "lucide-react"
 
 interface ModalListGroupProps {
-  isOpen: boolean;
-  setIsOpen: (open: boolean) => void;
-  isAdmin: boolean;
+  isOpen: boolean
+  setIsOpen: (open: boolean) => void
+  isAdmin: boolean
 }
 
 const ModalListGroup: React.FC<ModalListGroupProps> = ({ isOpen, setIsOpen, isAdmin }) => {
@@ -24,34 +24,41 @@ const ModalListGroup: React.FC<ModalListGroupProps> = ({ isOpen, setIsOpen, isAd
     { name: "Group E", chat: "You: abcdef", image: Images.MileyCyrus },
     { name: "Group F", chat: "You: abcdef", image: Images.ArleneMcCoy },
     { name: "Group G", chat: "You: abcdef", image: Images.CameronWilliamson },
-  ];
+  ]
 
-  const [selectedGroup, setSelectedGroup] = useState<number | null>(null);
-  const [showOptionsForGroup, setShowOptionsForGroup] = useState<number | null>(null);
-  const [modalPosition, setModalPosition] = useState<{ top: number; left: number } | null>(null);
+  const [selectedGroup, setSelectedGroup] = useState<number | null>(null)
+  const [showOptionsForGroup, setShowOptionsForGroup] = useState<number | null>(null)
+  const [modalPosition, setModalPosition] = useState<{ top: number; left: number } | null>(null)
 
   // Use ref to store the position of each group item
-  const groupRefs = useRef<(HTMLLIElement | null)[]>([]);
+  const groupRefs = useRef<(HTMLLIElement | null)[]>([])
 
   const handleEllipsisClick = (index: number) => {
     if (showOptionsForGroup === index) {
-      setShowOptionsForGroup(null); // Close if already open
+      setShowOptionsForGroup(null) // Close if already open
     } else {
-      setShowOptionsForGroup(index); // Open the clicked group's options
+      setShowOptionsForGroup(index) // Open the clicked group's options
       // Get position of the clicked group item
-      const groupElement = groupRefs.current[index];
+      const groupElement = groupRefs.current[index]
       if (groupElement) {
-        const rect = groupElement.getBoundingClientRect();
+        const rect = groupElement.getBoundingClientRect()
         setModalPosition({
           top: rect.top + window.scrollY, // Add scroll position if needed
           left: rect.left + window.scrollX, // Add scroll position if needed
-        });
+        })
       }
     }
-  };
+  }
 
   return (
-    <Dialog open={isOpen} onClose={() => {setIsOpen(false); setShowOptionsForGroup(null);}}  className="relative z-50">
+    <Dialog
+      open={isOpen}
+      onClose={() => {
+        setIsOpen(false)
+        setShowOptionsForGroup(null)
+      }}
+      className="relative z-50"
+    >
       <div className="fixed inset-0 bg-opacity-[.40]" aria-hidden="true" />
 
       <div className="fixed inset-0 flex items-center justify-center p-2">
@@ -66,8 +73,16 @@ const ModalListGroup: React.FC<ModalListGroupProps> = ({ isOpen, setIsOpen, isAd
         >
           <DialogPanel className="bg-[#385068] rounded-[5%] p-6 w-[80%] h-[95%] max-w-md max-h-screen transition-all transform">
             <DialogTitle className="text-xl font-bold mb-4 flex items-center justify-between text-white leading-6">
-              <span className="text-[30px] font-bold">Group List</span>
-              <button onClick={() => {setIsOpen(false); setShowOptionsForGroup(null);}}>
+              <div className="flex items-center gap-x-2">
+                <Image src={Images.IconChatList} alt="Chat Icon" width={40} height={40} />
+                <span className="text-[25px] font-bold">Group List</span>
+              </div>
+              <button
+                onClick={() => {
+                  setIsOpen(false)
+                  setShowOptionsForGroup(null)
+                }}
+              >
                 <Image src={Images.IconCloseModal} alt="close modal" width={40} height={40} />
               </button>
             </DialogTitle>
@@ -91,7 +106,9 @@ const ModalListGroup: React.FC<ModalListGroupProps> = ({ isOpen, setIsOpen, isAd
               {groups.map((group, index) => (
                 <li
                   key={index}
-                  ref={(el) => {groupRefs.current[index] = el}} // Assign ref to each group item
+                  ref={el => {
+                    groupRefs.current[index] = el
+                  }} // Assign ref to each group item
                   className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer mb-3
                               ${selectedGroup === index ? "bg-[#7a99b8]/90" : ""}
                               bg-[#fff]
@@ -105,9 +122,9 @@ const ModalListGroup: React.FC<ModalListGroupProps> = ({ isOpen, setIsOpen, isAd
                   </div>
                   <EllipsisVertical
                     className="ml-auto text-gray-500"
-                    onClick={(e) => {
-                      handleEllipsisClick(index);
-                    }}// Call the click handler
+                    onClick={e => {
+                      handleEllipsisClick(index)
+                    }} // Call the click handler
                   />
                 </li>
               ))}
@@ -118,25 +135,25 @@ const ModalListGroup: React.FC<ModalListGroupProps> = ({ isOpen, setIsOpen, isAd
               <div
                 className="absolute bg-gradient-to-r from-[#501794] to-[#3E70A1] rounded-md shadow-lg p-2"
                 style={{
-                  top: `${modalPosition.top-30}px`,  // Positioning the modal based on group position
-                  left: `${modalPosition.left-135}px`, // Offset from the left to avoid overlap
+                  top: `${modalPosition.top - 30}px`, // Positioning the modal based on group position
+                  left: `${modalPosition.left - 135}px`, // Offset from the left to avoid overlap
                 }}
               >
                 <Button
                   onClick={() => {
                     // Add logic for leaving the group
-                    setShowOptionsForGroup(null);
+                    setShowOptionsForGroup(null)
                   }}
                   className="w-full py-1 px-1 mb-2 bg-gradient-to-r from-[#501794] to-[#3E70A1] text-white hover:bg-gradient-to-l"
                 >
-                  <LogOut/>
+                  <LogOut />
                   Leave Group
                 </Button>
                 {isAdmin && (
                   <Button
                     onClick={() => {
                       // Add logic for dissolving the group
-                      setShowOptionsForGroup(null);
+                      setShowOptionsForGroup(null)
                     }}
                     className="w-full py-1 px-1 bg-gradient-to-r from-[#501794] to-[#3E70A1] text-white hover:bg-gradient-to-l"
                   >
@@ -150,7 +167,7 @@ const ModalListGroup: React.FC<ModalListGroupProps> = ({ isOpen, setIsOpen, isAd
         </TransitionChild>
       </div>
     </Dialog>
-  );
-};
+  )
+}
 
-export default ModalListGroup;
+export default ModalListGroup
