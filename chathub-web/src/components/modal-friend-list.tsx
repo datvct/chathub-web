@@ -19,7 +19,7 @@ interface Friend {
 
 const friends: Friend[] = [
     { name: "Guy Hawkins", phone: "0903112233", online: true, image: Images.GuyHawkins },
-    { name: "Ronald Richards", phone: "0902445566", image: Images.RonaldRichards },
+    { name: "Ronald Richards", phone: "0902445566", online: true, image: Images.RonaldRichards },
     { name: "Esther Howard", phone: "0904998877", image: Images.EstherHoward },
     { name: "Albert Flores", phone: "0905336699", image: Images.AlbertFlores },
     { name: "Miley Cyrus", phone: "0909225588", image: Images.MileyCyrus },
@@ -76,7 +76,7 @@ const ModalFriendList: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) =>
                                 leaveFrom="opacity-100 scale-100"
                                 leaveTo="opacity-0 scale-95"
                             >
-                                <DialogPanel className="w-[500px] h-[800px] rounded-[30px] transform overflow-hidden bg-[#385068] p-6 text-left align-middle shadow-xl transition-all">
+                                <DialogPanel className="bg-[#385068] rounded-[5%] w-[30%] h-[50%] transform overflow-hidden  p-6 text-left align-middle shadow-xl transition-all">
                                     <div className="flex items-center mb-2">
                                         <Image src={Images.IconChatList} alt="Chat Icon" width={40} height={40} />
                                         <DialogTitle className="text-2xl font-bold text-white ml-3 leading-6">
