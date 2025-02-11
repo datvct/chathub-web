@@ -183,13 +183,13 @@ const ModalCreateNewGroupChat: React.FC<ModalCreateNewGroupChatProps> = ({ isOpe
                     onClick={() => setIsOpen(false)}
                     disabled={!isCreateButtonEnabled || groupName.trim() === ""}
                     className={`
-                                            w-auto px-4 py-2 rounded-[12px] text-lg text-white 
-                                            ${
-                                              isCreateButtonEnabled && groupName.trim() !== ""
-                                                ? "bg-gradient-to-r from-[#501794] to-[#3E70A1] hover:bg-gradient-to-l"
-                                                : "bg-gray-400"
-                                            } 
-                                        `}
+                                w-auto px-4 py-2 rounded-[12px] text-lg text-white 
+                                ${
+                                  isCreateButtonEnabled && groupName.trim() !== ""
+                                    ? "bg-gradient-to-r from-[#501794] to-[#3E70A1] hover:bg-gradient-to-l"
+                                    : "bg-gray-400"
+                                } 
+                              `}
                   >
                     Create Group
                   </Button>

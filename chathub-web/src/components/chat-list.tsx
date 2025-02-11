@@ -9,6 +9,7 @@ import ModalCreateNewChat from "./modal-create-new-chat"
 import ModalCreateNewGroupChat from "./modal-create-new-group-chat"
 import ModalProfile from "./modal-profile"
 import ChangePasswordModal from "./modal-change-password"
+import ModalFriendList from "./modal-friend-list";
 import ModalListGroup from "./modal-list-group"
 
 const ChatList = () => {
@@ -190,6 +191,7 @@ const ChatList = () => {
         ) : (
           <ModalProfile isOpen={isModalProfileOpen} setIsOpen={setIsProfileModalOpen} setIsChangePasswordModalOpen={handleOpenChangePassword} />
         )}
+      <ModalFriendList isOpen={isFriendListModalOpen} setIsOpen={setIsFriendListModalOpen} />
       <ModalListGroup isOpen={modalListGroup} setIsOpen={setModalListGroup} isAdmin={true}/>
     </div>
   )
