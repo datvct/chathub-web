@@ -76,7 +76,7 @@ const ModalFriendList: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) =>
                                 leaveFrom="opacity-100 scale-100"
                                 leaveTo="opacity-0 scale-95"
                             >
-                                <DialogPanel className="bg-[#385068] rounded-[5%] w-[30%] h-[50%] transform overflow-hidden  p-6 text-left align-middle shadow-xl transition-all">
+                                <DialogPanel className="bg-[#385068] rounded-[5%] w-[30%] h-[40%] max-w-lg max-h-screen transform overflow-hidden p-6 text-left align-middle shadow-xl transition-all">
                                     <div className="flex items-center mb-2">
                                         <Image src={Images.IconChatList} alt="Chat Icon" width={40} height={40} />
                                         <DialogTitle className="text-2xl font-bold text-white ml-3 leading-6">
@@ -120,7 +120,7 @@ const ModalFriendList: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) =>
                                         </button>
                                     </div>
 
-                                    <div className="h-[530px] overflow-y-auto custom-scrollbar pr-2">
+                                    <div className="max-h-[55vh] overflow-y-auto custom-scrollbar pr-2">
                                         {friendsToDisplay.map((friend, index) => (
                                             <div
                                                 key={index}
