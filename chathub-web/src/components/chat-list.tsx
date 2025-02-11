@@ -7,6 +7,11 @@ import "../styles/custom-scroll.css"
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react"
 import ModalCreateNewChat from "./modal-create-new-chat"
 import ModalCreateNewGroupChat from "./modal-create-new-group-chat"
+import ModalProfile from "./modal-profile"
+import ChangePasswordModal from "./modal-change-password"
+import ModalFriendList from "./modal-friend-list"
+import ModalFriendRequests from "./modal-friend-requests"
+import ModalListGroup from "./modal-list-group"
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const ChatList = ({ setSelectedChat }: { setSelectedChat: (id: number) => void }) => {
@@ -24,6 +29,23 @@ const ChatList = ({ setSelectedChat }: { setSelectedChat: (id: number) => void }
   ]
   const [modalCreateChatOpen, setModalCreateNewChatOpen] = useState(false)
   const [modalCreateGroupChatOpen, setModalCreateNewGroupChatOpen] = useState(false)
+  const [modalProfileOpen, setModalProfileOpen] = useState(false)
+  const [isModalProfileOpen, setIsProfileModalOpen] = useState(false)
+  const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false)
+  const [isFriendListModalOpen, setIsFriendListModalOpen] = useState(false);
+  const [isFriendRequestModalOpen, setIsFriendRequestModalOpen] = useState(false);
+
+  const handleOpenChangePassword = () => {
+    setIsProfileModalOpen(false); 
+    setIsChangePasswordModalOpen(true);
+  };
+
+  const handleCloseChangePassword = () => {
+    setIsChangePasswordModalOpen(false);
+    setIsProfileModalOpen(true); 
+  };
+
+  const [modalListGroup,setModalListGroup] = useState(false)
 
   return (
     <div className="bg-[#202020] text-white w-1/4 h-screen p-4 relative">
@@ -34,29 +56,36 @@ const ChatList = ({ setSelectedChat }: { setSelectedChat: (id: number) => void }
         </MenuButton>
 
         <MenuItems className="absolute top-14 left-2 bg-black border border-white border-opacity-30 w-55 p-4 rounded-[20px] shadow-md z-50 mt-2 text-left focus:outline-none">
-          <MenuItem as="a" href="/profile">
-            <button className="w-full group rounded-lg px-4 py-2 flex items-center cursor-pointer hover:bg-gray-600">
-              <Image src={Images.IconProfile} alt="Profile" width={24} height={24} />
-              <span className="block ml-3 font-medium truncate">Profile</span>
+          <MenuItem>
+            <button 
+              className="w-full group rounded-lg px-4 py-2 flex items-center cursor-pointer hover:bg-gray-600"
+              onClick={() => setModalProfileOpen(true)}>
+                <Image src={Images.IconProfile} alt="Profile" width={24} height={24} />
+                <span className="block ml-3 font-medium truncate">Profile</span>
             </button>
           </MenuItem>
 
-          <MenuItem as="a" href="/friend-list">
-            <button className="w-full group rounded-lg px-4 py-2 flex items-center cursor-pointer hover:bg-gray-600">
-              <Image src={Images.IconContact} alt="Profile" width={24} height={24} />
-              <span className="ml-3 block font-medium truncate">Friend List</span>
+          <MenuItem>
+            <button 
+              className="w-full group rounded-lg px-4 py-2 flex items-center cursor-pointer hover:bg-gray-600"
+              onClick={() => setIsFriendListModalOpen(true)}>
+                <Image src={Images.IconContact} alt="FriendList" width={24} height={24} />
+                <span className="ml-3 block font-medium truncate">Friend List</span>
             </button>
           </MenuItem>
 
-          <MenuItem as="a" href="/friend-requests">
-            <button className="w-full group rounded-lg px-4 py-2 flex items-center cursor-pointer hover:bg-gray-600">
-              <Image src={Images.IconAddFriend} alt="Friend Requests" width={24} height={24} />
-              <span className="ml-3 block font-medium truncate">Friend Requests</span>
+          <MenuItem>
+            <button 
+              className="w-full group rounded-lg px-4 py-2 flex items-center cursor-pointer hover:bg-gray-600"
+              onClick={() => setIsFriendRequestModalOpen(true)}>
+                <Image src={Images.IconAddFriend} alt="Friend Requests" width={24} height={24} />
+                <span className="ml-3 block font-medium truncate">Friend Requests</span>
             </button>
           </MenuItem>
 
-          <MenuItem as="a" href="/group-list">
-            <button className="w-full group rounded-lg px-4 py-2 flex items-center cursor-pointer hover:bg-gray-600">
+          <MenuItem>
+            <button className="w-full group rounded-lg px-4 py-2 flex items-center cursor-pointer hover:bg-gray-600"
+                    onClick={()=>setModalListGroup(true)}>
               <Image src={Images.IconGroup} alt="Group List" width={24} height={24} />
               <span className="ml-3 block font-medium truncate">Group List</span>
             </button>
@@ -154,9 +183,18 @@ const ChatList = ({ setSelectedChat }: { setSelectedChat: (id: number) => void }
         </MenuItems>
       </Menu>
 
-      {/* Render the modal */}
+      {/* Render the modals */}
       <ModalCreateNewChat isOpen={modalCreateChatOpen} setIsOpen={setModalCreateNewChatOpen} />
       <ModalCreateNewGroupChat isOpen={modalCreateGroupChatOpen} setIsOpen={setModalCreateNewGroupChatOpen} />
+      <ModalProfile isOpen={modalProfileOpen} setIsOpen={setModalProfileOpen} setIsChangePasswordModalOpen = {setIsChangePasswordModalOpen} />
+        {isChangePasswordModalOpen ? (
+          <ChangePasswordModal isOpen={isChangePasswordModalOpen} setIsOpen={handleCloseChangePassword} />
+        ) : (
+          <ModalProfile isOpen={isModalProfileOpen} setIsOpen={setIsProfileModalOpen} setIsChangePasswordModalOpen={handleOpenChangePassword} />
+        )}
+      <ModalFriendList isOpen={isFriendListModalOpen} setIsOpen={setIsFriendListModalOpen} />
+      <ModalFriendRequests isOpen={isFriendRequestModalOpen} setIsOpen={setIsFriendRequestModalOpen} />
+      <ModalListGroup isOpen={modalListGroup} setIsOpen={setModalListGroup} isAdmin={true}/>
     </div>
   )
 }

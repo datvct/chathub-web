@@ -14,6 +14,7 @@ import Window from "../../public/images/window.svg"
 import CreateNewChat from "../../public/images/create-new-chat.svg"
 import CreateNewGroupChat from "../../public/images/create-new-group-chat.svg"
 import IconProfile from "../../public/images/icon-profile.svg"
+import IconMessage from "../../public/images/icon-message.svg"
 import IconAddFriend from "../../public/images/icon-add-friend.svg"
 import IconContact from "../../public/images/icon-contact.svg"
 import IconGroup from "../../public/images/icon-group.svg"
@@ -28,8 +29,13 @@ import IconCloseModal from "../../public/images/icon-close-modal.png"
 import IconSearch from "../../public/images/icon-search.png"
 import IconMore from "../../public/images/icon-more.png"
 import IconClosePurple from "../../public/images/icon-close-purple.png"
+import IconOutlinedCamera from "../../public/images/icon-outlined-camera.png"
 import IconCamera from "../../public/images/icon-camera.png"
-import AvatarDefault from "../../public/images/default-avatar.jpg"
+import IconNext from "../../public/images/icon-next.png"
+import IconChevronDown from "../../public/images/icon-chevron-down.png"
+import ProfileImage from "../../public/images/profile-image.png"
+import ProfileImage2 from "../../public/images/profile-image-2.png"
+import IconSearchLucide from "../../public/images/icon-search-lucide.png"import AvatarDefault from "../../public/images/default-avatar.jpg"
 
 export const Images = {
   File,
@@ -48,6 +54,7 @@ export const Images = {
   CreateNewChat,
   CreateNewGroupChat,
   IconProfile,
+  IconMessage,
   IconAddFriend,
   IconContact,
   IconGroup,
@@ -62,6 +69,12 @@ export const Images = {
   IconSearch,
   IconMore,
   IconClosePurple,
+  IconOutlinedCamera,
   IconCamera,
   AvatarDefault,
+  IconNext,
+  ProfileImage,
+  ProfileImage2,
+  IconChevronDown,
+  IconSearchLucide,
 }
