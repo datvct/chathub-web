@@ -3,7 +3,6 @@
 import { Menu, MenuButton, MenuItem, MenuItems, Transition } from "@headlessui/react"
 import { Fragment } from "react"
 import Image from "next/image"
-import Link from "next/link"
 import { Images } from "../constants/images"
 import { Ellipsis } from "lucide-react"
 
@@ -19,7 +18,6 @@ interface FriendListDropdownProps {
     onOpenProfile: (friend: Friend) => void;
 }
 
-// const FriendListDropdown: React.FC<{ friend: Friend }> = ({ friend }) => {
 const FriendListDropdown: React.FC<FriendListDropdownProps> = ({ friend, onOpenProfile}) => {
     return (
         <Menu as="div" className="relative inline-block text-left gap-y-2">

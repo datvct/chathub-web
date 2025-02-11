@@ -36,9 +36,6 @@ interface ProfileModalProps {
 
 }
 
-// const ProfileModal: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) => void; setIsChangePasswordModalOpen?: any }> = ({
-//     isOpen, setIsOpen, setIsChangePasswordModalOpen }
-// ) => {
 const ProfileModal: React.FC<ProfileModalProps> = ({
     isOpen,
     setIsOpen,
