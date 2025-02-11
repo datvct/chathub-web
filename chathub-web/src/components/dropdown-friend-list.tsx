@@ -14,7 +14,13 @@ interface Friend {
     image: any
 }
 
-const FriendListDropdown: React.FC<{ friend: Friend }> = ({ friend }) => {
+interface FriendListDropdownProps {
+    friend: Friend;
+    onOpenProfile: (friend: Friend) => void;
+}
+
+// const FriendListDropdown: React.FC<{ friend: Friend }> = ({ friend }) => {
+const FriendListDropdown: React.FC<FriendListDropdownProps> = ({ friend, onOpenProfile}) => {
     return (
         <Menu as="div" className="relative inline-block text-left gap-y-2">
             <MenuButton as="button">
@@ -38,6 +44,7 @@ const FriendListDropdown: React.FC<{ friend: Friend }> = ({ friend }) => {
                         <MenuItem
                             as="li"
                             className="w-full px-3 py-3 text-white flex items-center gap-3 rounded-lg hover:bg-[#431078] hover:bg-opacity-50"
+                            onClick={() => onOpenProfile(friend)}
                         >
                             <Image src={Images.IconProfile} alt="Profile" width={20} height={20} className="ml-1" />
                             Profile

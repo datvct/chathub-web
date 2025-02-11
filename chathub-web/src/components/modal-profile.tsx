@@ -21,9 +21,30 @@ interface ProfileData {
     gender: "Male" | "Female"
 }
 
-const ProfileModal: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) => void; setIsChangePasswordModalOpen?: any }> = ({
-    isOpen, setIsOpen, setIsChangePasswordModalOpen }
-) => {
+interface Friend {
+    name: string
+    phone: string
+    online?: boolean
+    image: any
+}
+
+interface ProfileModalProps {
+    isOpen: boolean;
+    setIsOpen: (open: boolean) => void;
+    setIsChangePasswordModalOpen?: any;
+    friend: Friend | null;  
+
+}
+
+// const ProfileModal: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) => void; setIsChangePasswordModalOpen?: any }> = ({
+//     isOpen, setIsOpen, setIsChangePasswordModalOpen }
+// ) => {
+const ProfileModal: React.FC<ProfileModalProps> = ({
+    isOpen,
+    setIsOpen,
+    setIsChangePasswordModalOpen,
+    friend
+}) => {
     const [profileData, setProfileData] = useState<ProfileData>({
         displayName: "Miley Cyrus",
         dateOfBirth: new Date("1995-05-23"),
@@ -143,7 +164,7 @@ const ProfileModal: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) => vo
                                             <Input
                                                 id="display-name"
                                                 type="text"
-                                                value={profileData.displayName}
+                                                value={friend?.name || profileData.displayName}
                                                 className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500"
                                                 onChange={e => handleChange("displayName", e.target.value)}
                                             />
