@@ -38,7 +38,6 @@ const ModalFriendRequests: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean
     return (
         <Transition appear show={isOpen} as={Fragment}>
             <Dialog as="div" className="relative z-50" onClose={() => setIsOpen(false)}>
-                {/* Background overlay */}
                 <TransitionChild
                     as={Fragment}
                     enter="ease-out duration-300"
@@ -62,7 +61,7 @@ const ModalFriendRequests: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean
                             leaveFrom="opacity-100 scale-100"
                             leaveTo="opacity-0 scale-95"
                         >
-                            <DialogPanel className="w-[500px] h-[700px] rounded-[30px] transform overflow-hidden bg-[#385068] p-6 text-left align-middle shadow-xl transition-all">
+                            <DialogPanel className="bg-[#385068] rounded-[5%] w-[30%] h-[40%] max-w-md max-h-screen transform overflow-hidden p-6 text-left align-middle shadow-xl transition-all">
                                 <div className="flex items-center mb-2">
                                     <Image src={Images.IconChatList} alt="Chat Icon" width={40} height={40} />
                                     <DialogTitle className="text-2xl font-bold text-white ml-3 leading-6">
@@ -93,7 +92,7 @@ const ModalFriendRequests: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean
                                     </div>
                                 </div>
 
-                                <div className="h-[530px] overflow-y-auto custom-scrollbar pr-2">
+                                <div className="max-h-[55vh] overflow-y-auto custom-scrollbar pr-2">
                                     {requestsToDisplay.map((request, index) => (
                                         <div key={index} className="flex items-center odd:bg-[#E4DEED] even:bg-[#AF9CC9] rounded-lg p-3 mb-3 space-x-3">
                                             <Image src={request.image} alt={request.name} width={45} height={45} className="rounded-full" />
