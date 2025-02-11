@@ -51,7 +51,7 @@ const ModalListGroup: React.FC<ModalListGroupProps> = ({ isOpen, setIsOpen, isAd
   };
 
   return (
-    <Dialog open={isOpen} onClose={() => setIsOpen(false)} className="relative z-50">
+    <Dialog open={isOpen} onClose={() => {setIsOpen(false); setShowOptionsForGroup(null);}}  className="relative z-50">
       <div className="fixed inset-0 bg-opacity-[.40]" aria-hidden="true" />
 
       <div className="fixed inset-0 flex items-center justify-center p-2">
@@ -64,10 +64,10 @@ const ModalListGroup: React.FC<ModalListGroupProps> = ({ isOpen, setIsOpen, isAd
           leaveFrom="opacity-100 scale-100"
           leaveTo="opacity-0 scale-95"
         >
-          <DialogPanel className="bg-[#385068] rounded-[5%] p-6 w-[80%] h-[95%] max-w-lg max-h-screen transition-all transform">
+          <DialogPanel className="bg-[#385068] rounded-[5%] p-6 w-[80%] h-[95%] max-w-md max-h-screen transition-all transform">
             <DialogTitle className="text-xl font-bold mb-4 flex items-center justify-between text-white leading-6">
               <span className="text-[30px] font-bold">Group List</span>
-              <button onClick={() => setIsOpen(false)}>
+              <button onClick={() => {setIsOpen(false); setShowOptionsForGroup(null);}}>
                 <Image src={Images.IconCloseModal} alt="close modal" width={40} height={40} />
               </button>
             </DialogTitle>
@@ -84,7 +84,7 @@ const ModalListGroup: React.FC<ModalListGroupProps> = ({ isOpen, setIsOpen, isAd
             </div>
 
             <Button className="w-20 py-2 px-4 mb-2 bg-[#7746f5] rounded-[12px] text-lg text-white bg-gradient-to-r from-[#501794] to-[#3E70A1] hover:bg-gradient-to-l">
-              All({groups.length})
+              All ({groups.length})
             </Button>
 
             <ul className="max-h-[55vh] overflow-auto custom-scrollbar">
@@ -105,7 +105,9 @@ const ModalListGroup: React.FC<ModalListGroupProps> = ({ isOpen, setIsOpen, isAd
                   </div>
                   <EllipsisVertical
                     className="ml-auto text-gray-500"
-                    onClick={() => handleEllipsisClick(index)} // Call the click handler
+                    onClick={(e) => {
+                      handleEllipsisClick(index);
+                    }}// Call the click handler
                   />
                 </li>
               ))}
@@ -114,10 +116,10 @@ const ModalListGroup: React.FC<ModalListGroupProps> = ({ isOpen, setIsOpen, isAd
             {/* Modal for Leave Group / Dissolve */}
             {showOptionsForGroup !== null && modalPosition && (
               <div
-                className="absolute bg-gradient-to-r from-[#501794] to-[#3E70A1] p-1 rounded-lg shadow-lg"
+                className="absolute bg-gradient-to-r from-[#501794] to-[#3E70A1] rounded-md shadow-lg p-2"
                 style={{
-                  top: `${modalPosition.top-50}px`,  // Positioning the modal based on group position
-                  left: `${modalPosition.left +90}px`, // Offset from the left to avoid overlap
+                  top: `${modalPosition.top-30}px`,  // Positioning the modal based on group position
+                  left: `${modalPosition.left-135}px`, // Offset from the left to avoid overlap
                 }}
               >
                 <Button
@@ -125,9 +127,9 @@ const ModalListGroup: React.FC<ModalListGroupProps> = ({ isOpen, setIsOpen, isAd
                     // Add logic for leaving the group
                     setShowOptionsForGroup(null);
                   }}
-                  className="w-full py-1 px-1 mb-2 bg-gradient-to-r from-[#501794] to-[#3E70A1] text-white rounded-[12px] hover:bg-gradient-to-l"
+                  className="w-full py-1 px-1 mb-2 bg-gradient-to-r from-[#501794] to-[#3E70A1] text-white hover:bg-gradient-to-l"
                 >
-                  <LogOut className="ml-7"/>
+                  <LogOut/>
                   Leave Group
                 </Button>
                 {isAdmin && (
@@ -136,7 +138,7 @@ const ModalListGroup: React.FC<ModalListGroupProps> = ({ isOpen, setIsOpen, isAd
                       // Add logic for dissolving the group
                       setShowOptionsForGroup(null);
                     }}
-                    className="w-full py-1 px-1 bg-gradient-to-r from-[#501794] to-[#3E70A1] text-white rounded-[12px] hover:bg-gradient-to-l"
+                    className="w-full py-1 px-1 bg-gradient-to-r from-[#501794] to-[#3E70A1] text-white hover:bg-gradient-to-l"
                   >
                     <CircleX />
                     Dissolve
