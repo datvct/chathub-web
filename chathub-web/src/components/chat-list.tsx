@@ -7,6 +7,8 @@ import "../styles/custom-scroll.css"
 import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react"
 import ModalCreateNewChat from "./modal-create-new-chat"
 import ModalCreateNewGroupChat from "./modal-create-new-group-chat"
+import ModalProfile from "./modal-profile"
+import ChangePasswordModal from "./modal-change-password"
 import ModalListGroup from "./modal-list-group"
 
 const ChatList = () => {
@@ -24,6 +26,22 @@ const ChatList = () => {
   ]
   const [modalCreateChatOpen, setModalCreateNewChatOpen] = useState(false)
   const [modalCreateGroupChatOpen, setModalCreateNewGroupChatOpen] = useState(false)
+  const [modalProfileOpen, setModalProfileOpen] = useState(false)
+  const [isModalProfileOpen, setIsProfileModalOpen] = useState(false)
+  const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false)
+  const [isFriendListModalOpen, setIsFriendListModalOpen] = useState(false);
+  const [isFriendRequestModalOpen, setIsFriendRequestModalOpen] = useState(false);
+
+  const handleOpenChangePassword = () => {
+    setIsProfileModalOpen(false); 
+    setIsChangePasswordModalOpen(true);
+  };
+
+  const handleCloseChangePassword = () => {
+    setIsChangePasswordModalOpen(false);
+    setIsProfileModalOpen(true); 
+  };
+
   const [modalListGroup,setModalListGroup] = useState(false)
 
   return (
@@ -35,24 +53,30 @@ const ChatList = () => {
         </MenuButton>
 
         <MenuItems className="absolute top-14 left-2 bg-black border border-white border-opacity-30 w-55 p-4 rounded-[20px] shadow-md z-50 mt-2 text-left focus:outline-none">
-          <MenuItem as="a" href="/profile">
-            <button className="w-full group rounded-lg px-4 py-2 flex items-center cursor-pointer hover:bg-gray-600">
-              <Image src={Images.IconProfile} alt="Profile" width={24} height={24} />
-              <span className="block ml-3 font-medium truncate">Profile</span>
+          <MenuItem>
+            <button 
+              className="w-full group rounded-lg px-4 py-2 flex items-center cursor-pointer hover:bg-gray-600"
+              onClick={() => setModalProfileOpen(true)}>
+                <Image src={Images.IconProfile} alt="Profile" width={24} height={24} />
+                <span className="block ml-3 font-medium truncate">Profile</span>
             </button>
           </MenuItem>
 
-          <MenuItem as="a" href="/friend-list">
-            <button className="w-full group rounded-lg px-4 py-2 flex items-center cursor-pointer hover:bg-gray-600">
-              <Image src={Images.IconContact} alt="Profile" width={24} height={24} />
-              <span className="ml-3 block font-medium truncate">Friend List</span>
+          <MenuItem>
+            <button 
+              className="w-full group rounded-lg px-4 py-2 flex items-center cursor-pointer hover:bg-gray-600"
+              onClick={() => setIsFriendListModalOpen(true)}>
+                <Image src={Images.IconContact} alt="FriendList" width={24} height={24} />
+                <span className="ml-3 block font-medium truncate">Friend List</span>
             </button>
           </MenuItem>
 
-          <MenuItem as="a" href="/friend-requests">
-            <button className="w-full group rounded-lg px-4 py-2 flex items-center cursor-pointer hover:bg-gray-600">
-              <Image src={Images.IconAddFriend} alt="Friend Requests" width={24} height={24} />
-              <span className="ml-3 block font-medium truncate">Friend Requests</span>
+          <MenuItem>
+            <button 
+              className="w-full group rounded-lg px-4 py-2 flex items-center cursor-pointer hover:bg-gray-600"
+              onClick={() => setIsFriendRequestModalOpen(true)}>
+                <Image src={Images.IconAddFriend} alt="Friend Requests" width={24} height={24} />
+                <span className="ml-3 block font-medium truncate">Friend Requests</span>
             </button>
           </MenuItem>
 
@@ -157,9 +181,15 @@ const ChatList = () => {
         </MenuItems>
       </Menu>
 
-      {/* Render the modal */}
+      {/* Render the modals */}
       <ModalCreateNewChat isOpen={modalCreateChatOpen} setIsOpen={setModalCreateNewChatOpen} />
       <ModalCreateNewGroupChat isOpen={modalCreateGroupChatOpen} setIsOpen={setModalCreateNewGroupChatOpen} />
+      <ModalProfile isOpen={modalProfileOpen} setIsOpen={setModalProfileOpen} setIsChangePasswordModalOpen = {setIsChangePasswordModalOpen} />
+        {isChangePasswordModalOpen ? (
+          <ChangePasswordModal isOpen={isChangePasswordModalOpen} setIsOpen={handleCloseChangePassword} />
+        ) : (
+          <ModalProfile isOpen={isModalProfileOpen} setIsOpen={setIsProfileModalOpen} setIsChangePasswordModalOpen={handleOpenChangePassword} />
+        )}
       <ModalListGroup isOpen={modalListGroup} setIsOpen={setModalListGroup} isAdmin={true}/>
     </div>
   )

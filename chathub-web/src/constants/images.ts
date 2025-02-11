@@ -28,8 +28,12 @@ import IconCloseModal from "../../public/images/icon-close-modal.png"
 import IconSearch from "../../public/images/icon-search.png"
 import IconMore from "../../public/images/icon-more.png"
 import IconClosePurple from "../../public/images/icon-close-purple.png"
+import IconOutlinedCamera from "../../public/images/icon-outlined-camera.png"
 import IconCamera from "../../public/images/icon-camera.png"
-
+import IconNext from "../../public/images/icon-next.png"
+import IconChevronDown from "../../public/images/icon-chevron-down.png"
+import ProfileImage from "../../public/images/profile-image.png"
+import ProfileImage2 from "../../public/images/profile-image-2.png"
 
 export const Images = {
   File,
@@ -62,5 +66,10 @@ export const Images = {
   IconSearch,
   IconMore,
   IconClosePurple,
+  IconOutlinedCamera,
   IconCamera,
+  IconNext,
+  ProfileImage,
+  ProfileImage2,
+  IconChevronDown,
 }
