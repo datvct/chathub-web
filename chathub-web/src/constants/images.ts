@@ -36,6 +36,7 @@ import IconChevronDown from "../../public/images/icon-chevron-down.png"
 import ProfileImage from "../../public/images/profile-image.png"
 import ProfileImage2 from "../../public/images/profile-image-2.png"
 import IconSearchLucide from "../../public/images/icon-search-lucide.png"
+import AvatarDefault from "../../public/images/default-avatar.jpg"
 
 export const Images = {
   File,
@@ -71,6 +72,7 @@ export const Images = {
   IconClosePurple,
   IconOutlinedCamera,
   IconCamera,
+  AvatarDefault,
   IconNext,
   ProfileImage,
   ProfileImage2,
