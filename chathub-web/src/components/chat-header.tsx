@@ -11,7 +11,7 @@ const ChatHeader = ({ name }: { name: string }) => {
           <Image
             src={Images.AvatarDefault}
             alt={name}
-            className="w-[3.125rem] h-[3.125rem] rounded-full"
+            className="w-[3.125rem] h-[3.125rem] rounded-[30px]"
             width={50}
             height={50}
           />
@@ -22,16 +22,16 @@ const ChatHeader = ({ name }: { name: string }) => {
         </div>
       </div>
       <div className="flex gap-2.5">
-        <button className="bg-[#484848] h-10 w-10 rounded-full flex items-center justify-center">
+        <button className="bg-[#484848] h-10 w-10 rounded-[20px] flex items-center justify-center">
           <IoSearch size={20} color="white" className="text-white" />
         </button>
-        <button className="bg-[#484848] h-10 w-10 rounded-full flex items-center justify-center">
+        <button className="bg-[#484848] h-10 w-10 rounded-[20px] flex items-center justify-center">
           <FaPhoneAlt size={20} color="white" className="text-white" />
         </button>
-        <button className="bg-[#484848] h-10 w-10 rounded-full flex items-center justify-center">
+        <button className="bg-[#484848] h-10 w-10 rounded-[20px] flex items-center justify-center">
           <IoMdVideocam size={20} color="white" className="text-white" />
         </button>
-        <button className="bg-[#484848] h-10 w-10 rounded-full flex items-center justify-center">
+        <button className="bg-[#484848] h-10 w-10 rounded-[20px] flex items-center justify-center">
           <IoMdMore size={20} color="white" className="text-white" />
         </button>
       </div>

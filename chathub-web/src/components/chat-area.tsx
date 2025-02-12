@@ -70,14 +70,14 @@ const ChatScreen = ({ selectedChatId }: { selectedChatId: number }) => {
                 width={32}
                 height={32}
                 alt="avatar"
-                className="w-8 h-8 rounded-full mr-2"
+                className="w-8 h-8 mr-2 rounded-[20px]"
               />
             )}
             <div>
               {msg.type === "image" ? (
                 <>
                   <Image src={msg.url} alt="sent" className="rounded-lg w-40" about="" width={150} height={150} />
-                  <span className="text-xs text-gray-400 block mt-1">{msg.time}</span>
+                  <span className="text-[10px] text-gray-400 block mt-1">{msg.time}</span>
                 </>
               ) : (
                 <p className={`p-3 rounded-lg w-max max-w-xs ${msg.isMe ? "bg-[#1566A3]" : "bg-[#484848]"}`}>

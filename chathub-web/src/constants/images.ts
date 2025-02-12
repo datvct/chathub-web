@@ -35,7 +35,8 @@ import IconNext from "../../public/images/icon-next.png"
 import IconChevronDown from "../../public/images/icon-chevron-down.png"
 import ProfileImage from "../../public/images/profile-image.png"
 import ProfileImage2 from "../../public/images/profile-image-2.png"
-import IconSearchLucide from "../../public/images/icon-search-lucide.png"import AvatarDefault from "../../public/images/default-avatar.jpg"
+import IconSearchLucide from "../../public/images/icon-search-lucide.png"
+import AvatarDefault from "../../public/images/default-avatar.jpg"
 
 export const Images = {
   File,

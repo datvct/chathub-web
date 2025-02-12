@@ -98,7 +98,7 @@ const ChatList = ({ setSelectedChat }: { setSelectedChat: (id: number) => void }
         <input
           type="text"
           placeholder="Search"
-          className="w-full p-2 pl-4 bg-white bg-opacity-15 text-white placeholder-gray-400 rounded-lg"
+          className="w-full rounded p-2 pl-4 bg-white bg-opacity-15 text-white placeholder-gray-400 rounded-lg"
         />
       </div>
 
@@ -112,7 +112,7 @@ const ChatList = ({ setSelectedChat }: { setSelectedChat: (id: number) => void }
             onClick={() => setSelectedChat(chat.id)}
           >
             {/* Avatar */}
-            <div className="w-12 h-12 rounded-full bg-gray-500 flex items-center justify-center">{chat.name[0]}</div>
+            <div className="w-12 h-12 rounded-full bg-gray-500 flex items-center justify-center rounded-[100px]">{chat.name[0]}</div>
             {/* Details */}
             <div className="flex-1">
               <div className="flex items-center justify-between">
@@ -139,7 +139,7 @@ const ChatList = ({ setSelectedChat }: { setSelectedChat: (id: number) => void }
       <Menu>
         <MenuButton
           as="button"
-          className="absolute bottom-6 right-12 bg-white bg-opacity-30 p-4 rounded-full flex items-center justify-center text-white text-[30px]"
+          className="absolute bottom-6 right-12 bg-white bg-opacity-30 p-4 rounded-full flex items-center justify-center text-white text-[30px] rounded-[100px]"
         >
           <Image src={Images.IconPlus} alt="Plus Icon" width={28} height={28} />
         </MenuButton>

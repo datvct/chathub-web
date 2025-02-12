@@ -61,7 +61,7 @@ const ModalFriendRequests: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean
                             leaveFrom="opacity-100 scale-100"
                             leaveTo="opacity-0 scale-95"
                         >
-                            <DialogPanel className="bg-[#385068] rounded-[5%] w-[80%] h-[95%] max-w-md max-h-screen  transform overflow-hidden p-6 text-left align-middle shadow-xl transition-all">
+                            <DialogPanel className="bg-[#385068] rounded-[5%] w-[80%] h-[95%] max-w-2xl max-h-screen transform overflow-hidden p-6 text-left align-middle shadow-xl transition-all">
                                 <DialogTitle className="text-xl font-bold mb-4 flex items-center justify-between text-white leading-6">
                                     <div className="flex items-center gap-x-2">
                                         <Image src={Images.IconChatList} alt="Chat Icon" width={40} height={40} />
