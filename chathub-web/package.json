@@ -6,7 +6,8 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "codegen": "npx swagger-typescript-api -p http://localhost:8080/v3/api-docs -o ./src/codegen -n swagger-generated.ts --modular"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",

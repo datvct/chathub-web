@@ -5,10 +5,16 @@ import { Button } from "~/components/ui/button"
 import { Input } from "~/components/ui/input"
 import { Images } from "~/constants/images"
 import Link from "next/link"
+import { useSignUp } from "~/hooks/use-login"
+import { useRouter } from "next/navigation"
 
 const SignInPage: React.FC = () => {
   const [phoneNumber, setPhoneNumber] = useState("")
   const [password, setPassword] = useState("")
+  const [errorMessage, setErrorMessage] = useState("")
+  const [loading, setLoading] = useState(false)
+  const { submitSignUp } = useSignUp()
+  const router = useRouter()
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPhoneNumber(e.target.value)
@@ -17,25 +23,58 @@ const SignInPage: React.FC = () => {
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPassword(e.target.value)
   }
-
-  const handleSubmit = () => {
-    console.log("Phone:", phoneNumber, "Password:", password)
-  }
-
   const isFormValid = phoneNumber !== "" && password !== ""
+
+  const handleSubmit = async () => {
+    setLoading(true)
+    setErrorMessage("")
+
+    if (!isFormValid) {
+      setErrorMessage("Please fill in all fields.")
+      setLoading(false)
+      return
+    }
+    if (!/^\d+$/.test(phoneNumber)) {
+      setErrorMessage("Phone number must contain only digits.")
+      setLoading(false)
+      return
+    }
+
+    if (phoneNumber.length < 10) {
+      setErrorMessage("Phone number must be at least 10 digits.")
+      setLoading(false)
+      return
+    }
+
+    const data = { phoneNumber, password }
+
+    try {
+      const response = await submitSignUp(data)
+
+      if (response.status === 200) {
+        console.log("Login successful:", response)
+        localStorage.setItem("authToken", response?.response?.token)
+        router.push("/")
+      } else {
+        setErrorMessage("Invalid phone number or password.")
+      }
+    } catch (error) {
+      console.error("Login error:", error)
+      setErrorMessage("Something went wrong. Please try again.")
+    }
+
+    setLoading(false)
+  }
 
   return (
     <div className="h-screen w-full flex justify-center items-center bg-[#160430] relative">
-      <Image 
-        src={Images.Background} 
-        alt="background-image" 
-        layout="fill" 
-        objectFit="cover" 
-      />
+      <Image src={Images.Background} alt="background-image" layout="fill" objectFit="cover" />
       <div className="absolute inset-0 bg-black opacity-50" />
 
       <div className="z-20 bg-black bg-opacity-55 p-8 rounded-[20px] w-full max-w-md flex flex-col items-center justify-center">
         <h2 className="text-[45px] font-bold text-white mb-3">SIGN IN</h2>
+
+        {errorMessage && <p className="text-red-500 text-sm mb-3">{errorMessage}</p>}
 
         <div className="w-full mb-5 relative">
           <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
@@ -77,16 +116,18 @@ const SignInPage: React.FC = () => {
 
         <Button
           onClick={handleSubmit}
-          className={`w-full py-4 text-lg text-white rounded-[12px] bg-gradient-to-r from-[#501794] to-[#3E70A1] hover:bg-gradient-to-l ${!isFormValid ? 'opacity-50 cursor-not-allowed' : ''}`}
-          disabled={!isFormValid} 
+          className={`w-full py-4 text-lg text-white rounded-[12px] bg-gradient-to-r from-[#501794] to-[#3E70A1] hover:bg-gradient-to-l ${
+            !isFormValid || loading ? "opacity-50 cursor-not-allowed" : ""
+          }`}
+          disabled={!isFormValid || loading}
         >
-          Sign In
+          {loading ? "Signing In..." : "Sign In"}
         </Button>
 
         <hr className="w-3/4 my-4 border-1 border-gray-500" />
 
         <div className="text-white text-[14px] uppercase">
-          Don't have an account?{" "}
+          {`Don't have an account? `}
           <Link href="/sign-up" className="text-[#3E70A1] hover:underline font-bold">
             Sign Up
           </Link>
