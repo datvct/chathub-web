@@ -4,7 +4,13 @@ import { Images } from "~/constants/images"
 import ChatHeader from "./chat-header"
 import ChatInput from "./chat-input"
 
-const ChatScreen = ({ selectedChatId }: { selectedChatId: number }) => {
+interface ChatScreenProps {
+  selectedChatId: number | null
+  setIsChatInfoOpen: (isOpen: boolean) => void
+  isChatInfoOpen: boolean
+}
+
+const ChatScreen = ({ selectedChatId, setIsChatInfoOpen, isChatInfoOpen }: ChatScreenProps) => {
   const chatData = [
     {
       id: 1,
@@ -54,13 +60,13 @@ const ChatScreen = ({ selectedChatId }: { selectedChatId: number }) => {
   ]
 
   if (!selectedChatId)
-    return <div className="flex-1 flex items-center justify-center text-white">Chọn một cuộc trò chuyện</div>
+    return <div className="flex items-center justify-center text-white">Chọn một cuộc trò chuyện</div>
 
   const chat = chatData.find(chat => chat.id === selectedChatId) || { name: "Unknown", messages: [] }
 
   return (
-    <div className="flex-1 h-full w-full p-4 bg-[#3A3A3A] text-white flex flex-col relative">
-      <ChatHeader name={chat.name} />
+    <div className="flex-1 h-full w-full p-4 bg-[#3A3A3A] text-white flex flex-col relative transition-all">
+      <ChatHeader name={chat.name} setIsChatInfoOpen={setIsChatInfoOpen} isChatInfoOpen={isChatInfoOpen} />
       <div className="flex flex-col space-y-3 overflow-y-auto h-[75vh] custom-scrollbar">
         {chat.messages.map((msg, index) => (
           <div key={index} className={`flex ${msg.isMe ? "justify-end" : "justify-start"}`}>
