@@ -13,42 +13,66 @@ import ModalFriendList from "./modal-friend-list"
 import ModalFriendRequests from "./modal-friend-requests"
 import ModalListGroup from "./modal-list-group"
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-const ChatList = ({ setSelectedChat }: { setSelectedChat: (id: number) => void }) => {
+const ChatList = ({
+  setSelectedChat,
+  setIsGroupChat,
+}: {
+  setSelectedChat: (id: number) => void
+  setIsGroupChat: (isGroup: boolean) => void
+}) => {
   const chats = [
-    { id: 1, name: "Sweetie", message: "I love you so much!", time: "8:32 PM", type: "text", pinned: true },
-    { id: 2, name: "Jane Cooper", message: "Photo", time: "3:27 PM", type: "photo", pinned: true },
-    { id: 3, name: "Design Review Chat", message: "Document", time: "2:49 AM", type: "document", unread: 34 },
-    { id: 4, name: "R4IN80W", message: "That is how you do it!", time: "7:21 PM", type: "text" },
-    { id: 5, name: "ptec", message: "You: lets do this quick", time: "6:18 PM", type: "text" },
-    { id: 6, name: "480 Design", message: "Check out this new design!", time: "1:58 PM", type: "text" },
-    { id: 7, name: "help! I'm in the hole", message: "Let's go", time: "10:54 AM", type: "text" },
-    { id: 8, name: "kiguk", message: "Photo", time: "3:36 AM", type: "photo" },
-    { id: 9, name: "iceChat", message: "I reeeeally love this animation!", time: "Thu", unread: 57 },
-    { id: 10, name: "iceDSGN", message: "Happy New Year! 🎉", time: "Thu" },
+    {
+      id: 1,
+      name: "Sweetie",
+      message: "I love you so much!",
+      time: "8:32 PM",
+      type: "text",
+      pinned: true,
+      isGroup: false,
+    },
+    { id: 2, name: "Jane Cooper", message: "Photo", time: "3:27 PM", type: "photo", pinned: true, isGroup: false },
+    {
+      id: 3,
+      name: "Design Review Chat",
+      message: "Document",
+      time: "2:49 AM",
+      type: "document",
+      unread: 34,
+      isGroup: true,
+    },
+    { id: 4, name: "R4IN80W", message: "That is how you do it!", time: "7:21 PM", type: "text", isGroup: false },
+    { id: 5, name: "ptec", message: "You: lets do this quick", time: "6:18 PM", type: "text", isGroup: false },
+    { id: 6, name: "480 Design", message: "Check out this new design!", time: "1:58 PM", type: "text", isGroup: false },
+    { id: 7, name: "help! I'm in the hole", message: "Let's go", time: "10:54 AM", type: "text", isGroup: false },
+    { id: 8, name: "kiguk", message: "Photo", time: "3:36 AM", type: "photo", isGroup: false },
+    { id: 9, name: "iceChat", message: "I reeeeally love this animation!", time: "Thu", unread: 57, isGroup: false },
+    { id: 10, name: "iceDSGN", message: "Happy New Year! 🎉", time: "Thu", isGroup: false },
   ]
   const [modalCreateChatOpen, setModalCreateNewChatOpen] = useState(false)
   const [modalCreateGroupChatOpen, setModalCreateNewGroupChatOpen] = useState(false)
   const [modalProfileOpen, setModalProfileOpen] = useState(false)
   const [isModalProfileOpen, setIsProfileModalOpen] = useState(false)
   const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false)
-  const [isFriendListModalOpen, setIsFriendListModalOpen] = useState(false);
-  const [isFriendRequestModalOpen, setIsFriendRequestModalOpen] = useState(false);
+  const [isFriendListModalOpen, setIsFriendListModalOpen] = useState(false)
+  const [isFriendRequestModalOpen, setIsFriendRequestModalOpen] = useState(false)
+  const [modalListGroup, setModalListGroup] = useState(false)
 
   const handleOpenChangePassword = () => {
-    setIsProfileModalOpen(false); 
-    setIsChangePasswordModalOpen(true);
-  };
+    setIsProfileModalOpen(false)
+    setIsChangePasswordModalOpen(true)
+  }
 
   const handleCloseChangePassword = () => {
-    setIsChangePasswordModalOpen(false);
-    setIsProfileModalOpen(true); 
-  };
+    setIsChangePasswordModalOpen(false)
+    setIsProfileModalOpen(true)
+  }
 
-  const [modalListGroup,setModalListGroup] = useState(false)
-
+  const handleSelectChat = (id: number, isGroup?: boolean) => {
+    setSelectedChat(id)
+    setIsGroupChat(isGroup || false)
+  }
   return (
-    <div className="bg-[#202020] text-white w-1/4 h-screen p-4 relative">
+    <div className="bg-[#202020] text-white w-1/4 h-screen p-4 relative z-50">
       <Menu>
         <MenuButton as="button" className="flex items-center justify-start gap-5 mb-4">
           <Image src={Images.IconChatList} alt="Chat Icon" width={35} height={35} />
@@ -57,35 +81,40 @@ const ChatList = ({ setSelectedChat }: { setSelectedChat: (id: number) => void }
 
         <MenuItems className="absolute top-14 left-2 bg-black border border-white border-opacity-30 w-55 p-4 rounded-[20px] shadow-md z-50 mt-2 text-left focus:outline-none">
           <MenuItem>
-            <button 
+            <button
               className="w-full group rounded-lg px-4 py-2 flex items-center cursor-pointer hover:bg-gray-600"
-              onClick={() => setModalProfileOpen(true)}>
-                <Image src={Images.IconProfile} alt="Profile" width={24} height={24} />
-                <span className="block ml-3 font-medium truncate">Profile</span>
+              onClick={() => setModalProfileOpen(true)}
+            >
+              <Image src={Images.IconProfile} alt="Profile" width={24} height={24} />
+              <span className="block ml-3 font-medium truncate">Profile</span>
             </button>
           </MenuItem>
 
           <MenuItem>
-            <button 
+            <button
               className="w-full group rounded-lg px-4 py-2 flex items-center cursor-pointer hover:bg-gray-600"
-              onClick={() => setIsFriendListModalOpen(true)}>
-                <Image src={Images.IconContact} alt="FriendList" width={24} height={24} />
-                <span className="ml-3 block font-medium truncate">Friend List</span>
+              onClick={() => setIsFriendListModalOpen(true)}
+            >
+              <Image src={Images.IconContact} alt="FriendList" width={24} height={24} />
+              <span className="ml-3 block font-medium truncate">Friend List</span>
             </button>
           </MenuItem>
 
           <MenuItem>
-            <button 
+            <button
               className="w-full group rounded-lg px-4 py-2 flex items-center cursor-pointer hover:bg-gray-600"
-              onClick={() => setIsFriendRequestModalOpen(true)}>
-                <Image src={Images.IconAddFriend} alt="Friend Requests" width={24} height={24} />
-                <span className="ml-3 block font-medium truncate">Friend Requests</span>
+              onClick={() => setIsFriendRequestModalOpen(true)}
+            >
+              <Image src={Images.IconAddFriend} alt="Friend Requests" width={24} height={24} />
+              <span className="ml-3 block font-medium truncate">Friend Requests</span>
             </button>
           </MenuItem>
 
           <MenuItem>
-            <button className="w-full group rounded-lg px-4 py-2 flex items-center cursor-pointer hover:bg-gray-600"
-                    onClick={()=>setModalListGroup(true)}>
+            <button
+              className="w-full group rounded-lg px-4 py-2 flex items-center cursor-pointer hover:bg-gray-600"
+              onClick={() => setModalListGroup(true)}
+            >
               <Image src={Images.IconGroup} alt="Group List" width={24} height={24} />
               <span className="ml-3 block font-medium truncate">Group List</span>
             </button>
@@ -98,7 +127,7 @@ const ChatList = ({ setSelectedChat }: { setSelectedChat: (id: number) => void }
         <input
           type="text"
           placeholder="Search"
-          className="w-full rounded p-2 pl-4 bg-white bg-opacity-15 text-white placeholder-gray-400 rounded-lg"
+          className="w-full p-2 pl-4 bg-white bg-opacity-15 text-white placeholder-gray-400 rounded-lg"
         />
       </div>
 
@@ -109,11 +138,9 @@ const ChatList = ({ setSelectedChat }: { setSelectedChat: (id: number) => void }
             key={chat.id}
             className={`flex items-center gap-3 p-2 rounded-lg hover:cursor-pointer
             `}
-            onClick={() => setSelectedChat(chat.id)}
+            onClick={() => handleSelectChat(chat.id, chat?.isGroup)}
           >
-            {/* Avatar */}
-            <div className="w-12 h-12 rounded-full bg-gray-500 flex items-center justify-center rounded-[100px]">{chat.name[0]}</div>
-            {/* Details */}
+            <div className="w-12 h-12 rounded-full bg-gray-500 flex items-center justify-center">{chat.name[0]}</div>
             <div className="flex-1">
               <div className="flex items-center justify-between">
                 <span className="font-semibold">{chat.name}</span>
@@ -139,7 +166,7 @@ const ChatList = ({ setSelectedChat }: { setSelectedChat: (id: number) => void }
       <Menu>
         <MenuButton
           as="button"
-          className="absolute bottom-6 right-12 bg-white bg-opacity-30 p-4 rounded-full flex items-center justify-center text-white text-[30px] rounded-[100px]"
+          className="absolute bottom-6 right-12 bg-white bg-opacity-30 p-4 rounded-full flex items-center justify-center text-white text-[30px]"
         >
           <Image src={Images.IconPlus} alt="Plus Icon" width={28} height={28} />
         </MenuButton>
@@ -186,15 +213,23 @@ const ChatList = ({ setSelectedChat }: { setSelectedChat: (id: number) => void }
       {/* Render the modals */}
       <ModalCreateNewChat isOpen={modalCreateChatOpen} setIsOpen={setModalCreateNewChatOpen} />
       <ModalCreateNewGroupChat isOpen={modalCreateGroupChatOpen} setIsOpen={setModalCreateNewGroupChatOpen} />
-      <ModalProfile isOpen={modalProfileOpen} setIsOpen={setModalProfileOpen} setIsChangePasswordModalOpen = {setIsChangePasswordModalOpen} />
-        {isChangePasswordModalOpen ? (
-          <ChangePasswordModal isOpen={isChangePasswordModalOpen} setIsOpen={handleCloseChangePassword} />
-        ) : (
-          <ModalProfile isOpen={isModalProfileOpen} setIsOpen={setIsProfileModalOpen} setIsChangePasswordModalOpen={handleOpenChangePassword} />
-        )}
+      <ModalProfile
+        isOpen={modalProfileOpen}
+        setIsOpen={setModalProfileOpen}
+        setIsChangePasswordModalOpen={setIsChangePasswordModalOpen}
+      />
+      {isChangePasswordModalOpen ? (
+        <ChangePasswordModal isOpen={isChangePasswordModalOpen} setIsOpen={handleCloseChangePassword} />
+      ) : (
+        <ModalProfile
+          isOpen={isModalProfileOpen}
+          setIsOpen={setIsProfileModalOpen}
+          setIsChangePasswordModalOpen={handleOpenChangePassword}
+        />
+      )}
       <ModalFriendList isOpen={isFriendListModalOpen} setIsOpen={setIsFriendListModalOpen} />
       <ModalFriendRequests isOpen={isFriendRequestModalOpen} setIsOpen={setIsFriendRequestModalOpen} />
-      <ModalListGroup isOpen={modalListGroup} setIsOpen={setModalListGroup} isAdmin={true}/>
+      <ModalListGroup isOpen={modalListGroup} setIsOpen={setModalListGroup} isAdmin={true} />
     </div>
   )
 }
