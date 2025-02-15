@@ -67,7 +67,7 @@ const ModalAddMember: React.FC<{
 
               <button
                 onClick={() => setIsOpen(false)}
-                className="absolute top-2 right-2 w-10 h-10 text-gray-400 hover:text-gray-500"
+                className="absolute top-2 right-2 w-10 h-10"
               >
                 <Image src={Images.IconCloseModal} alt="close modal" width={40} height={4} />
               </button>
@@ -89,13 +89,15 @@ const ModalAddMember: React.FC<{
                   {filteredMembers.map((member, index) => (
                     <li
                       key={index}
-                      className={`flex items-center justify-between odd:bg-[#E4DEED] even:bg-[#AF9CC9] rounded-lg px-3 py-3 space-x-3 transition duration-150 mb-1 cursor-pointer
+                      className={`flex items-center justify-between rounded-lg px-3 py-3 space-x-3 transition duration-150 mb-1 cursor-pointer
                           ${member.selected
-                          ? "bg-[#93C1D2] even:bg-[#93C1D2] odd:bg-[#93C1D2] rounded-lg"
-                          : ""}
-                          ${!member.selected && !isOpen
-                          ? "even:hover:bg-[#93C1D2] hover:rounded-lg odd:hover:bg-[#93C1D2] rounded-lg "
-                          : ""}
+                          ? "bg-[#93C1D2]"
+                          : "odd:bg-[#E4DEED] even:bg-[#AF9CC9]"
+                        }
+                          ${!member.selected
+                          ? "hover:rounded-lg bg-[#7a99b8]/90"
+                          : ""
+                        }
                       `}
                       onClick={() => handleMemberToggle(index)}
                     >
@@ -126,7 +128,7 @@ const ModalAddMember: React.FC<{
 
                 <Button
                   onClick={handleAddMembers}
-                  className="bg-gradient-to-r from-[#501794] to-[#3E70A1] text-white rounded-[12px] px-4 py-2"
+                  className="bg-gradient-to-r from-[#501794] to-[#3E70A1] text-white rounded-[12px] px-4 py-2 hover:bg-gradient-to-l"
                 >
                   Add
                 </Button>
