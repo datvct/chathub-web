@@ -30,6 +30,7 @@ import IconCloseModal from "../../public/images/icon-close-modal.png"
 import IconSearch from "../../public/images/icon-search.png"
 import IconMore from "../../public/images/icon-more.png"
 import IconClosePurple from "../../public/images/icon-close-purple.png"
+import IconCheckSmall from "../../public/images/icon-check-small.png"
 import IconOutlinedCamera from "../../public/images/icon-outlined-camera.png"
 import IconCamera from "../../public/images/icon-camera.png"
 import IconBack from "../../public/images/icon-back.png"
@@ -74,6 +75,7 @@ export const Images = {
   IconBack,
   IconMore,
   IconClosePurple,
+  IconCheckSmall,
   IconOutlinedCamera,
   IconCamera,
   AvatarDefault,

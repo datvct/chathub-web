@@ -104,22 +104,20 @@ const ModalFriendList: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) =>
                     <button
                       onClick={() => setActiveTab("all")}
                       className={`px-4 py-2 rounded-lg text-white font-semibold 
-                                                    ${
-                                                      activeTab === "all"
-                                                        ? "bg-[#501794]"
-                                                        : "bg-[#8C8595] hover:bg-[#7746F5]"
-                                                    }`}
+                                                    ${activeTab === "all"
+                          ? "bg-[#501794]"
+                          : "bg-[#8C8595] hover:bg-[#7746F5]"
+                        }`}
                     >
                       All ({friends.length})
                     </button>
                     <button
                       onClick={() => setActiveTab("recent")}
                       className={`px-4 py-2 rounded-lg text-white font-semibold 
-                                                    ${
-                                                      activeTab === "recent"
-                                                        ? "bg-[#501794]"
-                                                        : "bg-[#8C8595] hover:bg-[#7746F5]"
-                                                    }`}
+                                                    ${activeTab === "recent"
+                          ? "bg-[#501794]"
+                          : "bg-[#8C8595] hover:bg-[#7746F5]"
+                        }`}
                     >
                       Recently online ({friends.filter(friend => friend.online).length})
                     </button>
