@@ -16,11 +16,35 @@ import ModalLeaveGroup from "./modal-leave-group"
 import { FaChevronLeft } from "react-icons/fa6"
 import { Button } from "./ui/button"
 import { LuUserRoundPlus } from "react-icons/lu"
+import ModalAddMembers from "./modal-add-members" // Adjust path if needed
+
+interface Member {
+  name: string;
+  phone: string;
+  image: any;
+  selected?: boolean; 
+}
 
 const ChatInfo = ({ isOpen, isGroupChat }: { isOpen?: boolean; isGroupChat?: boolean }) => {
   const [isOpenLeaveGroup, setIsOpenLeaveGroup] = useState(false)
   const [isAddingMember, setIsAddingMember] = useState(false) // Thêm state này
   if (!isOpen) return null
+  const [selectedMembers, setSelectedMembers] = useState<Member[]>([]);
+  const [groupMembers, setGroupMembers] = useState<Member[]>([
+    { name: "Guy Hawkins", phone: "0903112233", image: Images.GuyHawkins, selected: false },
+    { name: "Ronald Richards", phone: "0902445566", image: Images.RonaldRichards, selected: false },
+    { name: "Esther Howard", phone: "0904998877", image: Images.EstherHoward, selected: false },
+    { name: "Albert Flores", phone: "0905336699", image: Images.AlbertFlores, selected: false },
+    { name: "Miley Cyrus", phone: "0909225588", image: Images.MileyCyrus, selected: false },
+    { name: "Arlene McCoy", phone: "0906114477", image: Images.ArleneMcCoy, selected: false },
+    { name: "Cameron Williamson", phone: "0902115599", image: Images.CameronWilliamson, selected: false },
+  ]);
+
+  const handleAddMembers = (members: Member[]) => {
+    // setSelectedMembers(members)
+    setGroupMembers([...groupMembers, ...members]);
+    setIsAddingMember(false)
+  }
 
   return (
     <div className="bg-[#292929] text-white w-full mx-auto mt-2">
@@ -50,13 +74,12 @@ const ChatInfo = ({ isOpen, isGroupChat }: { isOpen?: boolean; isGroupChat?: boo
                 </div>
                 {isGroupChat && (
                   <div className="flex items-center flex-col">
-                    <button
-                      className="bg-[#484848] h-10 w-10 rounded-full flex items-center justify-center"
-                      onClick={() => setIsAddingMember(true)}
-                    >
-                      <AiOutlineUsergroupAdd size={25} color="white" className="text-white" />
+                    <button 
+                      className="bg-[#484848] h-10 w-10 rounded-full flex items-center justify-center" 
+                      onClick={() => setIsAddingMember(true)}>
+                        <AiOutlineUsergroupAdd size={25} color="white" className="text-white" />
                     </button>
-                    <span>Add Memeber</span>
+                    <span>Add Member</span>
                   </div>
                 )}
                 <div className="flex items-center flex-col">
@@ -169,7 +192,7 @@ const ChatInfo = ({ isOpen, isGroupChat }: { isOpen?: boolean; isGroupChat?: boo
             </div>
           </div>
           <div className="mt-4">
-            <Button className="w-full bg-[#D9D9D9] hover:bg-white">
+            <Button className="w-full bg-[#D9D9D9] hover:bg-white" onClick={() => handleAddMembers(selectedMembers)}>
               <LuUserRoundPlus size={30} color="black" />
               <span className="text-black text-sm">Add member</span>
             </Button>
@@ -190,6 +213,14 @@ const ChatInfo = ({ isOpen, isGroupChat }: { isOpen?: boolean; isGroupChat?: boo
             </div>
           </div>
         </>
+      )}
+
+      {isAddingMember && (  
+        <ModalAddMembers
+          isOpen={isAddingMember}
+          setIsOpen={setIsAddingMember}
+          onAddMembers={handleAddMembers}
+        />
       )}
       {isOpenLeaveGroup && <ModalLeaveGroup isOpen={isOpenLeaveGroup} setIsOpen={setIsOpenLeaveGroup} />}
     </div>
