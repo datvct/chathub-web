@@ -36,9 +36,9 @@ const ModalAddMember: React.FC<{
 
   const handleMemberToggle = (index: number) => {
     setMembers(prevMembers => {
-        const newMembers = [...prevMembers];  
-        newMembers[index] = { ...newMembers[index], selected: !newMembers[index].selected };
-        return newMembers; 
+      const newMembers = [...prevMembers];
+      newMembers[index] = { ...newMembers[index], selected: !newMembers[index].selected };
+      return newMembers;
     });
   };
 
@@ -51,7 +51,7 @@ const ModalAddMember: React.FC<{
     const selectedMembers = members.filter(member => member.selected);
     onAddMembers(selectedMembers);
     setIsOpen(false);
-    setMembers(members.map(member => ({...member, selected: false}))); 
+    setMembers(members.map(member => ({ ...member, selected: false })));
   };
 
   return (
@@ -90,12 +90,12 @@ const ModalAddMember: React.FC<{
                     <li
                       key={index}
                       className={`flex items-center justify-between odd:bg-[#E4DEED] even:bg-[#AF9CC9] rounded-lg px-3 py-3 space-x-3 transition duration-150 mb-1 cursor-pointer
-                          ${member.selected  
-                            ? "bg-[#93C1D2] even:bg-[#93C1D2] odd:bg-[#93C1D2] rounded-lg"
-                            : ""}
-                          ${!member.selected && !isOpen 
-                            ? "even:hover:bg-[#93C1D2] hover:rounded-lg odd:hover:bg-[#93C1D2] rounded-lg "
-                            : ""}
+                          ${member.selected
+                          ? "bg-[#93C1D2] even:bg-[#93C1D2] odd:bg-[#93C1D2] rounded-lg"
+                          : ""}
+                          ${!member.selected && !isOpen
+                          ? "even:hover:bg-[#93C1D2] hover:rounded-lg odd:hover:bg-[#93C1D2] rounded-lg "
+                          : ""}
                       `}
                       onClick={() => handleMemberToggle(index)}
                     >
