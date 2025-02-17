@@ -1,18 +1,27 @@
 "use client"
+
 import Image from "next/image"
 import Link from "next/link"
 import { useState } from "react"
 import { Button } from "~/components/ui/button"
 import { Input } from "~/components/ui/input"
 import { Images } from "~/constants/images"
+import { useRouter } from "next/navigation"
+import { toast } from "react-toastify"
+import { RegistrationRequest } from "~/codegen/data-contracts"
+import { useRegister } from "~/hooks/use-register"
 
 const SignUpPage: React.FC = () => {
+  const [avatar, setAvatar] = useState("")
   const [phoneNumber, setPhoneNumber] = useState("")
   const [fullName, setFullName] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [agreeTerms, setAgreeTerms] = useState(false)
   const [agreeSocialTerms, setAgreeSocialTerms] = useState(false)
+  const [errorMessage, setErrorMessage] = useState("")
+  const { submitRegister, loading, errorMessage: registrationErrorMessage } = useRegister()
+  // const router = useRouter()
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPhoneNumber(e.target.value)
@@ -30,21 +39,42 @@ const SignUpPage: React.FC = () => {
     setConfirmPassword(e.target.value)
   }
 
-  const handleSubmit = () => {
-    console.log(
-      "Phone:",
+  const handleSubmit = async () => {
+    // if (!phoneNumber || !fullName || !password || !confirmPassword || !avatar) {
+    //   toast.error("Please fill in all fields.")
+    //   return
+    // }
+
+    // if (password !== confirmPassword) {
+    //   toast.error("Passwords do not match")
+    //   return
+    // }
+
+    // if (!/^\d+$/.test(phoneNumber)) {
+    //   toast.error("Phone number must contain only digits.")
+    //   return
+    // }
+
+    // if (phoneNumber.length < 10) {
+    //   toast.error("Phone number must be at least 10 digits.")
+    //   return
+    // }
+
+    const data: RegistrationRequest = {
       phoneNumber,
-      "Full name:",
-      fullName,
-      "Password:",
+      name: fullName,
       password,
-      "Confirm password:",
-      confirmPassword,
-      "Terms:",
-      agreeTerms,
-      "Social terms:",
-      agreeSocialTerms,
-    )
+      avatar: avatar || "https://i.pravatar.cc/300",
+    }
+    console.log("Registration data:", data)
+    const response = await submitRegister(data)
+    console.log("Registration response:", response)
+    if (response.success) {
+      toast.success("Registration successful!")
+      // router.push("/sign-in")
+    } else {
+      toast.error(response.error || "Something went wrong.")
+    }
   }
 
   const isFormValid = phoneNumber && fullName && password && confirmPassword && agreeTerms && agreeSocialTerms
@@ -139,9 +169,8 @@ const SignUpPage: React.FC = () => {
 
         <Button
           onClick={handleSubmit}
-          className={`w-full py-4 text-lg text-white rounded-[12px] bg-gradient-to-r from-[#501794] to-[#3E70A1] hover:bg-gradient-to-l ${
-            !isFormValid ? "opacity-50 cursor-not-allowed" : ""
-          }`}
+          className={`w-full py-4 text-lg text-white rounded-[12px] bg-gradient-to-r from-[#501794] to-[#3E70A1] hover:bg-gradient-to-l ${!isFormValid ? "opacity-50 cursor-not-allowed" : ""
+            }`}
           disabled={!isFormValid}
         >
           Sign Up
