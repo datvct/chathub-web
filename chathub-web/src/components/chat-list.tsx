@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import Image from "next/image"
 import { Images } from "../constants/images"
 import "../styles/custom-scroll.css"
@@ -12,6 +12,10 @@ import ChangePasswordModal from "./modal-change-password"
 import ModalFriendList from "./modal-friend-list"
 import ModalFriendRequests from "./modal-friend-requests"
 import ModalListGroup from "./modal-list-group"
+import { useSelector } from "react-redux"
+import { RootState } from "~/lib/reudx/store"
+import { useConversation } from "~/hooks/use-converstation"
+import { ConversationResponse } from "~/codegen/data-contracts"
 
 const ChatList = ({
   setSelectedChat,
@@ -20,34 +24,8 @@ const ChatList = ({
   setSelectedChat: (id: number) => void
   setIsGroupChat: (isGroup: boolean) => void
 }) => {
-  const chats = [
-    {
-      id: 1,
-      name: "Sweetie",
-      message: "I love you so much!",
-      time: "8:32 PM",
-      type: "text",
-      pinned: true,
-      isGroup: false,
-    },
-    { id: 2, name: "Jane Cooper", message: "Photo", time: "3:27 PM", type: "photo", pinned: true, isGroup: false },
-    {
-      id: 3,
-      name: "Design Review Chat",
-      message: "Document",
-      time: "2:49 AM",
-      type: "document",
-      unread: 34,
-      isGroup: true,
-    },
-    { id: 4, name: "R4IN80W", message: "That is how you do it!", time: "7:21 PM", type: "text", isGroup: false },
-    { id: 5, name: "ptec", message: "You: lets do this quick", time: "6:18 PM", type: "text", isGroup: false },
-    { id: 6, name: "480 Design", message: "Check out this new design!", time: "1:58 PM", type: "text", isGroup: false },
-    { id: 7, name: "help! I'm in the hole", message: "Let's go", time: "10:54 AM", type: "text", isGroup: false },
-    { id: 8, name: "kiguk", message: "Photo", time: "3:36 AM", type: "photo", isGroup: false },
-    { id: 9, name: "iceChat", message: "I reeeeally love this animation!", time: "Thu", unread: 57, isGroup: false },
-    { id: 10, name: "iceDSGN", message: "Happy New Year! 🎉", time: "Thu", isGroup: false },
-  ]
+  
+  const userId = useSelector((state: RootState) => state.auth.userId);
   const [modalCreateChatOpen, setModalCreateNewChatOpen] = useState(false)
   const [modalCreateGroupChatOpen, setModalCreateNewGroupChatOpen] = useState(false)
   const [modalProfileOpen, setModalProfileOpen] = useState(false)
@@ -56,7 +34,23 @@ const ChatList = ({
   const [isFriendListModalOpen, setIsFriendListModalOpen] = useState(false)
   const [isFriendRequestModalOpen, setIsFriendRequestModalOpen] = useState(false)
   const [modalListGroup, setModalListGroup] = useState(false)
+  const {getConversation} = useConversation()
+  const [dataConversation, setDataConversation] = useState<ConversationResponse[]>([])
+  useEffect(() => {
+      if(userId) {
+        const init = async () => {
+        
+          const response = await getConversation(userId)
+          if(response) {
+            setDataConversation(response)
+          }
+          }
+          init()
+        }
+      }
+  , [userId])
 
+  
   const handleOpenChangePassword = () => {
     setIsProfileModalOpen(false)
     setIsChangePasswordModalOpen(true)
@@ -71,6 +65,12 @@ const ChatList = ({
     setSelectedChat(id)
     setIsGroupChat(isGroup || false)
   }
+
+  const formatTime = (timestamp: string) => {
+    const date = new Date(timestamp);
+    return `${date.getHours()}:${date.getMinutes()}`;
+  };
+
   return (
     <div className="bg-[#202020] text-white w-1/4 h-screen p-4 relative z-50">
       <Menu>
@@ -133,33 +133,42 @@ const ChatList = ({
 
       {/* Chat List */}
       <ul className="space-y-3 overflow-y-scroll custom-scrollbar h-[calc(100%-150px)]">
-        {chats.map(chat => (
-          <li
-            key={chat.id}
-            className={`flex items-center gap-3 p-2 rounded-lg hover:cursor-pointer
-            `}
-            onClick={() => handleSelectChat(chat.id, chat?.isGroup)}
-          >
-            <div className="w-12 h-12 rounded-full bg-gray-500 flex items-center justify-center">{chat.name[0]}</div>
-            <div className="flex-1">
-              <div className="flex items-center justify-between">
-                <span className="font-semibold">{chat.name}</span>
-                <div className="flex items-center">
-                  <span className="text-[14px] text-[#838383] mr-2">{chat.time}</span>
-                  {chat.pinned && <Image src={Images.IconPin} alt="Pin Icon" width={20} height={20} />}
+      {dataConversation.length >0 ? dataConversation.map((chat) => (
+            <li
+              key={chat.id}
+              className={`flex items-center gap-3 p-2 rounded-lg hover:cursor-pointer`}
+              onClick={() => handleSelectChat(chat.id, chat.chatType === "GROUP")}
+            >
+              <div className="w-12 h-12 rounded-full bg-gray-500 flex items-center justify-center">
+                <Image
+                  src={chat.chatType === "GROUP" ? chat.groupAvatar : chat.senderAvatar}
+                  alt={chat.chatType === "GROUP" ? chat.groupName : chat.senderName}
+                  width={48}
+                  height={48}
+                  className="rounded-full"
+                />
+              </div>
+              <div className="flex-1">
+                <div className="flex items-center justify-between">
+                  <span className="font-semibold">{chat.chatType === "GROUP" ? chat.groupName : chat.senderName}</span>
+                  <div className="flex items-center">
+                    <span className="text-[14px] text-[#838383] mr-2">
+                      {formatTime(chat.lastMessageAt)}
+                    </span>
+                    {chat.pinned && <Image src={Images.IconPin} alt="Pin Icon" width={20} height={20} />}
+                  </div>
+                </div>
+                <div className="flex justify-between items-center">
+                  <p className="text-sm text-[#838383] truncate">{chat.lastMessage}</p>
+                  {chat.isSeen === false && (
+                    <span className="bg-[#0078D4] text-xs font-bold text-white rounded-[20px] px-1 flex items-center justify-center">
+                      NEW
+                    </span>
+                  )}
                 </div>
               </div>
-              <div className="flex justify-between items-center">
-                <p className="text-sm text-[#838383] truncate">{chat.message}</p>
-                {chat.unread && (
-                  <span className="bg-[#0078D4] text-xs font-bold text-white rounded-[20px] px-1 flex items-center justify-center">
-                    {chat.unread}
-                  </span>
-                )}
-              </div>
-            </div>
-          </li>
-        ))}
+            </li>
+          )):<>Loading...</>}
       </ul>
 
       {/* Floating Button */}

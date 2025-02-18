@@ -7,6 +7,8 @@ import { Images } from "~/constants/images"
 import Link from "next/link"
 import { useSignUp } from "~/hooks/use-login"
 import { useRouter } from "next/navigation"
+import { useDispatch } from "react-redux"
+import { setUser } from "~/lib/reudx/authSlice"
 
 const SignInPage: React.FC = () => {
   const [phoneNumber, setPhoneNumber] = useState("")
@@ -15,6 +17,7 @@ const SignInPage: React.FC = () => {
   const [loading, setLoading] = useState(false)
   const { submitSignUp } = useSignUp()
   const router = useRouter()
+  const dispatch = useDispatch();
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPhoneNumber(e.target.value)
@@ -52,8 +55,9 @@ const SignInPage: React.FC = () => {
       const response = await submitSignUp(data)
 
       if (response.status === 200) {
-        console.log("Login successful:", response)
         localStorage.setItem("authToken", response?.response?.token)
+        dispatch(setUser({ userId: response?.response?.userId, token: response?.response?.token }));
+
         router.push("/")
       } else {
         setErrorMessage("Invalid phone number or password.")

@@ -5,7 +5,6 @@ export const useSignUp = () => {
   const submitSignUp = async (values: AuthRequest) => {
     try {
       const response = await signIn(values)
-      console.log("response", response)
       if (response?.userId) {
         return { status: 200, isSuccess: true, response }
       } else {
