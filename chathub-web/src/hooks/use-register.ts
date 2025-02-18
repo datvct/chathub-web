@@ -17,9 +17,10 @@ export const useRegister = () => {
     try {
       const response = await signUp(values)
       console.log("Registration response:", response)
-      if (response.status === 201) return { success: true, data: response.data }
+      if (response.statusCode === 200) return { success: true }
       else {
-        throw new Error((response.error as ErrorResponse)?.message || "Registration Failed.")
+        // throw new Error(response.message)
+        return { success: false, error: response.message }
       }
     } catch (error: any) {
       console.log("Registration error:", error)
