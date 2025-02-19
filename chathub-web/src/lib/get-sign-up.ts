@@ -1,0 +1,14 @@
+import { Auth } from "~/codegen/Auth";
+import { RegistrationRequest, SuccessResponse, ErrorResponse } from "~/codegen/data-contracts";
+
+const authInstance = new Auth({ baseUrl: process.env.API_URL });
+
+export async function signUp(data: RegistrationRequest) {
+  try {
+    const response = await authInstance.register(data) as SuccessResponse;
+    return response;
+  } catch (error) {
+    console.error("Registration error:", error);
+    throw error; 
+  }
+}

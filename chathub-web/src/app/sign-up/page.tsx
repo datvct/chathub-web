@@ -1,18 +1,28 @@
 "use client"
+
 import Image from "next/image"
 import Link from "next/link"
 import { useState } from "react"
 import { Button } from "~/components/ui/button"
 import { Input } from "~/components/ui/input"
 import { Images } from "~/constants/images"
+import { useRouter } from "next/navigation"
+import { toast } from "react-toastify"
+import { RegistrationRequest } from "~/codegen/data-contracts"
+import { useRegister } from "~/hooks/use-register"
 
 const SignUpPage: React.FC = () => {
+  const [avatar, setAvatar] = useState("")
   const [phoneNumber, setPhoneNumber] = useState("")
   const [fullName, setFullName] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [agreeTerms, setAgreeTerms] = useState(false)
   const [agreeSocialTerms, setAgreeSocialTerms] = useState(false)
+  const [errorMessage, setErrorMessage] = useState("")
+  const { submitRegister } = useRegister()
+  const router = useRouter()
+  const [loading, setLoading] = useState(false)
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPhoneNumber(e.target.value)
@@ -30,21 +40,62 @@ const SignUpPage: React.FC = () => {
     setConfirmPassword(e.target.value)
   }
 
-  const handleSubmit = () => {
-    console.log(
-      "Phone:",
+  const handleSubmit = async () => {
+    setLoading(true)
+    setErrorMessage("")
+    
+    if (!isFormValid) {
+      setLoading(false)
+      setErrorMessage("Please fill in all fields.")
+      return;
+    }
+
+    if (typeof password !== "string" || !/(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,20}/.test(password)) {
+      setLoading(false);
+      setErrorMessage("Password must contain at least one lowercase letter, one uppercase letter, one digit, and be 6-20 characters long.");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setLoading(false);
+      setErrorMessage("Passwords do not match");
+      return;
+    }
+
+    if (!/^\+?[0-9]{10}$/.test(phoneNumber)) {
+      setLoading(false);
+      setErrorMessage("Phone number must be valid and contain at least 10 digits.");
+      return;
+    }
+
+    if (phoneNumber.length < 10) {
+      setLoading(false);
+      setErrorMessage("Phone number must be at least 10 digits.");
+      return;
+    }
+
+    if (typeof fullName !== "string") {
+      setLoading(false);
+      setErrorMessage("Full name must be a string.");
+      return;
+    }
+
+    const data: RegistrationRequest = {
       phoneNumber,
-      "Full name:",
-      fullName,
-      "Password:",
+      name: fullName,
       password,
-      "Confirm password:",
-      confirmPassword,
-      "Terms:",
-      agreeTerms,
-      "Social terms:",
-      agreeSocialTerms,
-    )
+      avatar: avatar || "https://i.pravatar.cc/300",
+    }
+
+    console.log("Registration data:", data)
+    const response = await submitRegister(data)
+    console.log("Registration response:", response)
+    if (response.success) {
+      toast.success("Registration successful!")
+      router.push("/sign-in")
+    } else {
+      toast.error(response.error || "Something went wrong.")
+    }
   }
 
   const isFormValid = phoneNumber && fullName && password && confirmPassword && agreeTerms && agreeSocialTerms
@@ -56,6 +107,8 @@ const SignUpPage: React.FC = () => {
 
       <div className="z-20 bg-black bg-opacity-55 p-8 rounded-[20px] w-full max-w-md flex flex-col items-center justify-center">
         <h2 className="text-[45px] font-bold text-white mb-3">SIGN UP</h2>
+
+        {errorMessage && <p className="text-red-500 text-sm mb-3">{errorMessage}</p>}
 
         <div className="w-full mb-5 relative">
           <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
@@ -139,9 +192,8 @@ const SignUpPage: React.FC = () => {
 
         <Button
           onClick={handleSubmit}
-          className={`w-full py-4 text-lg text-white rounded-[12px] bg-gradient-to-r from-[#501794] to-[#3E70A1] hover:bg-gradient-to-l ${
-            !isFormValid ? "opacity-50 cursor-not-allowed" : ""
-          }`}
+          className={`w-full py-4 text-lg text-white rounded-[12px] bg-gradient-to-r from-[#501794] to-[#3E70A1] hover:bg-gradient-to-l ${!isFormValid ? "opacity-50 cursor-not-allowed" : ""
+            }`}
           disabled={!isFormValid}
         >
           Sign Up
