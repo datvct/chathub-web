@@ -18,7 +18,7 @@ const ResetPasswordPage: React.FC = () => {
   }
 
   const handleSubmit = () => {
-    console.log("Update password successfully")
+
     showToast()
   }
 
