@@ -1,5 +1,5 @@
 import { Auth } from "~/codegen/Auth";
-import { RegistrationRequest, SuccessResponse, ErrorResponse } from "~/codegen/data-contracts";
+import { RegistrationRequest, SuccessResponse } from "~/codegen/data-contracts";
 
 const authInstance = new Auth({ baseUrl: process.env.API_URL });
 

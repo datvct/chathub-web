@@ -43,41 +43,43 @@ const SignUpPage: React.FC = () => {
   const handleSubmit = async () => {
     setLoading(true)
     setErrorMessage("")
-    
+
     if (!isFormValid) {
       setLoading(false)
       setErrorMessage("Please fill in all fields.")
-      return;
+      return
     }
 
     if (typeof password !== "string" || !/(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,20}/.test(password)) {
-      setLoading(false);
-      setErrorMessage("Password must contain at least one lowercase letter, one uppercase letter, one digit, and be 6-20 characters long.");
-      return;
+      setLoading(false)
+      setErrorMessage(
+        "Password must contain at least one lowercase letter, one uppercase letter, one digit, and be 6-20 characters long.",
+      )
+      return
     }
 
     if (password !== confirmPassword) {
-      setLoading(false);
-      setErrorMessage("Passwords do not match");
-      return;
+      setLoading(false)
+      setErrorMessage("Passwords do not match")
+      return
     }
 
     if (!/^\+?[0-9]{10}$/.test(phoneNumber)) {
-      setLoading(false);
-      setErrorMessage("Phone number must be valid and contain at least 10 digits.");
-      return;
+      setLoading(false)
+      setErrorMessage("Phone number must be valid and contain at least 10 digits.")
+      return
     }
 
     if (phoneNumber.length < 10) {
-      setLoading(false);
-      setErrorMessage("Phone number must be at least 10 digits.");
-      return;
+      setLoading(false)
+      setErrorMessage("Phone number must be at least 10 digits.")
+      return
     }
 
     if (typeof fullName !== "string") {
-      setLoading(false);
-      setErrorMessage("Full name must be a string.");
-      return;
+      setLoading(false)
+      setErrorMessage("Full name must be a string.")
+      return
     }
 
     const data: RegistrationRequest = {
@@ -87,9 +89,7 @@ const SignUpPage: React.FC = () => {
       avatar: avatar || "https://i.pravatar.cc/300",
     }
 
-    console.log("Registration data:", data)
     const response = await submitRegister(data)
-    console.log("Registration response:", response)
     if (response.success) {
       toast.success("Registration successful!")
       router.push("/sign-in")
@@ -192,8 +192,9 @@ const SignUpPage: React.FC = () => {
 
         <Button
           onClick={handleSubmit}
-          className={`w-full py-4 text-lg text-white rounded-[12px] bg-gradient-to-r from-[#501794] to-[#3E70A1] hover:bg-gradient-to-l ${!isFormValid ? "opacity-50 cursor-not-allowed" : ""
-            }`}
+          className={`w-full py-4 text-lg text-white rounded-[12px] bg-gradient-to-r from-[#501794] to-[#3E70A1] hover:bg-gradient-to-l ${
+            !isFormValid ? "opacity-50 cursor-not-allowed" : ""
+          }`}
           disabled={!isFormValid}
         >
           Sign Up
