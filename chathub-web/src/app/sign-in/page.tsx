@@ -17,7 +17,7 @@ const SignInPage: React.FC = () => {
   const [loading, setLoading] = useState(false)
   const { submitSignUp } = useSignUp()
   const router = useRouter()
-  const dispatch = useDispatch();
+  const dispatch = useDispatch()
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPhoneNumber(e.target.value)
@@ -56,9 +56,15 @@ const SignInPage: React.FC = () => {
 
       if (response.status === 200) {
         localStorage.setItem("authToken", response?.response?.token)
-        dispatch(setUser({ userId: response?.response?.userId, token: response?.response?.token }));
-
-        router.push("/")
+        dispatch(setUser({ userId: response?.response?.userId, token: response?.response?.token }))
+        const res = await fetch("/api/cookies", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ token: response.response.token, userId: response?.response?.userId }),
+        })
+        if (res.ok) {
+          router.push("/")
+        }
       } else {
         setErrorMessage("Invalid phone number or password.")
       }

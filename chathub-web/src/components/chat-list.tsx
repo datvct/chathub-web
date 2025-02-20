@@ -24,8 +24,8 @@ const ChatList = ({
   setSelectedChat: (id: number) => void
   setIsGroupChat: (isGroup: boolean) => void
 }) => {
-  
-  const userId = useSelector((state: RootState) => state.auth.userId);
+  const userId = useSelector((state: RootState) => state.auth.userId)
+  const token = useSelector((state: RootState) => state.auth.token)
   const [modalCreateChatOpen, setModalCreateNewChatOpen] = useState(false)
   const [modalCreateGroupChatOpen, setModalCreateNewGroupChatOpen] = useState(false)
   const [modalProfileOpen, setModalProfileOpen] = useState(false)
@@ -34,23 +34,21 @@ const ChatList = ({
   const [isFriendListModalOpen, setIsFriendListModalOpen] = useState(false)
   const [isFriendRequestModalOpen, setIsFriendRequestModalOpen] = useState(false)
   const [modalListGroup, setModalListGroup] = useState(false)
-  const {getConversation} = useConversation()
+  const { getConversation } = useConversation()
   const [dataConversation, setDataConversation] = useState<ConversationResponse[]>([])
   useEffect(() => {
-      if(userId) {
-        const init = async () => {
-        
-          const response = await getConversation(userId)
-          if(response) {
-            setDataConversation(response)
-          }
-          }
-          init()
+    if (userId) {
+      setDataConversation([])
+      const init = async () => {
+        const response = await getConversation(userId, token)
+        if (response) {
+          setDataConversation(response)
         }
       }
-  , [userId])
+      init()
+    }
+  }, [userId, modalCreateChatOpen, modalCreateGroupChatOpen])
 
-  
   const handleOpenChangePassword = () => {
     setIsProfileModalOpen(false)
     setIsChangePasswordModalOpen(true)
@@ -67,9 +65,9 @@ const ChatList = ({
   }
 
   const formatTime = (timestamp: string) => {
-    const date = new Date(timestamp);
-    return `${date.getHours()}:${date.getMinutes()}`;
-  };
+    const date = new Date(timestamp)
+    return `${date.getHours()}:${date.getMinutes()}`
+  }
 
   return (
     <div className="bg-[#202020] text-white w-1/4 h-screen p-4 relative z-50">
@@ -133,7 +131,8 @@ const ChatList = ({
 
       {/* Chat List */}
       <ul className="space-y-3 overflow-y-scroll custom-scrollbar h-[calc(100%-150px)]">
-      {dataConversation.length >0 ? dataConversation.map((chat) => (
+        {dataConversation.length > 0 ? (
+          dataConversation.map(chat => (
             <li
               key={chat.id}
               className={`flex items-center gap-3 p-2 rounded-lg hover:cursor-pointer`}
@@ -141,8 +140,8 @@ const ChatList = ({
             >
               <div className="w-12 h-12 rounded-full bg-gray-500 flex items-center justify-center">
                 <Image
-                  src={chat.chatType === "GROUP" ? chat.groupAvatar : chat.senderAvatar}
-                  alt={chat.chatType === "GROUP" ? chat.groupName : chat.senderName}
+                  src={chat.chatType === "GROUP" ? chat.groupAvatar : chat.senderAvatar || Images.AvatarDefault}
+                  alt={chat.chatType === "GROUP" ? chat.groupName : chat.senderName || "Avatar"}
                   width={48}
                   height={48}
                   className="rounded-full"
@@ -152,9 +151,7 @@ const ChatList = ({
                 <div className="flex items-center justify-between">
                   <span className="font-semibold">{chat.chatType === "GROUP" ? chat.groupName : chat.senderName}</span>
                   <div className="flex items-center">
-                    <span className="text-[14px] text-[#838383] mr-2">
-                      {formatTime(chat.lastMessageAt)}
-                    </span>
+                    <span className="text-[14px] text-[#838383] mr-2">{formatTime(chat.lastMessageAt)}</span>
                     {chat.pinned && <Image src={Images.IconPin} alt="Pin Icon" width={20} height={20} />}
                   </div>
                 </div>
@@ -168,7 +165,10 @@ const ChatList = ({
                 </div>
               </div>
             </li>
-          )):<>Loading...</>}
+          ))
+        ) : (
+          <>Loading...</>
+        )}
       </ul>
 
       {/* Floating Button */}
