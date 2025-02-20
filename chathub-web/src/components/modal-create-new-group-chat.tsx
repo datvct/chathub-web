@@ -8,6 +8,11 @@ import { Images } from "../constants/images"
 import { Dialog, DialogPanel, DialogTitle, Transition, TransitionChild } from "@headlessui/react"
 import { Search, EllipsisVertical } from "lucide-react"
 import "../styles/custom-scroll.css"
+import { useFriends } from "~/hooks/use-friends"
+import { RootState } from "~/lib/reudx/store"
+import { useSelector } from "react-redux"
+import { ConversationRequest, UserDTO } from "~/codegen/data-contracts"
+import { useConversation } from "~/hooks/use-converstation"
 
 interface ModalCreateNewGroupChatProps {
   isOpen: boolean
@@ -15,29 +20,39 @@ interface ModalCreateNewGroupChatProps {
 }
 
 const ModalCreateNewGroupChat: React.FC<ModalCreateNewGroupChatProps> = ({ isOpen, setIsOpen }) => {
-  const users = [
-    { name: "Guy Hawkins", phone: "0903112233", image: Images.GuyHawkins },
-    { name: "Ronald Richards", phone: "0902445566", image: Images.RonaldRichards },
-    { name: "Esther Howard", phone: "0904998877", image: Images.EstherHoward },
-    { name: "Albert Flores", phone: "0905336699", image: Images.AlbertFlores },
-    { name: "Miley Cyrus", phone: "0909225588", image: Images.MileyCyrus },
-    { name: "Arlene McCoy", phone: "0906114477", image: Images.ArleneMcCoy },
-    { name: "Cameron Williamson", phone: "0902115599", image: Images.CameronWilliamson },
-  ]
-
-  const [selectedUsers, setSelectedUsers] = useState<number[]>([])
+  const [selectedUsers, setSelectedUsers] = useState<UserDTO[]>([])
   const [groupName, setGroupName] = useState("")
+  const userId = useSelector((state: RootState) => state.auth.userId)
+  const token = useSelector((state: RootState) => state.auth.token)
+  const { friends, loading, error } = useFriends(userId, token)
+  const { createConversation } = useConversation()
 
-  const handleUserSelect = (index: number) => {
-    if (selectedUsers.includes(index)) {
-      setSelectedUsers(selectedUsers.filter(i => i !== index))
+  const handleUserSelect = (user: UserDTO) => {
+    if (selectedUsers.some(u => u.id === user.id)) {
+      setSelectedUsers(selectedUsers.filter(u => u.id !== user.id))
     } else {
-      setSelectedUsers([...selectedUsers, index])
+      setSelectedUsers([...selectedUsers, user])
+    }
+  }
+
+  const handleCreateChat = async () => {
+    if (!selectedUsers.length) return
+    const data: ConversationRequest = {
+      chatType: "GROUP",
+      creatorId: userId,
+      participantIds: [userId, ...selectedUsers.map(u => u.id)],
+      groupName: groupName,
+    }
+    const response = await createConversation(data, token)
+    if (response) {
+      setIsOpen(false)
+    } else {
+      console.log("Lỗi")
     }
   }
 
   const isCreateButtonEnabled = selectedUsers.length >= 1
-
+  if (loading) return <p>Loading...</p>
   return (
     <Transition appear show={isOpen} as={React.Fragment}>
       <Dialog as="div" className="relative z-50" onClose={() => setIsOpen(false)}>
@@ -64,7 +79,7 @@ const ModalCreateNewGroupChat: React.FC<ModalCreateNewGroupChatProps> = ({ isOpe
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <DialogPanel className="w-full max-w-4xl h-[95%] max-h-screen rounded-[30px] transform rounded-2xl bg-[#385068] p-6 text-left align-middle shadow-xl transition-all">
+              <DialogPanel className="w-full max-w-4xl h-[95%] max-h-screen rounded-[30px] transform bg-[#385068] p-6 text-left align-middle shadow-xl transition-all">
                 <DialogTitle
                   as="h3"
                   className="text-2xl font-bold leading-6 text-white flex justify-between items-center"
@@ -89,25 +104,31 @@ const ModalCreateNewGroupChat: React.FC<ModalCreateNewGroupChatProps> = ({ isOpe
                     </div>
 
                     <ul className="max-h-[55vh] overflow-y-auto custom-scrollbar rounded-lg p-2">
-                      {users.map((user, index) => (
+                      {friends.map((user, index) => (
                         <li
                           key={index}
                           className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer mb-2 bg-white hover:bg-[#93C1D2]
-                                                        ${selectedUsers.includes(index) ? "bg-gray-200" : ""}`}
-                          onClick={() => handleUserSelect(index)}
+                                                        ${selectedUsers.includes(user) ? "bg-gray-200" : ""}`}
+                          onClick={() => handleUserSelect(user)}
                         >
                           <input
-                            id={`user-${index}`}
+                            id={`user-${user.id}`}
                             type="checkbox"
                             className="rounded border-[#d4d4d4] text-[#6568FF] focus:ring-0"
-                            checked={selectedUsers.includes(index)}
-                            onChange={() => handleUserSelect(index)}
+                            checked={selectedUsers.includes(user)}
+                            onChange={() => handleUserSelect(user)}
                           />
 
-                          <Image src={user.image} alt={user.name} width={40} height={40} className="rounded-full" />
+                          <Image
+                            src={user.avatar ?? Images.AvatarDefault}
+                            alt={user.name ?? "avtar-1"}
+                            width={40}
+                            height={40}
+                            className="rounded-full"
+                          />
                           <div>
                             <p className="font-medium text-gray-900">{user.name}</p>
-                            <p className="text-sm text-gray-500">{user.phone}</p>
+                            <p className="text-sm text-gray-500">{user.phoneNumber}</p>
                           </div>
                           <EllipsisVertical className="ml-auto text-gray-400 w-5 h-5" />
                         </li>
@@ -133,12 +154,11 @@ const ModalCreateNewGroupChat: React.FC<ModalCreateNewGroupChatProps> = ({ isOpe
                       <div className="text-lg font-semibold text-[#282828] mb-6 bg-[#F4F6F9] p-2 rounded-lg">
                         Selected Contacts
                         <span className="text-[#979797] text-sm ml-2 rounded-lg bg-[#E9E9E9] py-0.5 px-2">
-                          {selectedUsers.length}/{users.length}
+                          {selectedUsers.length}/{friends.length}
                         </span>
                         <ul className="max-h-[42vh] mt-3 overflow-y-auto custom-scrollbar bg-[#F4F6F9] rounded-lg p-2">
-                          {selectedUsers.map(index => {
-                            const user = users[index]
-
+                          {selectedUsers.map(user => {
+                            const index = selectedUsers.indexOf(user)
                             return (
                               <li
                                 key={index}
@@ -146,8 +166,8 @@ const ModalCreateNewGroupChat: React.FC<ModalCreateNewGroupChatProps> = ({ isOpe
                               >
                                 <div className="flex items-center gap-3">
                                   <Image
-                                    src={user.image}
-                                    alt={user.name}
+                                    src={user.avatar ?? Images.AvatarDefault}
+                                    alt={user.name ?? "avatar"}
                                     width={40}
                                     height={40}
                                     className="rounded-full"
@@ -156,11 +176,11 @@ const ModalCreateNewGroupChat: React.FC<ModalCreateNewGroupChatProps> = ({ isOpe
                                     <div className="font-semibold text-[#373737] text-sm md:text-base ">
                                       {user.name}
                                     </div>
-                                    <p className="text-xs text-[#A6A6A6] font-normal leading-4">{user.phone}</p>
+                                    <p className="text-xs text-[#A6A6A6] font-normal leading-4">{user.phoneNumber}</p>
                                   </div>
                                 </div>
 
-                                <button onClick={() => handleUserSelect(index)}>
+                                <button onClick={() => handleUserSelect(user)}>
                                   <Image src={Images.IconClosePurple} alt="close" width={20} height={20} />
                                 </button>
                               </li>
@@ -180,7 +200,7 @@ const ModalCreateNewGroupChat: React.FC<ModalCreateNewGroupChatProps> = ({ isOpe
                     Cancel
                   </Button>
                   <Button
-                    onClick={() => setIsOpen(false)}
+                    onClick={() => handleCreateChat()}
                     disabled={!isCreateButtonEnabled || groupName.trim() === ""}
                     className={`
                                 w-auto px-4 py-2 rounded-[12px] text-lg text-white 

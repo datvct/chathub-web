@@ -1,0 +1,31 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { UserDTO } from "~/codegen/data-contracts";
+import { getListFriends } from "~/lib/get-user";
+
+export function useFriends(userId: number,token:string) {
+  const [friends, setFriends] = useState<UserDTO[] | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!userId) return;
+
+    const fetchFriends = async () => {
+      setLoading(true);
+      try {
+        const data = await getListFriends(userId,token);
+        setFriends(data);
+      } catch {
+        setError("Failed to fetch friends.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFriends();
+  }, [userId]);
+
+  return { friends, loading, error };
+}
