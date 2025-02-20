@@ -28,6 +28,7 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ isOpen, setIs
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState("")
+  const { changePassword } = useChangePassword()
 
   const handleClose = () => {
     setIsOpen(false)
@@ -57,7 +58,8 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ isOpen, setIs
     }
     console.log("Change password data:", data)
 
-    const userId = useSelector((state: RootState) => state.auth.userId)
+    // const userId = useSelector((state: RootState) => state.auth.userId)
+    const userId = Number(localStorage.getItem("userId"))
 
     try {
       const data = {id: userId, oldPassword, newPassword, changeType: 'UPDATE'}
