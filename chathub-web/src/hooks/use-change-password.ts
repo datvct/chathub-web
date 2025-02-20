@@ -19,7 +19,7 @@ export const useChangePassword = () => {
       }
     } catch (error: any) {
       console.error("Change password error: ", error)
-      setErrorMessage(error.message || "Something went wrong.")
+      setErrorMessage(error.message || "Something went wrong, please try again later..")
       return { success: false, error: error.message }
     } finally {
       setLoading(false)
