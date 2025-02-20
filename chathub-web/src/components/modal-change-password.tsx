@@ -11,6 +11,9 @@ import { Button } from "./ui/button"
 import { ChangePasswordRequest, SuccessResponse } from "~/codegen/data-contracts"
 import { changePassword } from "../lib/get-change-password"
 import { useChangePassword } from "../hooks/use-change-password"
+import { useSelector } from "react-redux"
+import { RootState } from "~/lib/reudx/store"
+import { toast } from "react-toastify"
 
 interface ChangePasswordModalProps {
   isOpen: boolean
@@ -30,9 +33,16 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ isOpen, setIs
     setIsOpen(false)
   }
 
+  
   const handleChangePassword = async () => {
     setLoading(true)
     setErrorMessage("")
+
+    if (!oldPassword || !newPassword || !confirmNewPassword) {
+      setErrorMessage("Please fill in all fields.")
+      setLoading(false)
+      return
+    }
 
     if (newPassword !== confirmNewPassword) {
       setErrorMessage("New passwords do not match.")
@@ -47,14 +57,21 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ isOpen, setIs
     }
     console.log("Change password data:", data)
 
+    const userId = useSelector((state: RootState) => state.auth.userId)
+
     try {
-      const response: SuccessResponse = await changePassword(data)
-      console.log("Change password response: ", response)
-      handleClose()
-      // router.push('/')
-    } catch (error) {
-      setErrorMessage("Failed to change password.")
-      console.error("Error changing password:", error)
+      const data = {id: userId, oldPassword, newPassword, changeType: 'UPDATE'}
+      const response = await changePassword(data)
+      
+      if (response.status == 200) {
+        console.log("Change password response: ", response)
+        handleClose()
+      } else {
+        setErrorMessage(response.error?.message || "Failed to change password.")
+      }
+    } catch (error: any) {
+      setErrorMessage("An error occurred! Please try again.")
+      console.error("Error changing password: ", error)
     } finally {
       setLoading(false)
     }
@@ -152,7 +169,8 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ isOpen, setIs
                       className="w-30 px-4 py-2 bg-[#7746f5] rounded-[12px] text-lg text-white bg-gradient-to-r from-[#501794] to-[#3E70A1] hover:bg-gradient-to-l"
                       onClick={handleChangePassword}
                     >
-                      Change
+                      {/* Change */}
+                      {loading? "Changing": "Change"}
                     </Button>
                   </div>
                 </div>

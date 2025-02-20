@@ -5,7 +5,7 @@ const conversationInstance = new Conversation({ baseUrl: process.env.API_URL })
 
 export async function getConversationByUserID(userId: number) {
   const token = localStorage.getItem("authToken")
-   try {
+  try {
     if (!userId) return null
 
     const response = (await conversationInstance.getRecentConversations({userId}, {

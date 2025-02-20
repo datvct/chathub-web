@@ -1,19 +1,19 @@
 import { useState } from "react"
-import { ChangePasswordRequest, SuccessResponse, ErrorResponse } from "../codegen/data-contracts"
-import { changePassword as changePasswordApi } from "../lib/get-change-password" 
+import { ChangePasswordRequest } from "~/codegen/data-contracts"
+import { changePassword } from "~/lib/get-change-password"
 
 export const useChangePassword = () => {
   const [loading, setLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState("")
 
-  const changePassword = async (data: ChangePasswordRequest) => {
+  const changePassword = async (values: ChangePasswordRequest) => {
     setLoading(true)
     setErrorMessage("")
 
     try {
-      const response = await changePasswordApi(data)
+      const response = await changePassword(values)
       console.log("Change password response: ", response)
-      if (response.statusCode == 200) return { success: true }
+      if (response.statusCode == 200) return { success: true, data: response.data }
       else {
         return { success: false, error: response.message }
       }
