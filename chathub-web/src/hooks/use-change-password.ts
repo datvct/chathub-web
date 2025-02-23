@@ -1,30 +1,32 @@
-import { useState } from "react"
-import { ChangePasswordRequest } from "~/codegen/data-contracts"
-import { changePassword } from "~/lib/get-change-password"
+import { useState, useCallback } from "react";
+import { ChangePasswordRequest } from "~/codegen/data-contracts";
+import { changePassword as changePasswordAPI } from "~/lib/get-change-password";
 
 export const useChangePassword = () => {
-  const [loading, setLoading] = useState(false)
-  const [errorMessage, setErrorMessage] = useState("")
+  const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
-  const changePassword = async (values: ChangePasswordRequest) => {
-    setLoading(true)
-    setErrorMessage("")
+  const changePassword = useCallback(async (values: ChangePasswordRequest, token:string) => {
+    setLoading(true);
+    setErrorMessage("");
 
     try {
-      const response = await changePassword(values)
-      console.log("Change password response: ", response)
-      if (response.statusCode == 200) return { success: true, data: response.data }
-      else {
-        return { success: false, error: response.message }
+      const response = await changePasswordAPI(values,token);
+      console.log("Change password response:", response);
+      
+      if (response.statusCode === 200) {
+        return { success: true, data: response };
       }
+      return { success: false, error: response };
     } catch (error: any) {
-      console.error("Change password error: ", error)
-      setErrorMessage(error.message || "Something went wrong, please try again later..")
-      return { success: false, error: error.message }
+      console.error("Change password error:", error);
+      const errorMsg = error.message || "Something went wrong, please try again later.";
+      setErrorMessage(errorMsg);
+      return { success: false, error: errorMsg };
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  }, []);
 
-  return { changePassword, loading, errorMessage } 
-}
+  return { changePassword, loading, errorMessage };
+};

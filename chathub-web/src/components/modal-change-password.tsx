@@ -24,7 +24,8 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ isOpen, setIs
   const [oldPassword, setOldPassword] = useState("")
   const [newPassword, setNewPassword] = useState("")
   const [confirmNewPassword, setConfirmNewPassword] = useState("")
-  
+  const userId = useSelector((state: RootState) => state.auth.userId)
+  const token = useSelector((state: RootState) => state.auth.token)
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState("")
@@ -34,7 +35,6 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ isOpen, setIs
     setIsOpen(false)
   }
 
-  
   const handleChangePassword = async () => {
     setLoading(true)
     setErrorMessage("")
@@ -51,21 +51,11 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ isOpen, setIs
       return
     }
 
-    const data: ChangePasswordRequest = {
-      id: Number(localStorage.getItem("userId")) || 0,
-      oldPassword,
-      newPassword,
-    }
-    console.log("Change password data:", data)
-
-    // const userId = useSelector((state: RootState) => state.auth.userId)
-    const userId = Number(localStorage.getItem("userId"))
-
     try {
-      const data = {id: userId, oldPassword, newPassword, changeType: 'UPDATE'}
-      const response = await changePassword(data)
-      
-      if (response.status == 200) {
+      const data = { id: userId, oldPassword, newPassword, changeType: "UPDATE" }
+      const response = await changePassword(data, token)
+
+      if (response.success) {
         console.log("Change password response: ", response)
         handleClose()
       } else {
@@ -172,7 +162,7 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ isOpen, setIs
                       onClick={handleChangePassword}
                     >
                       {/* Change */}
-                      {loading? "Changing": "Change"}
+                      {loading ? "Changing" : "Change"}
                     </Button>
                   </div>
                 </div>
