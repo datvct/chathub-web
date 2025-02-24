@@ -1,19 +1,42 @@
-import { getConversationByUserID } from "~/lib/get-conversation"
+import { useState } from "react";
+import { ConversationRequest } from "~/codegen/data-contracts";
+import { getConversationByUserID, createConversationAPI } from "~/lib/get-conversation";
 
+export const useConversation = () => {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-export const useConversation  = () => {
-  const getConversation = async (id: number) => {
+  const getConversation = async (id: number, token:string) => {
+    setLoading(true);
+    setError(null);
     try {   
-      const response = await getConversationByUserID(id)
-      if (response) {
-        return response 
-      } else {
-        throw new Error("Failed to submit rating")
-      }
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const response = await getConversationByUserID(id);
+      return response || null;
     } catch (err) {
-      return null
+      setError("Failed to fetch conversation");
+      return null;
+    } finally {
+      setLoading(false);
     }
-  }
-  return { getConversation }
-}
+  };
+
+  const createConversation = async (data: ConversationRequest, token:string) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await createConversationAPI(data, token);
+      if (response) {
+        return response;
+      } else {
+        throw new Error("Failed to create conversation");
+      }
+    } catch {
+      setError("Failed to create conversation");
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { getConversation, createConversation, loading, error };
+};
