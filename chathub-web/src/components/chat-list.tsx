@@ -34,13 +34,13 @@ const ChatList = ({
   const [isFriendListModalOpen, setIsFriendListModalOpen] = useState(false)
   const [isFriendRequestModalOpen, setIsFriendRequestModalOpen] = useState(false)
   const [modalListGroup, setModalListGroup] = useState(false)
-  const { getConversation } = useConversation()
+  const { getRecentConversation } = useConversation()
   const [dataConversation, setDataConversation] = useState<ConversationResponse[]>([])
   useEffect(() => {
     if (userId) {
       setDataConversation([])
       const init = async () => {
-        const response = await getConversation(userId, token)
+        const response = await getRecentConversation(userId, token)
         if (response) {
           setDataConversation(response)
         }

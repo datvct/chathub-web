@@ -3,8 +3,7 @@ import { ConversationRequest, ConversationResponse, SuccessResponse } from "~/co
 
 const conversationInstance = new Conversation({ baseUrl: process.env.API_URL })
 
-export async function getConversationByUserID(userId: number) {
-  const token = localStorage.getItem("authToken")
+export async function getRecentConversationByUserID(userId: number, token: string) {
    try {
     if (!userId) return null
 
@@ -62,6 +61,21 @@ export async function putDissolveGroup(conversationId:number, userId:number, tok
     return response
   } catch (error) {
     console.error("Error dissolving group conversation:", error)
+    return null
+  }
+}
+
+export async function getGroupConversationsByUserId(userId: number, token: string) {
+  try {
+    if (!userId) return null
+    const response = (await conversationInstance.getGroupConversations({userId: userId}, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }).then(res => res.json())) as ConversationResponse[]
+    return response
+  }
+  catch  {
     return null
   }
 }
