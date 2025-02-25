@@ -97,9 +97,9 @@ const ForgotPasswordPage: React.FC = () => {
         </div>
         <Button
           onClick={handleSubmit}
-          className={`w-full py-4 text-lg text-white rounded-[12px] bg-gradient-to-r from-[#501794] to-[#3E70A1] hover:bg-gradient-to-l ${
-            !isFormValid ? "opacity-50 cursor-not-allowed" : ""
-          }`}
+          className={`w-full py-4 text-lg text-white rounded-[12px] bg-gradient-to-r from-[#501794] to-[#3E70A1] hover:bg-gradient-to-l
+            ${!isFormValid ? "opacity-50 cursor-not-allowed" : ""}`
+          }
           disabled={!isFormValid}
         >
           Continue
