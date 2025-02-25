@@ -20,9 +20,11 @@ import { ConversationResponse } from "~/codegen/data-contracts"
 const ChatList = ({
   setSelectedChat,
   setIsGroupChat,
+  setConversationData,
 }: {
   setSelectedChat: (id: number) => void
   setIsGroupChat: (isGroup: boolean) => void
+  setConversationData?: (data: ConversationResponse) => void
 }) => {
   const userId = useSelector((state: RootState) => state.auth.userId)
   const token = useSelector((state: RootState) => state.auth.token)
@@ -59,8 +61,9 @@ const ChatList = ({
     setIsProfileModalOpen(true)
   }
 
-  const handleSelectChat = (id: number, isGroup?: boolean) => {
+  const handleSelectChat = (id: number, converstation: ConversationResponse, isGroup?: boolean) => {
     setSelectedChat(id)
+    setConversationData(converstation)
     setIsGroupChat(isGroup || false)
   }
 
@@ -136,7 +139,7 @@ const ChatList = ({
             <li
               key={chat.id}
               className={`flex items-center gap-3 p-2 rounded-lg hover:cursor-pointer`}
-              onClick={() => handleSelectChat(chat.id, chat.chatType === "GROUP")}
+              onClick={() => handleSelectChat(chat.id, chat, chat.chatType === "GROUP")}
             >
               <div className="w-12 h-12 rounded-full bg-gray-500 flex items-center justify-center">
                 <Image

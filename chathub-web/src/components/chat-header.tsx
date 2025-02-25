@@ -10,9 +10,10 @@ interface ChatHeaderProps {
   name: string
   setIsChatInfoOpen: (isOpen: boolean) => void
   isChatInfoOpen: boolean
+  avatar?: string
 }
 
-const ChatHeader = ({ name, setIsChatInfoOpen, isChatInfoOpen }: ChatHeaderProps) => {
+const ChatHeader = ({ name, setIsChatInfoOpen, isChatInfoOpen, avatar }: ChatHeaderProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
 
@@ -31,7 +32,7 @@ const ChatHeader = ({ name, setIsChatInfoOpen, isChatInfoOpen }: ChatHeaderProps
       <div className="flex items-center flex-row justify-between w-full">
         <div className="flex items-center gap-3">
           <Image
-            src={Images.AvatarDefault}
+            src={avatar ? avatar : Images.AvatarDefault}
             alt={name}
             className="w-[3.125rem] h-[3.125rem] rounded-[30px]"
             width={50}
