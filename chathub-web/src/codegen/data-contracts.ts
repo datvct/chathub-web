@@ -18,9 +18,10 @@ export interface ErrorResponse {
 
 export interface ChangeProfileRequest {
   /** @format int64 */
-  id: number
+  id?: number
   name: string
-  avatar?: string
+  /** @format binary */
+  avatar?: File
   /** @format date */
   dateOfBirth?: string
   /** @pattern MALE|FEMALE */
@@ -33,9 +34,16 @@ export interface SuccessResponse {
   message?: string
 }
 
+export interface UpdateGroupInfoRequest {
+  /** @format int64 */
+  userId?: number
+  groupName?: string
+  avatar?: string
+}
+
 export interface ChangePasswordRequest {
   /** @format int64 */
-  id: number
+  id?: number
   oldPassword?: string
   /** @pattern ^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,20}$ */
   newPassword: string
@@ -48,6 +56,14 @@ export interface BlockRequest {
   blockerId: number
   /** @format int64 */
   blockedId: number
+}
+
+export interface ReactionRequest {
+  /** @format int64 */
+  messageId?: number
+  /** @format int64 */
+  userId?: number
+  reactionEmoji?: string
 }
 
 export interface FriendshipRequest {
@@ -73,8 +89,8 @@ export interface ConversationResponse {
   /** @format date-time */
   createAt?: string
   participants?: ParticipantDTO[]
-  pinned?: boolean
   dissolved?: boolean
+  pinned?: boolean
 }
 
 export interface ParticipantDTO {
@@ -99,10 +115,6 @@ export interface RegistrationRequest {
   /** @pattern ^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{6,20}$ */
   password: string
   avatar?: string
-  /** @format date */
-  dateOfBirth?: string
-  /** @pattern MALE|FEMALE */
-  gender?: string
 }
 
 export interface AuthRequest {
@@ -149,29 +161,24 @@ export interface MessageResponse {
   unsent?: boolean
 }
 
-export interface FriendRequest {
+export interface FriendRequestResponse {
   /** @format int64 */
-  id?: number
-  sender?: User
-  receiver?: User
-  status?: "PENDING" | "ACCEPTED" | "REJECTED"
+  userId?: number
+  name?: string
+  avatar?: string
   message?: string
-  /** @format date-time */
-  createdAt?: string
+  type?: string
 }
 
-export interface User {
+export interface MessageFindedResponse {
   /** @format int64 */
-  id?: number
-  phoneNumber?: string
-  name?: string
-  password?: string
+  messageId?: number
+  /** @format int64 */
+  senderId?: number
+  sender?: string
   avatar?: string
-  /** @format date */
-  dateOfBirth?: string
-  gender?: string
-  status?: "ONLINE" | "OFFLINE"
-  role?: "ADMIN" | "USER"
+  content?: string
   /** @format date-time */
-  lastSeenAt?: string
+  sendAt?: string
+  messageType?: "TEXT" | "IMAGE" | "VIDEO" | "DOCUMENT" | "EMOJI"
 }
