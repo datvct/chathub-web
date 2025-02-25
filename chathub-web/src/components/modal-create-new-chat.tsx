@@ -41,7 +41,6 @@ const ModalCreateNewChat: React.FC<ModalCreateNewChatProps> = ({ isOpen, setIsOp
     if (response) {
       setIsOpen(false)
     } else {
-      console.log("Lỗi")
     }
   }
 
