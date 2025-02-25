@@ -5,6 +5,7 @@ import ChatScreen from "~/components/chat-area"
 import Image from "next/image"
 import { Images } from "../constants/images"
 import ChatInfo from "~/components/chat-info"
+import { ToastContainer } from "react-toastify"
 
 export default function Home() {
   const [selectedChat, setSelectedChat] = useState<number | null>(null)
@@ -16,34 +17,32 @@ export default function Home() {
       setIsChatInfoOpen(false)
     }
   }, [selectedChat])
-
   return (
-    <div className="flex flex-row justify-between h-screen">
-      <ChatList setSelectedChat={setSelectedChat} setIsGroupChat={setIsGroupChat} />
-      {selectedChat ? (
-        <ChatScreen
-          selectedChatId={selectedChat}
-          isChatInfoOpen={isChatInfoOpen}
-          setIsChatInfoOpen={setIsChatInfoOpen}
-        />
-      ) : (
-        <>
-          <Image
-            src={Images.Background}
-            alt="background-image"
-            layout="fill"
-            objectFit="cover"
-            className="absolute inset-0"
+    <>
+      <ToastContainer position="top-center" autoClose={3000} closeOnClick />
+      <div className="flex flex-row justify-between h-screen">
+        <ChatList setSelectedChat={setSelectedChat} setIsGroupChat={setIsGroupChat} />
+        {selectedChat ? (
+          <ChatScreen
+            selectedChatId={selectedChat}
+            isChatInfoOpen={isChatInfoOpen}
+            setIsChatInfoOpen={setIsChatInfoOpen}
           />
-          <div className="absolute inset-0 bg-black opacity-30" />
-        </>
-      )}
+        ) : (
+          <>
+            <Image
+              src={Images.Background}
+              alt="background-image"
+              layout="fill"
+              objectFit="cover"
+              className="absolute inset-0"
+            />
+            <div className="absolute inset-0 bg-black opacity-30" />
+          </>
+        )}
 
-      {isChatInfoOpen && (
-        <div className="w-1/5 bg-[#292929] text-white p-4 shadow-lg transition-all">
-          <ChatInfo isOpen={isChatInfoOpen} isGroupChat={isGroupChat} />
-        </div>
-      )}
-    </div>
+        {isChatInfoOpen && <ChatInfo isOpen={isChatInfoOpen} isGroupChat={isGroupChat} selectedChat={selectedChat} />}
+      </div>
+    </>
   )
 }

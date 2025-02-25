@@ -9,7 +9,7 @@
  * ---------------------------------------------------------------
  */
 
-import { ErrorResponse, FriendRequest, FriendshipRequest, SuccessResponse, UserDTO } from "./data-contracts"
+import { ErrorResponse, FriendRequestResponse, FriendshipRequest, SuccessResponse, UserDTO } from "./data-contracts"
 import { ContentType, HttpClient, RequestParams } from "./http-client"
 
 export class Friend<SecurityDataType = unknown> extends HttpClient<SecurityDataType> {
@@ -101,7 +101,7 @@ export class Friend<SecurityDataType = unknown> extends HttpClient<SecurityDataT
     },
     params: RequestParams = {},
   ) =>
-    this.request<FriendRequest[], ErrorResponse>({
+    this.request<FriendRequestResponse[], ErrorResponse>({
       path: `/friend/list-friend-request`,
       method: "GET",
       query: query,
