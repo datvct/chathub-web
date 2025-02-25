@@ -1,16 +1,16 @@
 import { useState } from "react";
 import { ConversationRequest } from "~/codegen/data-contracts";
-import { getConversationByUserID, createConversationAPI, leaveConversation, putDissolveGroup } from "~/lib/get-conversation";
+import { getRecentConversationByUserID, createConversationAPI, leaveConversation, putDissolveGroup, getGroupConversationsByUserId } from "~/lib/get-conversation";
 
 export const useConversation = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const getConversation = async (id: number, token: string) => {
+  const getRecentConversation = async (id: number, token: string) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await getConversationByUserID(id);
+      const response = await getRecentConversationByUserID(id, token);
       return response || null;
     } catch (err) {
       setError("Failed to fetch conversation");
@@ -67,6 +67,20 @@ export const useConversation = () => {
   };
 
 
+  const getGroupConversations = async (userId: number, token: string) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await getGroupConversationsByUserId(userId, token);
+      return response || null;
+    } catch (err) {
+      setError("Failed to fetch conversation");
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  }
 
-  return { getConversation, createConversation, leaveConversationById, dissolveGroup, loading, error };
+
+  return { getRecentConversation, createConversation, leaveConversationById, dissolveGroup, getGroupConversations,loading, error };
 };
