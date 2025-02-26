@@ -11,25 +11,35 @@ import { AiOutlineUsergroupAdd } from "react-icons/ai"
 import { IoSettingsOutline } from "react-icons/io5"
 import { LuUserRound } from "react-icons/lu"
 import { HiOutlineArrowRightEndOnRectangle } from "react-icons/hi2"
-import { useState } from "react"
 import ModalLeaveGroup from "./modal-leave-group"
 import { FaChevronLeft } from "react-icons/fa6"
 import { Button } from "./ui/button"
 import { LuUserRoundPlus } from "react-icons/lu"
 import ModalAddMembers from "./modal-add-members" // Adjust path if needed
+import ModalDissolveGroup from "./modal-dissolve-group"
+import { useState } from "react"
 
 interface Member {
-  name: string;
-  phone: string;
-  image: any;
-  selected?: boolean; 
+  name: string
+  phone: string
+  image: any
+  selected?: boolean
 }
 
-const ChatInfo = ({ isOpen, isGroupChat }: { isOpen?: boolean; isGroupChat?: boolean }) => {
+const ChatInfo = ({
+  isOpen,
+  isGroupChat,
+  selectedChat,
+}: {
+  isOpen?: boolean
+  isGroupChat?: boolean
+  selectedChat: number
+}) => {
   const [isOpenLeaveGroup, setIsOpenLeaveGroup] = useState(false)
   const [isAddingMember, setIsAddingMember] = useState(false) // Thêm state này
+  const [isOpenAddMembers, setIsOpenAddMembers] = useState(false)
+  const [isOpenDissolveGroup, setIsOpenDissolveGroup] = useState(false)
   if (!isOpen) return null
-  const [selectedMembers, setSelectedMembers] = useState<Member[]>([]);
   const [groupMembers, setGroupMembers] = useState<Member[]>([
     { name: "Guy Hawkins", phone: "0903112233", image: Images.GuyHawkins, selected: false },
     { name: "Ronald Richards", phone: "0902445566", image: Images.RonaldRichards, selected: false },
@@ -38,22 +48,22 @@ const ChatInfo = ({ isOpen, isGroupChat }: { isOpen?: boolean; isGroupChat?: boo
     { name: "Miley Cyrus", phone: "0909225588", image: Images.MileyCyrus, selected: false },
     { name: "Arlene McCoy", phone: "0906114477", image: Images.ArleneMcCoy, selected: false },
     { name: "Cameron Williamson", phone: "0902115599", image: Images.CameronWilliamson, selected: false },
-  ]);
+  ])
 
   const handleAddMembers = (members: Member[]) => {
     // setSelectedMembers(members)
-    setGroupMembers([...groupMembers, ...members]);
+    setGroupMembers([...groupMembers, ...members])
     setIsAddingMember(false)
   }
 
   return (
-    <div className="bg-[#292929] text-white w-full mx-auto mt-2">
+    <div className="bg-[#292929] text-white h-screen overflow-hidden overflow-y-auto w-1/4 p-4">
       {!isAddingMember ? (
         <>
           <div className="flex justify-center items-center">
             <h2 className="text-2xl text-center font-semibold">Conversation Info</h2>
           </div>
-          <div className="mt-4 rounded-lg">
+          <div className="mt-4 rounded-lg ">
             <div className="flex justify-between items-center flex-col gap-4">
               <div className="flex flex-col items-center">
                 <Image
@@ -74,26 +84,27 @@ const ChatInfo = ({ isOpen, isGroupChat }: { isOpen?: boolean; isGroupChat?: boo
                 </div>
                 {isGroupChat && (
                   <div className="flex items-center flex-col">
-                    <button 
-                      className="bg-[#484848] h-10 w-10 rounded-full flex items-center justify-center" 
-                      onClick={() => setIsAddingMember(true)}>
-                        <AiOutlineUsergroupAdd size={25} color="white" className="text-white" />
+                    <button
+                      className="bg-[#484848] h-10 w-10 rounded-full flex items-center justify-center"
+                      onClick={() => setIsAddingMember(true)}
+                    >
+                      <AiOutlineUsergroupAdd size={25} color="white" className="text-white" />
                     </button>
-                    <span>Add Member</span>
+                    <span className="whitespace-nowrap">Add Member</span>
                   </div>
                 )}
                 <div className="flex items-center flex-col">
                   <button className="bg-[#484848] h-10 w-10 rounded-full flex items-center justify-center">
                     <BsPinAngleFill size={20} color="white" className="text-white" />
                   </button>
-                  <span>Pin</span>
+                  <span className="whitespace-nowrap">Pin</span>
                 </div>
                 {isGroupChat && (
                   <div className="flex items-center flex-col">
                     <button className="bg-[#484848] h-10 w-10 rounded-full flex items-center justify-center">
                       <IoSettingsOutline size={20} color="white" className="text-white" />
                     </button>
-                    <span>Manage group</span>
+                    <span className="whitespace-nowrap">Manage group</span>
                   </div>
                 )}
               </div>
@@ -163,17 +174,24 @@ const ChatInfo = ({ isOpen, isGroupChat }: { isOpen?: boolean; isGroupChat?: boo
               <h3 className="text-md font-semibold">Privacy settings</h3>
               <div className="flex flex-col gap-3 mt-3 px-2">
                 {isGroupChat ? (
-                  <button className="flex items-center gap-3" onClick={() => setIsOpenLeaveGroup(true)}>
-                    <HiOutlineArrowRightEndOnRectangle size={25} color="red" className="font-semibold" />
-                    <span className="text-sm text-[#FF0000] font-semibold leading-[25px]">Leave group</span>
-                  </button>
+                  <>
+                    <button className="flex items-center gap-3" onClick={() => setIsOpenLeaveGroup(true)}>
+                      <HiOutlineArrowRightEndOnRectangle size={25} color="red" className="font-semibold" />
+                      <span className="text-sm text-[#FF0000] font-semibold leading-[25px]">Leave group</span>
+                    </button>
+                    <button className="flex items-center gap-3" onClick={() => setIsOpenDissolveGroup(true)}>
+                      <HiOutlineArrowRightEndOnRectangle size={25} color="red" className="font-semibold" />
+                      <span className="text-sm text-[#FF0000] font-semibold leading-[25px]">Dissolve Group</span>
+                    </button>
+                  </>
                 ) : (
                   <button className="flex items-center gap-3">
                     <MdBlock size={25} color="white" className="text-white font-semibold" />
                     <span className="text-sm font-semibold leading-[25px]">Block</span>
                   </button>
                 )}
-                <button className="flex items-center gap-3">
+
+                <button className="flex items-center gap-3" onClick={() => setIsOpenLeaveGroup(true)}>
                   <CgTrashEmpty size={25} color="red" className="text-red font-semibold" />
                   <span className="text-sm font-semibold leading-[25px] text-[#FF0000]">Delete chat history</span>
                 </button>
@@ -192,7 +210,7 @@ const ChatInfo = ({ isOpen, isGroupChat }: { isOpen?: boolean; isGroupChat?: boo
             </div>
           </div>
           <div className="mt-4">
-            <Button className="w-full bg-[#D9D9D9] hover:bg-white" onClick={() => handleAddMembers(selectedMembers)}>
+            <Button className="w-full bg-[#D9D9D9] hover:bg-white" onClick={() => setIsOpenAddMembers(true)}>
               <LuUserRoundPlus size={30} color="black" />
               <span className="text-black text-sm">Add member</span>
             </Button>
@@ -215,14 +233,15 @@ const ChatInfo = ({ isOpen, isGroupChat }: { isOpen?: boolean; isGroupChat?: boo
         </>
       )}
 
-      {isAddingMember && (  
-        <ModalAddMembers
-          isOpen={isAddingMember}
-          setIsOpen={setIsAddingMember}
-          onAddMembers={handleAddMembers}
-        />
+      {isOpenAddMembers && (
+        <ModalAddMembers isOpen={isOpenAddMembers} setIsOpen={setIsOpenAddMembers} onAddMembers={handleAddMembers} />
       )}
-      {isOpenLeaveGroup && <ModalLeaveGroup isOpen={isOpenLeaveGroup} setIsOpen={setIsOpenLeaveGroup} />}
+      {isOpenLeaveGroup && (
+        <ModalLeaveGroup isOpen={isOpenLeaveGroup} setIsOpen={setIsOpenLeaveGroup} chatId={selectedChat} />
+      )}
+      {isOpenDissolveGroup && (
+        <ModalDissolveGroup isOpen={isOpenDissolveGroup} setIsOpen={setIsOpenDissolveGroup} chatId={selectedChat} />
+      )}
     </div>
   )
 }

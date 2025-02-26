@@ -10,9 +10,19 @@ interface ChatHeaderProps {
   name: string
   setIsChatInfoOpen: (isOpen: boolean) => void
   isChatInfoOpen: boolean
+  avatar?: string
+  setIsChatSearchOpen?: (isOpen: boolean) => void
+  isChatSearchOpen?: boolean
 }
 
-const ChatHeader = ({ name, setIsChatInfoOpen, isChatInfoOpen }: ChatHeaderProps) => {
+const ChatHeader = ({
+  name,
+  setIsChatInfoOpen,
+  isChatInfoOpen,
+  avatar,
+  setIsChatSearchOpen,
+  isChatSearchOpen,
+}: ChatHeaderProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
 
@@ -31,7 +41,7 @@ const ChatHeader = ({ name, setIsChatInfoOpen, isChatInfoOpen }: ChatHeaderProps
       <div className="flex items-center flex-row justify-between w-full">
         <div className="flex items-center gap-3">
           <Image
-            src={Images.AvatarDefault}
+            src={avatar ? avatar : Images.AvatarDefault}
             alt={name}
             className="w-[3.125rem] h-[3.125rem] rounded-[30px]"
             width={50}
@@ -44,7 +54,10 @@ const ChatHeader = ({ name, setIsChatInfoOpen, isChatInfoOpen }: ChatHeaderProps
         </div>
         {/* Các nút chức năng */}
         <div className="flex gap-2.5">
-          <button className="bg-[#484848] h-10 w-10 rounded-full flex items-center justify-center">
+          <button
+            className="bg-[#484848] h-10 w-10 rounded-full flex items-center justify-center"
+            onClick={() => setIsChatSearchOpen(!isChatSearchOpen)}
+          >
             <IoSearch size={20} color="white" className="text-white" />
           </button>
           <button className="bg-[#484848] h-10 w-10 rounded-full flex items-center justify-center">

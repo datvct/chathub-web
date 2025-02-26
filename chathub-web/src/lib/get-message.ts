@@ -1,0 +1,21 @@
+import { MessageResponse } from "~/codegen/data-contracts";
+import { Message } from "~/codegen/Message";
+
+const messageInstance = new Message({ baseUrl: process.env.API_URL });
+
+
+export const getMessageByConversationId = async (conversationId: number, token: string) => {
+    try {
+        if (!conversationId) return null;
+
+        const response = await messageInstance.getMessages(conversationId, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        }).then(res => res.json()) as MessageResponse[];
+        return response;
+    } catch (error) {
+        console.error("Error checking admin token:", error);
+        return null;
+    }
+}
