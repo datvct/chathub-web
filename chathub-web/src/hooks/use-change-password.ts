@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import { ChangePasswordRequest } from "~/codegen/data-contracts";
 import { changePassword as changePasswordAPI } from "~/lib/get-change-password";
+import { toast } from "react-toastify";
 
 export const useChangePassword = () => {
   const [loading, setLoading] = useState(false);
@@ -15,13 +16,17 @@ export const useChangePassword = () => {
       console.log("Change password response:", response);
       
       if (response.statusCode === 200) {
+        toast.success("Changed password successfully!");
         return { success: true, data: response };
+      } else {
+        toast.error("Failed to change password!");
+        return { success: false, error: response };
       }
-      return { success: false, error: response };
     } catch (error: any) {
-      console.error("Change password error:", error);
+      console.error("Change password error: ", error);
       const errorMsg = error.message || "Something went wrong, please try again later.";
       setErrorMessage(errorMsg);
+      toast.error("Failed to change password!");
       return { success: false, error: errorMsg };
     } finally {
       setLoading(false);

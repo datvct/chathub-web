@@ -51,20 +51,20 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ isOpen, setIs
       return
     }
 
-    try {
-      const data = { id: userId, oldPassword, newPassword, changeType: "UPDATE" }
-      const response = await changePassword(data, token)
+    const data: ChangePasswordRequest = {
+      id: userId,
+      oldPassword,
+      newPassword,
+      changeType: 'UPDATE'
+    };
 
-      if (response.success) {
-        console.log("Change password response: ", response)
-        handleClose()
-      } else {
-        setErrorMessage(response.error?.message || "Failed to change password.")
-      }
-    } catch (error: any) {
-      setErrorMessage("An error occurred! Please try again.")
-      console.error("Error changing password: ", error)
-    } finally {
+    const response = await changePassword(data, token)
+    if (response) {
+      toast.success("Password changed successfully.")
+      setLoading(true)
+      handleClose()
+    } else {
+      toast.error("Failed to change password.")
       setLoading(false)
     }
   }
