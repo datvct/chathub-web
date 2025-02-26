@@ -1,36 +1,32 @@
-import { useState } from "react"
-import { ChangePasswordRequest } from "~/codegen/data-contracts"
-import { changePassword } from "~/lib/get-change-password" // Import hàm từ lib
-import { toast } from "react-toastify"
+import { useState, useCallback } from "react";
+import { ChangePasswordRequest } from "~/codegen/data-contracts";
+import { changePassword as changePasswordAPI } from "~/lib/get-change-password";
 
 export const useChangePassword = () => {
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
-  const changeUserPassword = async (data: ChangePasswordRequest) => {
-    setLoading(true)
-    setError(null)
+  const changePassword = useCallback(async (values: ChangePasswordRequest, token:string) => {
+    setLoading(true);
+    setErrorMessage("");
 
     try {
-      const response = await changePassword(data) // Gọi API changePassword
-
-      if ("status" in response && response.status !== 200) {
-        setError(response.error?.message || "Password changes failed. Try again!")
-        return { success: false }
-      } else {
-        setError(null)
-        toast.success("Change password successfuly!") // Thành công!
-        return { success: true }
+      const response = await changePasswordAPI(values,token);
+      console.log("Change password response:", response);
+      
+      if (response.statusCode === 200) {
+        return { success: true, data: response };
       }
-    } catch (err: any) {
-      setError("Something went wrong! Please try again.")
-      toast.error(error) // Báo lỗi
-      console.error("An Error Occurred: ", err)
-      return { success: false }
+      return { success: false, error: response };
+    } catch (error: any) {
+      console.error("Change password error:", error);
+      const errorMsg = error.message || "Something went wrong, please try again later.";
+      setErrorMessage(errorMsg);
+      return { success: false, error: errorMsg };
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  }, []);
 
-  return { changePassword: changeUserPassword, loading, error } // Export hàm changePassword
-}
+  return { changePassword, loading, errorMessage };
+};
