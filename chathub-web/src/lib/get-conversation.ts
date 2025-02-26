@@ -3,14 +3,8 @@ import { ConversationRequest, ConversationResponse, SuccessResponse } from "~/co
 
 const conversationInstance = new Conversation({ baseUrl: process.env.API_URL })
 
-<<<<<<< HEAD
-export async function getConversationByUserID(userId: number) {
-  const token = localStorage.getItem("authToken")
-  try {
-=======
 export async function getRecentConversationByUserID(userId: number, token: string) {
    try {
->>>>>>> ea19d2ec8f644d12fe0b84c21300b59284efd1a0
     if (!userId) return null
 
     const response = (await conversationInstance.getRecentConversations({userId}, {
