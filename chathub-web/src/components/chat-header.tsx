@@ -11,9 +11,18 @@ interface ChatHeaderProps {
   setIsChatInfoOpen: (isOpen: boolean) => void
   isChatInfoOpen: boolean
   avatar?: string
+  setIsChatSearchOpen?: (isOpen: boolean) => void
+  isChatSearchOpen?: boolean
 }
 
-const ChatHeader = ({ name, setIsChatInfoOpen, isChatInfoOpen, avatar }: ChatHeaderProps) => {
+const ChatHeader = ({
+  name,
+  setIsChatInfoOpen,
+  isChatInfoOpen,
+  avatar,
+  setIsChatSearchOpen,
+  isChatSearchOpen,
+}: ChatHeaderProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
 
@@ -45,7 +54,10 @@ const ChatHeader = ({ name, setIsChatInfoOpen, isChatInfoOpen, avatar }: ChatHea
         </div>
         {/* Các nút chức năng */}
         <div className="flex gap-2.5">
-          <button className="bg-[#484848] h-10 w-10 rounded-full flex items-center justify-center">
+          <button
+            className="bg-[#484848] h-10 w-10 rounded-full flex items-center justify-center"
+            onClick={() => setIsChatSearchOpen(!isChatSearchOpen)}
+          >
             <IoSearch size={20} color="white" className="text-white" />
           </button>
           <button className="bg-[#484848] h-10 w-10 rounded-full flex items-center justify-center">

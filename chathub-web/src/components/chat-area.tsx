@@ -9,6 +9,7 @@ import { RootState } from "~/lib/reudx/store"
 import { useMessages } from "~/hooks/use-message"
 import { formatDateTime } from "~/lib/utils"
 import { ConversationResponse } from "~/codegen/data-contracts"
+import { useEffect, useRef } from "react"
 
 interface ChatScreenProps {
   selectedChatId: number | null
@@ -16,8 +17,9 @@ interface ChatScreenProps {
   isChatInfoOpen: boolean
   isGroupChat: boolean
   conversationData?: ConversationResponse | null
+  isChatSearchOpen?: boolean
+  setIsChatSearchOpen?: (isOpen: boolean) => void
 }
-import { useEffect, useRef } from "react"
 
 const ChatScreen = ({
   selectedChatId,
@@ -25,6 +27,8 @@ const ChatScreen = ({
   isChatInfoOpen,
   isGroupChat,
   conversationData,
+  isChatSearchOpen,
+  setIsChatSearchOpen,
 }: ChatScreenProps) => {
   const token = useSelector((state: RootState) => state.auth.token)
   const userId = useSelector((state: RootState) => state.auth.userId)
@@ -49,6 +53,8 @@ const ChatScreen = ({
         setIsChatInfoOpen={setIsChatInfoOpen}
         isChatInfoOpen={isChatInfoOpen}
         avatar={conversationData?.groupAvatar}
+        isChatSearchOpen={isChatSearchOpen}
+        setIsChatSearchOpen={setIsChatSearchOpen}
       />
 
       <div className="flex flex-col-reverse overflow-y-auto h-[75vh] custom-scrollbar">
