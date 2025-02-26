@@ -47,7 +47,6 @@ const ModalCreateNewGroupChat: React.FC<ModalCreateNewGroupChatProps> = ({ isOpe
     if (response) {
       setIsOpen(false)
     } else {
-      console.log("Lỗi")
     }
   }
 

@@ -34,7 +34,7 @@ export class User<SecurityDataType = unknown> extends HttpClient<SecurityDataTyp
       method: "PUT",
       body: data,
       secure: true,
-      type: ContentType.Json,
+      type: ContentType.FormData,
       ...params,
     })
   /**
