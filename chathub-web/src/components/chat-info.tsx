@@ -39,7 +39,6 @@ const ChatInfo = ({
   const [isAddingMember, setIsAddingMember] = useState(false) // Thêm state này
   const [isOpenAddMembers, setIsOpenAddMembers] = useState(false)
   const [isOpenDissolveGroup, setIsOpenDissolveGroup] = useState(false)
-
   if (!isOpen) return null
   const [groupMembers, setGroupMembers] = useState<Member[]>([
     { name: "Guy Hawkins", phone: "0903112233", image: Images.GuyHawkins, selected: false },
@@ -175,20 +174,23 @@ const ChatInfo = ({
               <h3 className="text-md font-semibold">Privacy settings</h3>
               <div className="flex flex-col gap-3 mt-3 px-2">
                 {isGroupChat ? (
-                  <button className="flex items-center gap-3" onClick={() => setIsOpenLeaveGroup(true)}>
-                    <HiOutlineArrowRightEndOnRectangle size={25} color="red" className="font-semibold" />
-                    <span className="text-sm text-[#FF0000] font-semibold leading-[25px]">Leave group</span>
-                  </button>
+                  <>
+                    <button className="flex items-center gap-3" onClick={() => setIsOpenLeaveGroup(true)}>
+                      <HiOutlineArrowRightEndOnRectangle size={25} color="red" className="font-semibold" />
+                      <span className="text-sm text-[#FF0000] font-semibold leading-[25px]">Leave group</span>
+                    </button>
+                    <button className="flex items-center gap-3" onClick={() => setIsOpenDissolveGroup(true)}>
+                      <HiOutlineArrowRightEndOnRectangle size={25} color="red" className="font-semibold" />
+                      <span className="text-sm text-[#FF0000] font-semibold leading-[25px]">Dissolve Group</span>
+                    </button>
+                  </>
                 ) : (
                   <button className="flex items-center gap-3">
                     <MdBlock size={25} color="white" className="text-white font-semibold" />
                     <span className="text-sm font-semibold leading-[25px]">Block</span>
                   </button>
                 )}
-                <button className="flex items-center gap-3" onClick={() => setIsOpenDissolveGroup(true)}>
-                  <HiOutlineArrowRightEndOnRectangle size={25} color="red" className="font-semibold" />
-                  <span className="text-sm text-[#FF0000] font-semibold leading-[25px]">Dissolve Group</span>
-                </button>
+
                 <button className="flex items-center gap-3" onClick={() => setIsOpenLeaveGroup(true)}>
                   <CgTrashEmpty size={25} color="red" className="text-red font-semibold" />
                   <span className="text-sm font-semibold leading-[25px] text-[#FF0000]">Delete chat history</span>
