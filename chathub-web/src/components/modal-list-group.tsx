@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react"
+import React, { useState, useRef, useEffect } from "react"
 import Image from "next/image"
 import { Button } from "./ui/button"
 import { Input } from "./ui/input"
@@ -8,6 +8,10 @@ import { Search, EllipsisVertical } from "lucide-react"
 import "../styles/custom-scroll.css"
 import { LogOut } from "lucide-react"
 import { CircleX } from "lucide-react"
+import { useSelector } from "react-redux"
+import { RootState } from "~/lib/reudx/store"
+import { useConversation } from "~/hooks/use-converstation"
+import { ConversationResponse } from "~/codegen/data-contracts"
 
 interface ModalListGroupProps {
   isOpen: boolean
@@ -16,35 +20,40 @@ interface ModalListGroupProps {
 }
 
 const ModalListGroup: React.FC<ModalListGroupProps> = ({ isOpen, setIsOpen, isAdmin }) => {
-  const groups = [
-    { name: "Group A", chat: "You: abcdef", image: Images.GuyHawkins },
-    { name: "Group B", chat: "Anh A: xin chào, tôi tên là A", image: Images.RonaldRichards },
-    { name: "Group C", chat: "You: abcdef", image: Images.EstherHoward },
-    { name: "Group D", chat: "You: abcdef", image: Images.AlbertFlores },
-    { name: "Group E", chat: "You: abcdef", image: Images.MileyCyrus },
-    { name: "Group F", chat: "You: abcdef", image: Images.ArleneMcCoy },
-    { name: "Group G", chat: "You: abcdef", image: Images.CameronWilliamson },
-  ]
+  const userId = useSelector((state: RootState) => state.auth.userId)
+  const token = useSelector((state: RootState) => state.auth.token)
+  const [dataGroup, setDataGroup] = useState<ConversationResponse[]>([])
+  const { getGroupConversations } = useConversation()
 
   const [selectedGroup, setSelectedGroup] = useState<number | null>(null)
   const [showOptionsForGroup, setShowOptionsForGroup] = useState<number | null>(null)
   const [modalPosition, setModalPosition] = useState<{ top: number; left: number } | null>(null)
 
-  // Use ref to store the position of each group item
   const groupRefs = useRef<(HTMLLIElement | null)[]>([])
+
+  useEffect(() => {
+    if (userId) {
+      const init = async () => {
+        const response = await getGroupConversations(userId, token)
+        if (response) {
+          setDataGroup(response)
+        }
+      }
+      init()
+    }
+  }, [userId])
 
   const handleEllipsisClick = (index: number) => {
     if (showOptionsForGroup === index) {
-      setShowOptionsForGroup(null) // Close if already open
+      setShowOptionsForGroup(null)
     } else {
-      setShowOptionsForGroup(index) // Open the clicked group's options
-      // Get position of the clicked group item
+      setShowOptionsForGroup(index)
       const groupElement = groupRefs.current[index]
       if (groupElement) {
         const rect = groupElement.getBoundingClientRect()
         setModalPosition({
-          top: rect.top + window.scrollY, // Add scroll position if needed
-          left: rect.left + window.scrollX, // Add scroll position if needed
+          top: rect.top + window.scrollY,
+          left: rect.left + window.scrollX,
         })
       }
     }
@@ -72,101 +81,109 @@ const ModalListGroup: React.FC<ModalListGroupProps> = ({ isOpen, setIsOpen, isAd
           >
             <div className="fixed inset-0 bg-black bg-opacity-25" />
           </TransitionChild>
-            <DialogPanel className="overflow-visible bg-[#385068] rounded-[5%] w-[80%] h-[95%] max-w-md max-h-screen transform overflow-hidden p-6 text-left align-middle shadow-xl transition-all">
-              <DialogTitle className="text-xl font-bold mb-4 flex items-center justify-between text-white leading-6">
-                <div className="flex items-center gap-x-2">
-                  <Image src={Images.IconChatList} alt="Chat Icon" width={40} height={40} />
-                  <span className="text-[25px] font-bold">Group List</span>
-                </div>
-                <button
-                  onClick={() => {
-                    setIsOpen(false)
-                    setShowOptionsForGroup(null)
-                  }}
-                >
-                  <Image src={Images.IconCloseModal} alt="close modal" width={40} height={40} />
-                </button>
-              </DialogTitle>
-
-              <hr className="w-full my-4 border-1 border-gray-500 mb-6" />
-
-              <div className="relative mb-2">
-                <Input
-                  type="text"
-                  placeholder="Search by group name"
-                  className="w-full py-[22px] pl-12 pr-4 bg-[#fff] border border-[#545454] rounded-lg text-gray-900 focus:outline-none placeholder-[#828282]"
-                />
-                <Search className="absolute top-1/2 left-4 -translate-y-1/2 text-gray-500 pr-2" />
+          <DialogPanel className="overflow-visible bg-[#385068] rounded-[5%] w-[80%] h-[95%] max-w-md max-h-screen transform p-6 text-left align-middle shadow-xl transition-all">
+            <DialogTitle className="text-xl font-bold mb-4 flex items-center justify-between text-white leading-6">
+              <div className="flex items-center gap-x-2">
+                <Image src={Images.IconChatList} alt="Chat Icon" width={40} height={40} />
+                <span className="text-[25px] font-bold">Group List</span>
               </div>
+              <button
+                onClick={() => {
+                  setIsOpen(false)
+                  setShowOptionsForGroup(null)
+                }}
+              >
+                <Image src={Images.IconCloseModal} alt="close modal" width={40} height={40} />
+              </button>
+            </DialogTitle>
 
-              <Button className="w-20 py-2 px-4 mb-2 bg-[#7746f5] rounded-[12px] text-lg text-white bg-gradient-to-r from-[#501794] to-[#3E70A1] hover:bg-gradient-to-l">
-                All ({groups.length})
-              </Button>
+            <hr className="w-full my-4 border-1 border-gray-500 mb-6" />
 
-              <ul className="max-h-[55vh] overflow-auto custom-scrollbar">
-                {groups.map((group, index) => (
+            <div className="relative mb-2">
+              <Input
+                type="text"
+                placeholder="Search by group name"
+                className="w-full py-[22px] pl-12 pr-4 bg-[#fff] border border-[#545454] rounded-lg text-gray-900 focus:outline-none placeholder-[#828282]"
+              />
+              <Search className="absolute top-1/2 left-4 -translate-y-1/2 text-gray-500 pr-2" />
+            </div>
+
+            <Button className="w-20 py-2 px-4 mb-2 bg-[#7746f5] rounded-[12px] text-lg text-white bg-gradient-to-r from-[#501794] to-[#3E70A1] hover:bg-gradient-to-l">
+              All ({dataGroup.length})
+            </Button>
+
+            <ul className="max-h-[55vh] overflow-auto custom-scrollbar">
+              {dataGroup.length > 0 ? (
+                dataGroup.map((group, index) => (
                   <li
                     key={index}
                     ref={el => {
                       groupRefs.current[index] = el
-                    }} // Assign ref to each group item
+                    }}
                     className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer mb-3
                               ${selectedGroup === index ? "bg-[#7a99b8]/90" : ""}
                               bg-[#fff]
                               hover:bg-[#93C1D2]
                             `}
                   >
-                    <Image src={group.image} alt={group.name} width={40} height={40} className="rounded-full" />
+                    <Image
+                      src={group.groupAvatar ?? Images.AvatarDefault}
+                      alt={group.groupName ?? "Group Avatar"}
+                      width={40}
+                      height={40}
+                      className="rounded-full"
+                    />
                     <div>
-                      <p className="font-semibold text-black">{group.name}</p>
-                      <p className="text-sm text-gray-700">{group.chat}</p>
+                      <p className="font-semibold text-black">{group.groupName}</p>
+                      <p className="text-sm text-gray-700">{group.lastMessage}</p>
                     </div>
                     <EllipsisVertical
                       className="ml-auto text-gray-500"
-                      onClick={e => {
+                      onClick={() => {
                         handleEllipsisClick(index)
-                      }} // Call the click handler
+                      }}
                     />
                   </li>
-                ))}
-              </ul>
+                ))
+              ) : (
+                <p className="text-white">No group found</p>
+              )}
+            </ul>
 
-              {/* Modal for Leave Group / Dissolve */}
-              {showOptionsForGroup !== null && modalPosition && (
-                <div
-                  className="absolute bg-gradient-to-r from-[#501794] to-[#3E70A1] rounded-md shadow-lg p-2"
-                  style={{
-                    top: `${modalPosition.top - 30}px`, // Positioning the modal based on group position
-                    left: `${modalPosition.left - 135}px`, // Offset from the left to avoid overlap
+            {/* Modal for Leave Group / Dissolve */}
+            {showOptionsForGroup !== null && modalPosition && (
+              <div
+                className="absolute bg-gradient-to-r from-[#501794] to-[#3E70A1] rounded-md shadow-lg p-2"
+                style={{
+                  top: `${modalPosition.top - 30}px`,
+                  left: `${modalPosition.left - 135}px`,
+                }}
+              >
+                <Button
+                  onClick={() => {
+                    // Add logic for leaving the group
+                    setShowOptionsForGroup(null)
                   }}
+                  className="w-full py-1 px-1 mb-2 bg-gradient-to-r from-[#501794] to-[#3E70A1] text-white hover:bg-gradient-to-l"
                 >
+                  <LogOut />
+                  Leave Group
+                </Button>
+                {isAdmin && (
                   <Button
                     onClick={() => {
-                      // Add logic for leaving the group
+                      // Add logic for dissolving the group
                       setShowOptionsForGroup(null)
                     }}
-                    className="w-full py-1 px-1 mb-2 bg-gradient-to-r from-[#501794] to-[#3E70A1] text-white hover:bg-gradient-to-l"
+                    className="w-full py-1 px-1 bg-gradient-to-r from-[#501794] to-[#3E70A1] text-white hover:bg-gradient-to-l"
                   >
-                    <LogOut />
-                    Leave Group
+                    <CircleX />
+                    Dissolve
                   </Button>
-                  {isAdmin && (
-                    <Button
-                      onClick={() => {
-                        // Add logic for dissolving the group
-                        setShowOptionsForGroup(null)
-                      }}
-                      className="w-full py-1 px-1 bg-gradient-to-r from-[#501794] to-[#3E70A1] text-white hover:bg-gradient-to-l"
-                    >
-                      <CircleX />
-                      Dissolve
-                    </Button>
-                  )}
-                </div>
-
-              )}
-            </DialogPanel>
-
+                )}
+              </div>
+            )}
+          </DialogPanel>
         </div>
       </div>
     </Dialog>
