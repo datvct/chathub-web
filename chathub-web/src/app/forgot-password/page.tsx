@@ -10,12 +10,15 @@ import { Button } from "~/components/ui/button"
 import { Input } from "~/components/ui/input"
 import { Images } from "~/constants/images"
 import { auth, signInWithPhoneNumber } from "~/lib/firebase"
+import { useChangePassword } from "~/hooks/use-change-password"
+
 
 const ForgotPasswordPage: React.FC = () => {
   const [phoneNumber, setPhoneNumber] = useState("")
   const [openModal, setOpenModal] = useState(false)
   const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult>()
   const [recaptchaVerifier, setRecaptchaVerifier] = useState<RecaptchaVerifier | null>(null)
+  const { changePassword, loading, error } = useChangePassword()
 
   useEffect(() => {
     if (!recaptchaVerifier) {
@@ -46,6 +49,8 @@ const ForgotPasswordPage: React.FC = () => {
       console.error("RecaptchaVerifier is not initialized")
       return
     }
+
+    if (loading) return
 
     try {
       const confirmation = await signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier)
