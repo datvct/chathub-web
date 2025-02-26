@@ -13,7 +13,7 @@ export const useChangePassword = () => {
     try {
       const response = await changePassword(data);
       if (!response || (response as any)?.errorCode) {
-        throw new Error((response as any)?.message || "Đổi mật khẩu không thành công");
+        throw new Error((response as any)?.message || "Change password failed");
       }
       return { success: true, data: response as any };
     } catch (error: any) {
