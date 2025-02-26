@@ -24,7 +24,7 @@ export const useChangePassword = () => {
       }
     } catch (error: any) {
       console.error("Change password error: ", error);
-      const errorMsg = error.message || "Something went wrong, please try again later.";
+      const errorMsg = error.message || "Something went wrong. Please try again later!";
       setErrorMessage(errorMsg);
       toast.error("Failed to change password!");
       return { success: false, error: errorMsg };

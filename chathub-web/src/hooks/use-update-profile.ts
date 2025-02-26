@@ -1,6 +1,5 @@
-// hooks/use-update-profile.ts
 import { useState, useCallback } from "react";
-import { ChangeProfileRequest, SuccessResponse, ErrorResponse } from "~/codegen/data-contracts";
+import { ChangeProfileRequest } from "~/codegen/data-contracts";
 import { updateProfile as updateProfileAPI } from "~/lib/get-update-profile";
 import { toast } from "react-toastify";
 
@@ -15,7 +14,6 @@ export const useUpdateProfile = () => {
     try {
       const response = await updateProfileAPI(values, token);
       console.log("Update profile response: ", response);
-
       if (response.statusCode === 200) {
         toast.success("Updated profile successfully!");
         return { success: true, data: response };
