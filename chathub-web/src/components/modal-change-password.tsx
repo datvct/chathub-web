@@ -8,8 +8,7 @@ import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { Input } from "./ui/input"
 import { Button } from "./ui/button"
-import { ChangePasswordRequest, SuccessResponse } from "~/codegen/data-contracts"
-import { changePassword } from "../lib/get-change-password"
+import { ChangePasswordRequest } from "~/codegen/data-contracts"
 import { useChangePassword } from "../hooks/use-change-password"
 import { useSelector } from "react-redux"
 import { RootState } from "~/lib/reudx/store"
@@ -35,7 +34,7 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ isOpen, setIs
     setIsOpen(false)
   }
 
-  const handleChangePassword = async () => {
+  const handleSubmit = async () => {
     setLoading(true)
     setErrorMessage("")
 
@@ -59,14 +58,14 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ isOpen, setIs
     };
 
     const response = await changePassword(data, token)
-    if (response) {
-      toast.success("Password changed successfully.")
-      setLoading(true)
-      handleClose()
+    if (response.success) {
+      toast.success("Changed password successfully!")
+      setIsOpen(false)
     } else {
-      toast.error("Failed to change password.")
-      setLoading(false)
+      setErrorMessage(response.error || "Failed to change password.")
+      toast.error(response.error || "Failed to change password.")
     }
+    setLoading(false)
   }
 
   return (
@@ -159,10 +158,10 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ isOpen, setIs
                     <Button
                       type="button"
                       className="w-30 px-4 py-2 bg-[#7746f5] rounded-[12px] text-lg text-white bg-gradient-to-r from-[#501794] to-[#3E70A1] hover:bg-gradient-to-l"
-                      onClick={handleChangePassword}
+                      onClick={handleSubmit}
+                      disabled={loading}
                     >
-                      {/* Change */}
-                      {loading ? "Changing" : "Change"}
+                      {loading ? "Changing Password..." : "Change Password"}
                     </Button>
                   </div>
                 </div>
