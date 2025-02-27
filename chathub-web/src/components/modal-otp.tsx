@@ -13,9 +13,10 @@ interface ModalOTPProps {
   numberPhone: string
   confirmationResult: ConfirmationResult
   onResendOTP: () => void
+  userId: number
 }
 
-const ModalOTP = ({ isOpen, setIsOpen, numberPhone, confirmationResult, onResendOTP }: ModalOTPProps) => {
+const ModalOTP = ({ isOpen, setIsOpen, numberPhone, confirmationResult, onResendOTP, userId }: ModalOTPProps) => {
   const [otp, setOtp] = useState(Array(6).fill(""))
   const [timer, setTimer] = useState(60)
   const timerRef = useRef<NodeJS.Timeout | null>(null)
@@ -67,7 +68,7 @@ const ModalOTP = ({ isOpen, setIsOpen, numberPhone, confirmationResult, onResend
       toast.success("Confirm OTP successfully!")
 
       setTimeout(() => {
-        router.replace("/reset-password")
+        router.replace(`/reset-password?userId=${userId}`)
       }, 3000)
     } catch (error) {
       toast.error("Invalid OTP! Please try again.")
