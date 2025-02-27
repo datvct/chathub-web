@@ -16,8 +16,10 @@ export const useChangePassword = () => {
       console.log("Change password response:", response);
 
       if (response.statusCode === 200) {
+        toast.success("Changed password successfully!");
         return { success: true, data: response };
       } else if (response.statusCode === 400) {
+        toast.error(response.message);
         return { success: false, error: response.message };
       }
     } catch (error: any) {
@@ -27,7 +29,6 @@ export const useChangePassword = () => {
       toast.error("Failed to change password!");
       return { success: false, error: errorMsg };
     } finally {
-      toast.success("Changed password successfully!");
       setLoading(false);
     }
   }, []);
