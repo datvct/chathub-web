@@ -7,28 +7,27 @@ export const useChangePassword = () => {
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  const changePassword = useCallback(async (values: ChangePasswordRequest, token:string) => {
+  const changePassword = useCallback(async (values: ChangePasswordRequest, token: string) => {
     setLoading(true);
     setErrorMessage("");
 
     try {
-      const response = await changePasswordAPI(values,token);
+      const response = await changePasswordAPI(values, token);
       console.log("Change password response:", response);
-      
+
       if (response.statusCode === 200) {
-        toast.success("Changed password successfully!");
         return { success: true, data: response };
-      } else {
-        toast.error("Failed to change password!");
-        return { success: false, error: response };
+      } else if (response.statusCode === 400) {
+        return { success: false, error: response.message };
       }
     } catch (error: any) {
       console.error("Change password error: ", error);
-      const errorMsg = error.message || "Something went wrong, please try again later.";
+      const errorMsg = error.message || "Something went wrong. Please try again later!";
       setErrorMessage(errorMsg);
       toast.error("Failed to change password!");
       return { success: false, error: errorMsg };
     } finally {
+      toast.success("Changed password successfully!");
       setLoading(false);
     }
   }, []);
