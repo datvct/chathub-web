@@ -7,13 +7,12 @@ export const useChangePassword = () => {
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  const changePassword = useCallback(async (values: ChangePasswordRequest, token: string) => {
+  const changePassword = useCallback(async (values: ChangePasswordRequest, token?: string) => {
     setLoading(true);
     setErrorMessage("");
 
     try {
       const response = await changePasswordAPI(values, token);
-      console.log("Change password response:", response);
 
       if (response.statusCode === 200) {
         toast.success("Changed password successfully!");

@@ -25,7 +25,6 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ isOpen, setIs
   const [confirmNewPassword, setConfirmNewPassword] = useState("")
   const userId = useSelector((state: RootState) => state.auth.userId)
   const token = useSelector((state: RootState) => state.auth.token)
-  const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState("")
   const { changePassword } = useChangePassword()
@@ -54,8 +53,8 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ isOpen, setIs
       id: userId,
       oldPassword,
       newPassword,
-      changeType: 'UPDATE'
-    };
+      changeType: "UPDATE",
+    }
 
     const response = await changePassword(data, token)
     if (response.success) {
