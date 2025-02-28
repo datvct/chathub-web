@@ -33,7 +33,6 @@ const ChatSearch = ({ setIsOpen, conversationId, setHighlightMessageId }: ChatSe
   const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       if (searchTerm.trim() !== "") {
-        console.log("Fetching messages...")
         fetchMessages(searchTerm)
       }
     }
