@@ -15,6 +15,7 @@ export default function Home() {
   const [isGroupChat, setIsGroupChat] = useState(false)
   const [conversationData, setConversationData] = useState<ConversationResponse | null>(null)
   const [isChatSearchOpen, setIsChatSearchOpen] = useState(false)
+  const [highlightMessageId, setHighlightMessageId] = useState<number | null>(null)
 
   useEffect(() => {
     if (selectedChat) {
@@ -22,7 +23,6 @@ export default function Home() {
       setIsChatSearchOpen(false)
     }
   }, [selectedChat])
-  console.log(isChatSearchOpen, "isChatSearchOpen")
   return (
     <>
       <ToastContainer position="top-center" autoClose={3000} closeOnClick />
@@ -41,6 +41,7 @@ export default function Home() {
             conversationData={conversationData}
             isChatSearchOpen={isChatSearchOpen}
             setIsChatSearchOpen={setIsChatSearchOpen}
+            highlightMessageId={highlightMessageId}
           />
         ) : (
           <>
@@ -54,7 +55,13 @@ export default function Home() {
             <div className="absolute inset-0 bg-black opacity-30" />
           </>
         )}
-        {isChatSearchOpen && <ChatSearch isOpen={isChatSearchOpen} setIsOpen={setIsChatSearchOpen} />}
+        {isChatSearchOpen && (
+          <ChatSearch
+            setIsOpen={setIsChatSearchOpen}
+            conversationId={conversationData.id}
+            setHighlightMessageId={setHighlightMessageId}
+          />
+        )}
         {isChatInfoOpen && <ChatInfo isOpen={isChatInfoOpen} isGroupChat={isGroupChat} selectedChat={selectedChat} />}
       </div>
     </>
