@@ -6,10 +6,19 @@ import { Button } from "~/components/ui/button"
 import { Input } from "~/components/ui/input"
 import { Images } from "~/constants/images"
 import { toast, ToastContainer } from "react-toastify"
+import { useRouter, useSearchParams } from "next/navigation"
+import { useChangePassword } from "~/hooks/use-change-password"
+import { ChangePasswordRequest } from "~/codegen/data-contracts"
 
 const ResetPasswordPage: React.FC = () => {
+  const searchParams = useSearchParams()
+  const userId = searchParams.get("userId") // Lấy số điện thoại từ URL
+  const { changePassword } = useChangePassword()
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
+  const router = useRouter()
+  const [loading, setLoading] = useState(false)
+  const [errorMessage, setErrorMessage] = useState("")
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPassword(e.target.value)
   }
@@ -17,23 +26,46 @@ const ResetPasswordPage: React.FC = () => {
     setConfirmPassword(e.target.value)
   }
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    setLoading(true)
+    setErrorMessage("")
 
-    showToast()
+    if (!password || !confirmPassword) {
+      setErrorMessage("Please fill in all fields.")
+      setLoading(false)
+      return
+    }
+
+    if (confirmPassword !== password) {
+      setErrorMessage("New passwords do not match.")
+      setLoading(false)
+      return
+    }
+
+    const data: ChangePasswordRequest = {
+      id: parseInt(userId),
+      newPassword: password,
+      changeType: "REST",
+    }
+
+    const response = await changePassword(data)
+    if (response.success) {
+      toast.success("Rest password successfully!", {
+        position: "top-right",
+        autoClose: 3000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+      })
+      router.push("/sign-in")
+    } else {
+      setErrorMessage(response.error || "Failed to change password.")
+      toast.error(response.error || "Failed to change password.")
+    }
   }
 
   const isFormValid = password && confirmPassword
-
-  const showToast = () => {
-    toast.success("Change password successfully!", {
-      position: "top-right",
-      autoClose: 3000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-    })
-  }
 
   return (
     <div className="h-screen w-full flex justify-center items-center bg-[#160430] relative">
