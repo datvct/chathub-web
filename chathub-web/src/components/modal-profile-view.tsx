@@ -13,10 +13,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider"
 import { DatePicker } from "@mui/x-date-pickers/DatePicker"
 import { useSelector } from "react-redux"
 import { RootState } from "~/lib/reudx/store"
-import { useUpdateProfile } from "~/hooks/use-update-profile"
-import { ChangeProfileRequest } from "~/codegen/data-contracts"
 import dayjs from "dayjs"
-import { toast, ToastContainer } from "react-toastify"
 
 interface ProfileData {
 	displayName: string
@@ -103,7 +100,6 @@ const ProfileViewModal: React.FC<ProfileViewModalProps> = ({
 							leaveTo="opacity-0 scale-95"
 						>
 							<DialogPanel className="w-full max-w-md transform overflow-hidden rounded-[5%] bg-white p-6 text-left align-middle shadow-xl transition-all">
-								<ToastContainer />
 								<DialogTitle
 									as="h3"
 									className="text-lg font-medium leading-6 text-gray-900 flex items-center justify-between"
@@ -124,17 +120,9 @@ const ProfileViewModal: React.FC<ProfileViewModalProps> = ({
 												height={100}
 												className="mx-auto cursor-pointer w-24 h-24 rounded-[50px] border border-white transition duration-150 transform hover:scale-105 shadow-2xl hover:shadow-cyan"
 											/>
-
 											<span className="absolute bottom-[-10px] left-[55%] rounded-[50px] bg-[#F1F1F1] hover:bg-slate-300 w-[37px] h-[37px] flex items-center justify-center">
 												<Camera className="text-[#797979] w-5 h-5" strokeWidth={1.5} />
 											</span>
-
-											{/* <input
-												id="profile-upload"
-												type="file"
-												accept=".png,.jpg,.gif,.jpeg"
-												className="opacity-0 absolute top-0 inset-0 w-full h-full cursor-pointer"
-											/> */}
 										</label>
 									</div>
 
