@@ -26,7 +26,6 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ isOpen, setIs
   const [confirmNewPassword, setConfirmNewPassword] = useState("")
   const userId = useSelector((state: RootState) => state.auth.userId)
   const token = useSelector((state: RootState) => state.auth.token)
-  const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState("")
   const { changePassword } = useChangePassword()
@@ -51,22 +50,22 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ isOpen, setIs
       return
     }
 
-    try {
-      const data = { id: userId, oldPassword, newPassword, changeType: "UPDATE" }
-      const response = await changePassword(data, token)
+    const data: ChangePasswordRequest = {
+      id: userId,
+      oldPassword,
+      newPassword,
+      changeType: 'UPDATE'
+    };
 
-      if (response.success) {
-        console.log("Change password response: ", response)
-        handleClose()
-      } else {
-        setErrorMessage(response.error?.message || "Failed to change password.")
-      }
-    } catch (error: any) {
-      setErrorMessage("An error occurred! Please try again.")
-      console.error("Error changing password: ", error)
-    } finally {
-      setLoading(false)
+    const response = await changePassword(data, token)
+    if (response.success) {
+      toast.success("Changed password successfully!")
+      setIsOpen(false)
+    } else {
+      setErrorMessage(response.error || "Failed to change password.")
+      toast.error(response.error || "Failed to change password.")
     }
+    setLoading(false)
   }
 
   return (

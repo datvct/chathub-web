@@ -9,16 +9,14 @@ import ModalOTP from "~/components/modal-otp"
 import { Button } from "~/components/ui/button"
 import { Input } from "~/components/ui/input"
 import { Images } from "~/constants/images"
+import { useFindUserByPhoneNumber } from "~/hooks/use-user"
 import { auth, signInWithPhoneNumber } from "~/lib/firebase"
-import { useChangePassword } from "~/hooks/use-change-password"
-
 
 const ForgotPasswordPage: React.FC = () => {
   const [phoneNumber, setPhoneNumber] = useState("")
   const [openModal, setOpenModal] = useState(false)
   const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult>()
   const [recaptchaVerifier, setRecaptchaVerifier] = useState<RecaptchaVerifier | null>(null)
-  const { changePassword, loading, error } = useChangePassword()
 
   useEffect(() => {
     if (!recaptchaVerifier) {
@@ -32,7 +30,6 @@ const ForgotPasswordPage: React.FC = () => {
         },
       })
       setRecaptchaVerifier(verifier)
-      console.log("RecaptchaVerifier initialized:", verifier) // Check if it's initialized
     }
   }, [recaptchaVerifier])
 
@@ -52,6 +49,11 @@ const ForgotPasswordPage: React.FC = () => {
 
     if (loading) return
 
+    await checkPhoneNumber(formatPhoneNumber(phoneNumber))
+    if (!user) {
+      toast.error("Phone number not found!")
+      return
+    }
     try {
       const confirmation = await signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier)
       setOpenModal(true)
@@ -124,6 +126,7 @@ const ForgotPasswordPage: React.FC = () => {
           numberPhone={phoneNumber}
           confirmationResult={confirmationResult}
           onResendOTP={handleResendOTP}
+          userId={user?.id}
         />
       )}
 

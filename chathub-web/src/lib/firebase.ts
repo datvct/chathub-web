@@ -5,12 +5,13 @@ import { getAuth, signInWithPhoneNumber } from "firebase/auth"
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyAf4dMcVRIKMDb6L_KQWtDoRG6L8nvtqfU",
-  authDomain: "chathub-215d7.firebaseapp.com",
-  projectId: "chathub-215d7",
-  storageBucket: "chathub-215d7.firebasestorage.app",
-  messagingSenderId: "964645860857",
-  appId: "1:964645860857:web:2211c7f74d3c0daeecf928",
+  apiKey: "AIzaSyDqbK1-_Gzwb6jH6PR8tsrWrl1esCODY90",
+  authDomain: "chathubstaging.firebaseapp.com",
+  projectId: "chathubstaging",
+  storageBucket: "chathubstaging.firebasestorage.app",
+  messagingSenderId: "1025131653518",
+  appId: "1:1025131653518:web:c92a72e6e639e87531dcdf",
+  measurementId: "G-CLQKSF6LDH"
 }
 
 // Initialize Firebase
