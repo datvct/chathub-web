@@ -3,13 +3,13 @@ import { User } from "~/codegen/User";
 
 const userInstance = new User({ baseUrl: process.env.API_URL });
 
-export async function getListFriends(userId: number, token:string) {
+export async function getListFriends(userId: number, token: string) {
 
 
-   try {
+  try {
     if (!userId) return null
 
-    const response = (await friendInstance.getListFriend({userId}, {
+    const response = (await friendInstance.getListFriend({ userId }, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
