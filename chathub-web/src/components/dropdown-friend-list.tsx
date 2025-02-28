@@ -7,10 +7,13 @@ import { Images } from "../constants/images"
 import { Ellipsis } from "lucide-react"
 
 interface Friend {
+  userId: number
   name: string
-  phone: string
+  phoneNumber: string
+  avatar: string
   online?: boolean
-  image: any
+  dateOfBirth?: string
+  gender: "Male" | "Female"
 }
 
 interface FriendListDropdownProps {
