@@ -12,31 +12,16 @@ import { Input } from "./ui/input"
 import DropdownFriendList from "./dropdown-friend-list"
 import ProfileViewModal from "./modal-profile-view"
 import { useFriends } from "~/hooks/use-friends"
-
-interface Friend {
-  userId: number
-  name: string
-  phoneNumber: string
-  avatar: string
-  online?: boolean
-  dateOfBirth?: string
-  gender: "Male" | "Female"
-}
-
-const friends: Friend[] = [
-  { userId: 1, name: "Guy Hawkins", phoneNumber: "0903112233", online: true, avatar: "Images.GuyHawkins", dateOfBirth: "1992-01-01", gender: "Male" },
-  { userId: 2, name: "Ronald Richards", phoneNumber: "0902445566", online: true, avatar: "Images.RonaldRichards", dateOfBirth: "1994-02-03", gender: "Male" },
-  { userId: 3, name: "Esther Howard", phoneNumber: "0904998877", avatar: "Images.EstherHoward", dateOfBirth: "1995-04-07", gender: "Female" },
-  { userId: 4, name: "Albert Flores", phoneNumber: "0905336699", avatar: "Images.AlbertFlores", dateOfBirth: "1998-06-25", gender: "Male" },
-  { userId: 5, name: "Miley Cyrus", phoneNumber: "0909225588", avatar: "Images.MileyCyrus", dateOfBirth: "1997-02-17", gender: "Female" },
-  { userId: 6, name: "Arlene McCoy", phoneNumber: "0906114477", avatar: "Images.ArleneMcCoy", dateOfBirth: "1993-08-27", gender: "Female" },
-  { userId: 7, name: "Cameron Williamson", phoneNumber: "0902115599", avatar: "Images.CameronWilliamson", dateOfBirth: "1996-05-19", gender: "Male" },
-]
+import { useUnfriend } from "~/hooks/use-unfriend"
+import type { Friend } from "../types/types"
+import { toast } from "react-toastify"
+import { UserDTO } from "~/codegen/data-contracts"
 
 const ModalFriendList: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) => void }> = ({ isOpen, setIsOpen }) => {
   const userId = useSelector((state: RootState) => state.auth.userId)
   const token = useSelector((state: RootState) => state.auth.token)
   const { friends: fetchedFriends, loading, error } = useFriends(userId, token)
+  const { unfriend, isUnfriending, unfriendUserId, unfriendError } = useUnfriend()
 
   const [activeTab, setActiveTab] = useState("all")
   const [searchTerm, setSearchTerm] = useState("")
@@ -49,9 +34,18 @@ const ModalFriendList: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) =>
     setIsProfileViewModalOpen(true)
   }
 
-  const filteredFriends = fetchedFriends?.filter(friend => friend.name.toLowerCase().includes(searchTerm.toLowerCase())) || friends
+  const filteredFriends = fetchedFriends?.filter(friend => friend.name.toLowerCase().includes(searchTerm.toLowerCase()))
 
-  const friendsToDisplay = activeTab === "recent" ? filteredFriends.filter(friend => friend.online) : filteredFriends
+  const friendsToDisplay = activeTab === "recent" ? filteredFriends.filter(friend => friend.status === "ONLINE") : filteredFriends
+
+  const handleUnfriend = async (friendId: number) => {
+    if (!token || !userId || !friendId) return;
+    try {
+      await unfriend(token, userId, friendId);
+    } catch (error) {
+      toast.error("Failed to unfriend. Please try again.");
+    }
+  }
 
   return (
     <div>
@@ -108,50 +102,75 @@ const ModalFriendList: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) =>
                     <button
                       onClick={() => setActiveTab("all")}
                       className={`px-4 py-2 rounded-lg text-white font-semibold
-                                                    ${activeTab === "all"
+                        ${activeTab === "all"
                           ? "bg-[#501794]"
                           : "bg-[#8C8595] hover:bg-[#7746F5]"
-                        }`}
+                        }`
+                      }
                     >
-                      All ({friends.length})
+                      All ({fetchedFriends?.length || 0})
                     </button>
                     <button
                       onClick={() => setActiveTab("recent")}
                       className={`px-4 py-2 rounded-lg text-white font-semibold
-                                                    ${activeTab === "recent"
+                        ${activeTab === "recent"
                           ? "bg-[#501794]"
                           : "bg-[#8C8595] hover:bg-[#7746F5]"
                         }`}
                     >
-                      Recently online ({friends.filter(friend => friend.online).length})
+                      Recently online ({fetchedFriends?.filter(friend => friend.status == "ONLINE")?.length || 0})
                     </button>
                   </div>
 
                   <div className="max-h-[55vh] overflow-y-auto custom-scrollbar pr-2">
-                    {friendsToDisplay.map((friend, index) => (
-                      <div
-                        key={index}
-                        className="flex items-center odd:bg-[#E4DEED] even:bg-[#AF9CC9] rounded-lg p-3 mb-3 space-x-3"
-                        onClick={() => {
-                          setSelectedFriend(friend)
-                          setIsDropDownOpen(true)
-                        }}
-                      >
-                        <Image src={friend.avatar} alt={friend.name} width={45} height={45} className="rounded-full" />
+                    {loading ? (
+                      <div>Loading friends...</div>
+                    ) : error ? (
+                      <div>Error loading friends: {error}</div>
+                    ) : !friendsToDisplay || friendsToDisplay.length === 0 ? (
+                      <div>No friends found.</div>
+                    ) : (
+                      friendsToDisplay.map((userDTO, index) => {
+                        const friend: Friend = {
+                          userId: userDTO.id?.toString() || "0",
+                          name: userDTO.name || "",
+                          phoneNumber: userDTO.phoneNumber || "",
+                          avatar: userDTO.avatar || Images.AvatarDefault,
+                          dateOfBirth: userDTO.dateOfBirth,
+                          gender: userDTO.gender as "Male" | "Female",
+                          status: userDTO.status as "Online" | "Offline"
+                        };
 
-                        <div className="flex-1">
-                          <div className="flex items-start justify-between">
-                            <p className="text-black font-medium">{friend.name}</p>
+                        return (
+                          <div
+                            key={index}
+                            className="flex items-center odd:bg-[#E4DEED] even:bg-[#AF9CC9] rounded-lg p-3 mb-3 space-x-3"
+                            onClick={() => {
+                              setSelectedFriend(friend)
+                              setIsDropDownOpen(true)
+                            }}
+                          >
+                            <Image src={friend.avatar} alt={friend.name} width={45} height={45} className="rounded-full" />
+
+                            <div className="flex-1">
+                              <div className="flex items-start justify-between">
+                                <p className="text-black font-medium">{friend.name}</p>
+                              </div>
+                              <p className="text-gray-600 text-sm">{friend.phoneNumber}</p>
+                            </div>
+
+                            <Button
+                              className="w-20 px-4 py-2 bg-[#7746f5] rounded-[12px] text-lg text-white bg-gradient-to-r from-[#501794] to-[#3E70A1] hover:bg-gradient-to-l"
+                              onClick={() => handleUnfriend(parseInt(friend.userId.toString()))}
+                              disabled={isUnfriending && parseInt(friend.userId.toString()) === unfriendUserId}
+                            >
+                              {isUnfriending && parseInt(friend.userId.toString()) === unfriendUserId ? "Unfriending..." : "Unfriend"}
+                            </Button>
+                            <DropdownFriendList friend={friend} key={index} onOpenProfile={handleOpenProfile} />
                           </div>
-                          <p className="text-gray-600 text-sm">{friend.phoneNumber}</p>
-                        </div>
-
-                        <Button className="w-20 px-4 py-2 bg-[#7746f5] rounded-[12px] text-lg text-white bg-gradient-to-r from-[#501794] to-[#3E70A1] hover:bg-gradient-to-l">
-                          Unfriend
-                        </Button>
-                        <DropdownFriendList friend={friend} key={index} onOpenProfile={handleOpenProfile} />
-                      </div>
-                    ))}
+                        )
+                      })
+                    )}
                   </div>
                 </DialogPanel>
               </TransitionChild>
