@@ -1,7 +1,7 @@
 import { useState, useCallback } from "react";
 import { UserDTO, ChangeProfileRequest } from "~/codegen/data-contracts";
 import { getUserInfo } from "~/lib/get-user";
-import { updateProfile as updateProfileAPI } from "~/lib/get-update-profile";
+import { updateProfile as updateProfileAPI } from "~/lib/get-user";
 import { toast } from "react-toastify";
 
 export function useFindUserByPhoneNumber() {
