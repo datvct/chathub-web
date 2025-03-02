@@ -17,21 +17,7 @@ import { useUpdateProfile } from "~/hooks/use-update-profile"
 import { ChangeProfileRequest } from "~/codegen/data-contracts"
 import dayjs from "dayjs"
 import { toast, ToastContainer } from "react-toastify"
-
-interface ProfileData {
-  displayName: string
-  dateOfBirth: Date
-  gender: "Male" | "Female"
-}
-
-interface Friend {
-  name: string
-  dateOfBirth: Date
-  gender: boolean
-  phone: string
-  online?: boolean
-  image: any
-}
+import { Friend, ProfileData } from "~/types/types"
 
 interface ProfileModalProps {
   isOpen: boolean
