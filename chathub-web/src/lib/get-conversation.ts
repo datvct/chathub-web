@@ -1,5 +1,5 @@
 import { Conversation } from "~/codegen/Conversation"
-import { ConversationRequest, ConversationResponse, SuccessResponse } from "~/codegen/data-contracts"
+import { ConversationRequest, ConversationResponse, MessageFindedResponse, SuccessResponse } from "~/codegen/data-contracts"
 
 const conversationInstance = new Conversation({ baseUrl: process.env.API_URL })
 
@@ -76,6 +76,21 @@ export async function getGroupConversationsByUserId(userId: number, token: strin
     return response
   }
   catch  {
+    return null
+  }
+}
+
+export async function findMessagesByConversationId(conversationId: number, message: string, token: string) {
+  try {
+    if (!conversationId || !message) return null
+    const response = (await conversationInstance.findMessage(conversationId, { message }, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }).then(res => res.json())) as MessageFindedResponse[]
+    return response
+  } catch (error) {
+    console.error("Error checking admin token:", error)
     return null
   }
 }
