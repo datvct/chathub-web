@@ -99,7 +99,7 @@ const ProfileViewModal: React.FC<ProfileViewModalProps> = ({
 									<div className="relative">
 										<label htmlFor="profile-upload" className="relative cursor-pointer">
 											<Image
-												src={friend?.image ?? Images.ProfileImage}
+												src={friend?.avatar ?? Images.ProfileImage}
 												alt="profile default"
 												width={100}
 												height={100}
