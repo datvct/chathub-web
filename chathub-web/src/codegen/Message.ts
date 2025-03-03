@@ -45,10 +45,18 @@ export class Message<SecurityDataType = unknown> extends HttpClient<SecurityData
    * @request GET:/message/{conversationId}
    * @secure
    */
-  getMessages = (conversationId: number, params: RequestParams = {}) =>
+  getMessages = (
+    conversationId: number,
+    query: {
+      /** @format int64 */
+      userId: number
+    },
+    params: RequestParams = {},
+  ) =>
     this.request<MessageResponse[], ErrorResponse>({
       path: `/message/${conversationId}`,
       method: "GET",
+      query: query,
       secure: true,
       ...params,
     })
