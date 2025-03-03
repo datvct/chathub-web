@@ -38,7 +38,8 @@ export interface UpdateGroupInfoRequest {
   /** @format int64 */
   userId?: number
   groupName?: string
-  avatar?: string
+  /** @format binary */
+  avatar?: File
 }
 
 export interface ChangePasswordRequest {
@@ -74,6 +75,15 @@ export interface FriendshipRequest {
   message?: string
 }
 
+export interface ConversationRequest {
+  chatType?: "SINGLE" | "GROUP"
+  groupName?: string
+  groupAvatar?: string
+  /** @format int64 */
+  creatorId?: number
+  participantIds?: number[]
+}
+
 export interface ConversationResponse {
   /** @format int64 */
   id?: number
@@ -89,23 +99,14 @@ export interface ConversationResponse {
   /** @format date-time */
   createAt?: string
   participants?: ParticipantDTO[]
-  dissolved?: boolean
   pinned?: boolean
+  dissolved?: boolean
 }
 
 export interface ParticipantDTO {
   /** @format int64 */
   id?: number
   name?: string
-}
-
-export interface ConversationRequest {
-  chatType?: "SINGLE" | "GROUP"
-  groupName?: string
-  groupAvatar?: string
-  /** @format int64 */
-  creatorId?: number
-  participantIds?: number[]
 }
 
 export interface RegistrationRequest {
@@ -158,7 +159,13 @@ export interface MessageResponse {
   messageType?: "TEXT" | "IMAGE" | "VIDEO" | "DOCUMENT" | "EMOJI"
   /** @format date-time */
   sentAt?: string
+  reactions?: ReactionDTO[]
   unsent?: boolean
+}
+
+export interface ReactionDTO {
+  senderName?: string
+  reactionEmoji?: string
 }
 
 export interface FriendRequestResponse {
@@ -168,6 +175,28 @@ export interface FriendRequestResponse {
   avatar?: string
   message?: string
   type?: string
+}
+
+export interface ChatDetailSectionResponse {
+  avatar?: string
+  name?: string
+  list_media?: MediaDTO[]
+  members?: MemberDTO[]
+}
+
+export interface MediaDTO {
+  url?: string
+  type?: "IMAGE" | "VIDEO" | "DOCUMENT" | "LINK"
+  /** @format date-time */
+  sent_at?: string
+}
+
+export interface MemberDTO {
+  /** @format int64 */
+  id?: number
+  name?: string
+  avatar?: string
+  is_admin?: boolean
 }
 
 export interface MessageFindedResponse {
