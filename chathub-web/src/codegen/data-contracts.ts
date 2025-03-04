@@ -135,6 +135,14 @@ export interface AuthResponse {
   gender?: string
 }
 
+export interface UpdateNickNameRequest {
+  /** @format int64 */
+  conversationId?: number
+  /** @format int64 */
+  participantId?: number
+  nickName: string
+}
+
 export interface UserDTO {
   /** @format int64 */
   id?: number
