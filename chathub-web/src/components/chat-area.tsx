@@ -35,7 +35,7 @@ const ChatScreen = ({
 }: ChatScreenProps) => {
   const token = useSelector((state: RootState) => state.auth.token)
   const userId = useSelector((state: RootState) => state.auth.userId)
-  const { messages, loading } = useMessages(selectedChatId, token)
+  const { messages, loading } = useMessages(selectedChatId, userId, token)
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null)
 
