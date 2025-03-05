@@ -14,22 +14,21 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker"
 import { useSelector } from "react-redux"
 import { RootState } from "~/lib/reudx/store"
 import dayjs from "dayjs"
-import { Friend, ProfileData } from "../types/types"
 
-// interface ProfileData {
-// 	displayName: string
-// 	dateOfBirth?: string | Date
-// 	gender: string
-// }
+interface ProfileData {
+	displayName: string
+	dateOfBirth?: string | Date
+	gender: string
+}
 
-// interface Friend {
-// 	name: string
-// 	dateOfBirth?: string | Date
-// 	gender: "Male" | "Female"
-// 	phone: string
-// 	online?: boolean
-// 	image: any
-// }
+interface Friend {
+	name: string
+	dateOfBirth?: string | Date
+	gender: "Male" | "Female"
+	phone: string
+	online?: boolean
+	image: any
+}
 
 interface ProfileViewModalProps {
 	isOpen: boolean
@@ -50,7 +49,6 @@ const ProfileViewModal: React.FC<ProfileViewModalProps> = ({
 		dateOfBirth: friend?.dateOfBirth || new Date(),
 		gender: friend?.gender || "Male"
 	})
-
 
 	const handleChange = (field: keyof ProfileData, value: string | Date | "Male" | "Female") => {
 		setProfileData(prev => ({ ...prev, [field]: value }))
@@ -115,7 +113,7 @@ const ProfileViewModal: React.FC<ProfileViewModalProps> = ({
 									<div className="relative">
 										<label htmlFor="profile-upload" className="relative cursor-pointer">
 											<Image
-												src={friend?.image ?? Images.ProfileImage}
+												src={friend?.avatar ?? Images.ProfileImage}
 												alt="profile default"
 												width={100}
 												height={100}
@@ -136,7 +134,7 @@ const ProfileViewModal: React.FC<ProfileViewModalProps> = ({
 											<Input
 												id="display-name"
 												type="text"
-												value={friend?.name}
+												value={profileData.displayName}
 												className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500"
 												onChange={e => handleChange("displayName", e.target.value)}
 											/>
@@ -152,9 +150,8 @@ const ProfileViewModal: React.FC<ProfileViewModalProps> = ({
 											<DemoContainer components={["DatePicker"]}>
 												<DatePicker
 													label="Date of Birth"
-													value={friend ? dayjs(friend.dateOfBirth) : null}
+													value={date}
 													onChange={handleDateOfBirth}
-													readOnly
 													className="w-full block bg-white border border-slate-300"
 												/>
 											</DemoContainer>
