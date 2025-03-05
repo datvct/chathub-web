@@ -14,21 +14,22 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker"
 import { useSelector } from "react-redux"
 import { RootState } from "~/lib/reudx/store"
 import dayjs from "dayjs"
+import { Friend, ProfileData } from "../types/types"
 
-interface ProfileData {
-	displayName: string
-	dateOfBirth?: string | Date
-	gender: string
-}
+// interface ProfileData {
+// 	displayName: string
+// 	dateOfBirth?: string | Date
+// 	gender: string
+// }
 
-interface Friend {
-	name: string
-	dateOfBirth?: string | Date
-	gender: "Male" | "Female"
-	phone: string
-	online?: boolean
-	image: any
-}
+// interface Friend {
+// 	name: string
+// 	dateOfBirth?: string | Date
+// 	gender: "Male" | "Female"
+// 	phone: string
+// 	online?: boolean
+// 	image: any
+// }
 
 interface ProfileViewModalProps {
 	isOpen: boolean
