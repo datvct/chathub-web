@@ -87,7 +87,7 @@ const ModalCreateNewChat: React.FC<ModalCreateNewChatProps> = ({ isOpen, setIsOp
                   ${selectedUser === user.id ? "bg-[#7a99b8]/90" : "bg-[#fff]"}`}
                   onClick={() => handleSelectUser(user.id)}
                 >
-                  <Image src={user.avatar} alt={user.name} width={40} height={40} className="rounded-full" />
+                  <Image src={user.avatar} alt="avtart" width={40} height={40} className="rounded-full" />
                   <div>
                     <p className="font-semibold text-black">{user.name}</p>
                     <p className="text-sm text-gray-700">{user.phoneNumber}</p>
