@@ -1,4 +1,6 @@
 "use client"
+
+import { useState, useEffect } from "react"
 import Image from "next/image"
 import { Images } from "~/constants/images"
 import { GoBell } from "react-icons/go"
@@ -15,9 +17,19 @@ import ModalLeaveGroup from "./modal-leave-group"
 import { FaChevronLeft } from "react-icons/fa6"
 import { Button } from "./ui/button"
 import { LuUserRoundPlus } from "react-icons/lu"
-import ModalAddMembers from "./modal-add-members" // Adjust path if needed
+import ModalAddMembers from "./modal-add-members"
 import ModalDissolveGroup from "./modal-dissolve-group"
-import { useState } from "react"
+import { useConversation } from "~/hooks/use-converstation";
+import { useSelector } from "react-redux";
+import { RootState } from "~/lib/reudx/store";
+import { ChatDetailSectionResponse } from "~/codegen/data-contracts";
+
+interface ChatInfoProps {
+  isOpen?: boolean;
+  isGroupChat?: boolean;
+  selectedChat: number;
+  setIsChatInfoOpen: (isOpen: boolean) => void;
+}
 
 interface Member {
   name: string
@@ -30,31 +42,46 @@ const ChatInfo = ({
   isOpen,
   isGroupChat,
   selectedChat,
-}: {
-  isOpen?: boolean
-  isGroupChat?: boolean
-  selectedChat: number
-}) => {
+  setIsChatInfoOpen,
+}: ChatInfoProps) => {
   const [isOpenLeaveGroup, setIsOpenLeaveGroup] = useState(false)
-  const [isAddingMember, setIsAddingMember] = useState(false) // Thêm state này
+  const [isAddingMember, setIsAddingMember] = useState(false)
   const [isOpenAddMembers, setIsOpenAddMembers] = useState(false)
   const [isOpenDissolveGroup, setIsOpenDissolveGroup] = useState(false)
+
+  const token = useSelector((state: RootState) => state.auth.token);
+  const userId = useSelector((state: RootState) => state.auth.userId);
+
+  const { getChatDetailSection, loading: detailLoading, error: detailError } = useConversation();
+  const [chatDetail, setChatDetail] = useState<ChatDetailSectionResponse | null>(null);
+
+  useEffect(() => {
+    const fetchChatDetails = async () => {
+      if (selectedChat && userId && token) {
+        const details = await getChatDetailSection(selectedChat, userId, token);
+        setChatDetail(details || null);
+      }
+    };
+    fetchChatDetails();
+  }, [selectedChat, userId, token, getChatDetailSection]);
+
   if (!isOpen) return null
-  const [groupMembers, setGroupMembers] = useState<Member[]>([
-    { name: "Guy Hawkins", phone: "0903112233", image: Images.GuyHawkins, selected: false },
-    { name: "Ronald Richards", phone: "0902445566", image: Images.RonaldRichards, selected: false },
-    { name: "Esther Howard", phone: "0904998877", image: Images.EstherHoward, selected: false },
-    { name: "Albert Flores", phone: "0905336699", image: Images.AlbertFlores, selected: false },
-    { name: "Miley Cyrus", phone: "0909225588", image: Images.MileyCyrus, selected: false },
-    { name: "Arlene McCoy", phone: "0906114477", image: Images.ArleneMcCoy, selected: false },
-    { name: "Cameron Williamson", phone: "0902115599", image: Images.CameronWilliamson, selected: false },
-  ])
 
   const handleAddMembers = (members: Member[]) => {
-    // setSelectedMembers(members)
-    setGroupMembers([...groupMembers, ...members])
     setIsAddingMember(false)
   }
+
+  // if (detailLoading) {
+  //   return <div className="bg-[#292929] text-white h-screen overflow-hidden overflow-y-auto w-1/4 p-4">
+  //     Loading chat info...
+  //   </div>;
+  // }
+
+  // if (detailError || !chatDetail) {
+  //   return <div className="bg-[#292929] text-white h-screen overflow-hidden overflow-y-auto w-1/4 p-4">
+  //     Error loading chat info.
+  //   </div>;
+  // }
 
   return (
     <div className="bg-[#292929] text-white h-screen overflow-hidden overflow-y-auto w-1/4 p-4">
@@ -67,13 +94,15 @@ const ChatInfo = ({
             <div className="flex justify-between items-center flex-col gap-4">
               <div className="flex flex-col items-center">
                 <Image
-                  src={Images.ImageDefault}
+                  src={chatDetail?.avatar || Images.ImageDefault}
                   className="w-20 h-20 rounded-full"
                   alt="Avatar"
                   width={80}
                   height={80}
                 />
-                <p className="mt-2 text-lg font-semibold">Name</p>
+                <p className="mt-2 text-lg font-semibold">
+                  {chatDetail?.name || "Group Name"}
+                </p>
               </div>
               <div className="flex items-center gap-5">
                 <div className="flex items-center flex-col">
@@ -112,10 +141,12 @@ const ChatInfo = ({
 
             {isGroupChat && (
               <div className="mt-4">
-                <h3 className="text-md font-semibold">Group Member</h3>
+                <h3 className="text-md font-semibold">Group Members</h3>
                 <button className="mt-3 px-3 w-full flex gap-2" onClick={() => setIsAddingMember(true)}>
                   <LuUserRound size={20} color="white" />
-                  <span>5 Memebers</span>
+                  <span>
+                    {chatDetail?.members?.length} Memebers
+                  </span>
                 </button>
               </div>
             )}
@@ -123,10 +154,20 @@ const ChatInfo = ({
             <div className="mt-4">
               <h3 className="text-md font-semibold">Photos/ Videos</h3>
               <div className="grid grid-cols-4 gap-x-2 gap-y-4 mt-3 px-2">
-                {[...Array(8)].map((_, i) => (
+                {/* {[...Array(8)].map((_, i) => (
                   <Image
                     key={i}
                     src={Images.ImageDefault}
+                    className="w-20 h-20 object-cover"
+                    alt="Media"
+                    width={80}
+                    height={80}
+                  />
+                ))} */}
+                {chatDetail?.list_media?.map((media, index) => (
+                  <Image
+                    key={index}
+                    src={media.url || Images.ImageDefault}
                     className="w-20 h-20 object-cover"
                     alt="Media"
                     width={80}
@@ -214,9 +255,11 @@ const ChatInfo = ({
               <LuUserRoundPlus size={30} color="black" />
               <span className="text-black text-sm">Add member</span>
             </Button>
-            <div className="mt-4">List memeber (5)</div>
+            <div className="mt-4">
+              List members ({chatDetail?.members?.length || 0})
+            </div>
             <div className="mt-3 px-2">
-              {[...Array(5)].map((_, i) => (
+              {/* {[...Array(5)].map((_, i) => (
                 <div key={i} className="flex items-center gap-3 p-2">
                   <Image
                     src={Images.AvatarDefault}
@@ -226,6 +269,19 @@ const ChatInfo = ({
                     height={50}
                   />
                   <span>Member {i + 1}</span>
+                </div>
+              ))} */}
+
+              {chatDetail?.members?.map((member, i) => (
+                <div key={i} className="flex items-center gap-3 p-2">
+                  <Image
+                    src={member.avatar || Images.AvatarDefault}
+                    alt={"avatar"}
+                    className="w-[3.125rem] h-[3.125rem] rounded-[30px]"
+                    width={50}
+                    height={50}
+                  />
+                  <span>{member.name}</span>
                 </div>
               ))}
             </div>
