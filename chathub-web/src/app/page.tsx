@@ -51,7 +51,7 @@ export default function Home() {
           setSelectedChat={setSelectedChat}
           setIsGroupChat={setIsGroupChat}
           setConversationData={setConversationData}
-        // conversations={conversationsList}
+          onPinChange={handlePinChangeSuccess}
         />
         {selectedChat ? (
           <ChatScreen
@@ -63,7 +63,7 @@ export default function Home() {
             isChatSearchOpen={isChatSearchOpen}
             setIsChatSearchOpen={setIsChatSearchOpen}
             highlightMessageId={highlightMessageId}
-          // onRefetchConversations={handleRefetchConversationsList}
+            onRefetchConversations={handlePinChangeSuccess}
           />
         ) : (
           <>
