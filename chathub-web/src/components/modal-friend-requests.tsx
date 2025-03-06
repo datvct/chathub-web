@@ -11,8 +11,8 @@ import { useSelector } from "react-redux"
 import { RootState } from "../lib/reudx/store"
 
 const ModalFriendRequests: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) => void }> = ({
-	isOpen,
-	setIsOpen,
+  isOpen,
+  setIsOpen,
 }) => {
 	const userId = useSelector((state: RootState) => state.auth.userId)
 	const token = useSelector((state: RootState) => state.auth.token)
@@ -53,70 +53,67 @@ const ModalFriendRequests: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean
 	// Chọn danh sách hiển thị dựa trên tab đang chọn
 	const requestsToDisplay = activeTab === "received" ? receivedRequests : sentRequests
 
-	return (
-		<Transition appear show={isOpen} as={Fragment}>
-			<Dialog as="div" className="relative z-50" onClose={() => setIsOpen(false)}>
-				<TransitionChild
-					as={Fragment}
-					enter="ease-out duration-300"
-					enterFrom="opacity-0"
-					enterTo="opacity-100"
-					leave="ease-in duration-200"
-					leaveFrom="opacity-100"
-					leaveTo="opacity-0"
-				>
-					<div className="fixed inset-0 bg-black bg-opacity-25" />
-				</TransitionChild>
+  return (
+    <Transition appear show={isOpen} as={Fragment}>
+      <Dialog as="div" className="relative z-50" onClose={() => setIsOpen(false)}>
+        <TransitionChild
+          as={Fragment}
+          enter="ease-out duration-300"
+          enterFrom="opacity-0"
+          enterTo="opacity-100"
+          leave="ease-in duration-200"
+          leaveFrom="opacity-100"
+          leaveTo="opacity-0"
+        >
+          <div className="fixed inset-0 bg-black bg-opacity-25" />
+        </TransitionChild>
 
-				<div className="fixed inset-0 overflow-y-auto">
-					<div className="flex min-h-full items-center justify-center p-4 text-center">
-						<TransitionChild
-							as={Fragment}
-							enter="ease-out duration-300"
-							enterFrom="opacity-0 scale-95"
-							enterTo="opacity-100 scale-100"
-							leave="ease-in duration-200"
-							leaveFrom="opacity-100 scale-100"
-							leaveTo="opacity-0 scale-95"
-						>
-							<DialogPanel className="bg-[#385068] rounded-[5%] w-[80%] h-[95%] max-w-2xl max-h-screen transform overflow-hidden p-6 text-left align-middle shadow-xl transition-all">
-								<DialogTitle className="text-xl font-bold mb-4 flex items-center justify-between text-white leading-6">
-									<div className="flex items-center gap-x-2">
-										<Image src={Images.IconChatList} alt="Chat Icon" width={40} height={40} />
-										<span className="text-[25px] font-bold">Friend Request</span>
-									</div>
-									<button onClick={() => setIsOpen(false)}>
-										<Image src={Images.IconCloseModal} alt="close modal" width={40} height={40} />
-									</button>
-								</DialogTitle>
+        <div className="fixed inset-0 overflow-y-auto">
+          <div className="flex min-h-full items-center justify-center p-4 text-center">
+            <TransitionChild
+              as={Fragment}
+              enter="ease-out duration-300"
+              enterFrom="opacity-0 scale-95"
+              enterTo="opacity-100 scale-100"
+              leave="ease-in duration-200"
+              leaveFrom="opacity-100 scale-100"
+              leaveTo="opacity-0 scale-95"
+            >
+              <DialogPanel className="bg-[#385068] rounded-[5%] w-[80%] h-[95%] max-w-2xl max-h-screen transform overflow-hidden p-6 text-left align-middle shadow-xl transition-all">
+                <DialogTitle className="text-xl font-bold mb-4 flex items-center justify-between text-white leading-6">
+                  <div className="flex items-center gap-x-2">
+                    <Image src={Images.IconChatList} alt="Chat Icon" width={40} height={40} />
+                    <span className="text-[25px] font-bold">Friend Request</span>
+                  </div>
+                  <button onClick={() => setIsOpen(false)}>
+                    <Image src={Images.IconCloseModal} alt="close modal" width={40} height={40} />
+                  </button>
+                </DialogTitle>
 
-								<hr className="w-full border-gray-500 p-2 mb-3" />
+                <hr className="w-full border-gray-500 p-2 mb-3" />
 
-								<div className="relative mb-4">
-									<div className="flex space-x-4">
-										<button
-											onClick={() => setActiveTab("received")}
-											className={`px-4 py-2 rounded-lg text-white font-semibold 
-													${activeTab === "received"
-														? "bg-[#501794]"
-														: "bg-[#8C8595] hover:bg-[#7746F5]"
-													}`
-											}
-										>
-											Received ({receivedRequests.length})
-										</button>
-										<button
-											onClick={() => setActiveTab("sent")}
-											className={`px-4 py-2 rounded-lg text-white font-semibold 
-                                                        ${activeTab === "sent"
-													? "bg-[#501794]"
-													: "bg-[#8C8595] hover:bg-[#7746F5]"
-												}`}
-										>
-											Sent ({sentRequests.length})
-										</button>
-									</div>
-								</div>
+                <div className="relative mb-4">
+                  <div className="flex space-x-4">
+                    <button
+                      onClick={() => setActiveTab("received")}
+                      className={`px-4 py-2 rounded-lg text-white font-semibold 
+													${activeTab === "received" ? "bg-[#501794]" : "bg-[#8C8595] hover:bg-[#7746F5]"}`}
+                    >
+                      Received ({receivedRequests.length})
+                    </button>
+                    <button
+                      onClick={() => setActiveTab("sent")}
+                      className={`px-4 py-2 rounded-lg text-white font-semibold 
+                                                        ${
+                                                          activeTab === "sent"
+                                                            ? "bg-[#501794]"
+                                                            : "bg-[#8C8595] hover:bg-[#7746F5]"
+                                                        }`}
+                    >
+                      Sent ({sentRequests.length})
+                    </button>
+                  </div>
+                </div>
 
 								{/* Loading & Error Handling */}
 								{loading && <p className="text-white text-center">Loading...</p>}

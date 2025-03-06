@@ -1,13 +1,13 @@
 import { Conversation } from "~/codegen/Conversation"
-import { ConversationRequest, ConversationResponse, SuccessResponse } from "~/codegen/data-contracts"
+import { ConversationRequest, ConversationResponse, MessageFindedResponse, SuccessResponse } from "~/codegen/data-contracts"
 
 const conversationInstance = new Conversation({ baseUrl: process.env.API_URL })
 
 export async function getRecentConversationByUserID(userId: number, token: string) {
-   try {
+  try {
     if (!userId) return null
 
-    const response = (await conversationInstance.getRecentConversations({userId}, {
+    const response = (await conversationInstance.getRecentConversations({ userId }, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -19,7 +19,7 @@ export async function getRecentConversationByUserID(userId: number, token: strin
   }
 }
 
-export async function createConversationAPI(data: ConversationRequest, token:string) {
+export async function createConversationAPI(data: ConversationRequest, token: string) {
   try {
     if (!data) return null
 
@@ -36,9 +36,9 @@ export async function createConversationAPI(data: ConversationRequest, token:str
 }
 
 
-export async function leaveConversation(conversationId:number, userId:number, token?:string){
+export async function leaveConversation(conversationId: number, userId: number, token?: string) {
   try {
-    const response = (await conversationInstance.leaveGroupConversation(conversationId,{userId: userId},{
+    const response = (await conversationInstance.leaveGroupConversation(conversationId, { userId: userId }, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -50,10 +50,10 @@ export async function leaveConversation(conversationId:number, userId:number, to
   }
 }
 
-export async function putDissolveGroup(conversationId:number, userId:number, token?:string){
+export async function putDissolveGroup(conversationId: number, userId: number, token?: string) {
   try {
-  
-    const response = (await conversationInstance.dissolveGroupConversation(conversationId,{userId: userId},{
+
+    const response = (await conversationInstance.dissolveGroupConversation(conversationId, { userId: userId }, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -68,14 +68,29 @@ export async function putDissolveGroup(conversationId:number, userId:number, tok
 export async function getGroupConversationsByUserId(userId: number, token: string) {
   try {
     if (!userId) return null
-    const response = (await conversationInstance.getGroupConversations({userId: userId}, {
+    const response = (await conversationInstance.getGroupConversations({ userId: userId }, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
     }).then(res => res.json())) as ConversationResponse[]
     return response
   }
-  catch  {
+  catch {
+    return null
+  }
+}
+
+export async function findMessagesByConversationId(conversationId: number, message: string, token: string) {
+  try {
+    if (!conversationId || !message) return null
+    const response = (await conversationInstance.findMessage(conversationId, { message }, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }).then(res => res.json())) as MessageFindedResponse[]
+    return response
+  } catch (error) {
+    console.error("Error checking admin token:", error)
     return null
   }
 }
