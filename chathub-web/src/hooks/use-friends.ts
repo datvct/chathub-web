@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { UserDTO } from "~/codegen/data-contracts";
-import { getListFriends } from "~/lib/get-user";
+import { getListFriends } from "~/lib/get-friend";
 import {getListFriendRequest} from "~/lib/get-friend";
 
 export function useFriends(userId: number, token: string) {

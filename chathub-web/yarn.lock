@@ -985,7 +985,6 @@
     react-is "^19.0.0"
 
 "@mui/x-date-pickers@^7.27.0":
-"@mui/x-date-pickers@^7.27.0":
   version "7.27.0"
   resolved "https://registry.npmjs.org/@mui/x-date-pickers/-/x-date-pickers-7.27.0.tgz"
   integrity sha512-wSx8JGk4WQ2hTObfQITc+zlmUKNleQYoH1hGocaQlpWpo1HhauDtcQfX6sDN0J0dPT2eeyxDWGj4uJmiSfQKcw==
@@ -1798,14 +1797,11 @@ chalk@^4.0.0:
     "@mui/material" "^6.4.4"
     "@mui/system" "^6.4.3"
     "@mui/x-date-pickers" "^7.27.0"
-    "@mui/material" "^6.4.4"
-    "@mui/system" "^6.4.3"
-    "@mui/x-date-pickers" "^7.27.0"
     "@radix-ui/react-dialog" "^1.1.4"
     "@radix-ui/react-slot" "^1.1.1"
     "@reduxjs/toolkit" "^2.5.1"
     "@stomp/stompjs" "^7.0.0"
-    chathub-web "file:C:/Users/Windows/AppData/Local/Yarn/Cache/v6/npm-chathub-web-0.1.0-3b891087-6c25-40fa-b0cf-178be5b58a80-1741214417723/node_modules/chathub-web"
+    chathub-web "file:../../../../Library/Caches/Yarn/v6/npm-chathub-web-0.1.0-dbf5801b-9674-4086-88c2-2971cd6ed83e-1740068488854/node_modules/chathub-web"
     class-variance-authority "^0.7.1"
     dayjs "^1.11.13"
     emoji-picker-react "^4.12.0"
