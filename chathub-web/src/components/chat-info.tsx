@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import Image from "next/image"
 import { Images } from "~/constants/images"
-import { GoBell } from "react-icons/go"
+import { GoBell, GoBellSlash } from "react-icons/go"
 import { BsPinAngleFill } from "react-icons/bs"
 import { FaRegFile } from "react-icons/fa"
 import { FaLink } from "react-icons/fa6"
@@ -51,6 +51,7 @@ const ChatInfo = ({
   const [isAddingMember, setIsAddingMember] = useState(false)
   const [isOpenAddMembers, setIsOpenAddMembers] = useState(false)
   const [isOpenDissolveGroup, setIsOpenDissolveGroup] = useState(false)
+  const [isMuted, setIsMuted] = useState<boolean>(false)
 
   const token = useSelector((state: RootState) => state.auth.token);
   const userId = useSelector((state: RootState) => state.auth.userId);
@@ -90,6 +91,10 @@ const ChatInfo = ({
     }
   };
 
+  const handleMuteConversation = () => {
+    setIsMuted(!isMuted);
+    toast.success(`${isMuted ? 'Unmuted' : 'Muted'} conversation successfully!`);
+  };
 
   if (!isOpen) return null
 
@@ -115,15 +120,24 @@ const ChatInfo = ({
                   height={80}
                 />
                 <p className="mt-2 text-lg font-semibold">
-                  {chatDetail?.name || "Group Name"}
+                  {chatDetail?.name || "Conversation Name"}
                 </p>
               </div>
               <div className="flex items-center gap-5">
                 <div className="flex items-center flex-col">
-                  <button className="bg-[#484848] h-10 w-10 rounded-full flex items-center justify-center">
-                    <GoBell size={20} color="white" className="text-white" />
+                  <button
+                    className="bg-[#484848] h-10 w-10 rounded-full flex items-center justify-center"
+                    onClick={handleMuteConversation}
+                  >
+                    {isMuted ? (
+                      <GoBellSlash size={20} color="white" className="text-white" />
+                    ) : (
+                      <GoBell size={20} color="white" className="text-white" />
+                    )}
                   </button>
-                  <span>Mute</span>
+                  <span>
+                    {isMuted ? 'Unmute' : 'Mute'}
+                  </span>
                 </div>
                 {isGroupChat && (
                   <div className="flex items-center flex-col">
