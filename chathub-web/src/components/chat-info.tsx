@@ -61,9 +61,12 @@ const ChatInfo = ({
     loading: detailLoading,
     error: detailError,
     pinConversation,
+    deleteConversation,
+    loading: deleteLoading,
   } = useConversation();
   const [chatDetail, setChatDetail] = useState<ChatDetailSectionResponse | null>(null);
-  const [isPinned, setIsPinned] = useState<boolean>(false);
+  const [pinLoading, setPinLoading] = useState(false);
+  const [isPinned, setIsPinned] = useState(false);
 
   useEffect(() => {
     const fetchChatDetails = async () => {
@@ -75,25 +78,29 @@ const ChatInfo = ({
     fetchChatDetails();
   }, [selectedChat, userId, token, getChatDetailSection]);
 
+  const handleMuteConversation = () => {
+    setIsMuted(!isMuted);
+    toast.success(`${isMuted ? 'Unmuted' : 'Muted'} conversation successfully!`);
+  };
+
   const handlePinConversation = async () => {
     if (!selectedChat || !userId || !token) return;
     try {
       const newPinState = !isPinned;
-      await pinConversation(selectedChat, userId, newPinState, token);
-      setIsPinned(newPinState);
-      if (onPinChange) {
-        onPinChange();
+      const pinSuccess = await pinConversation(selectedChat, userId, newPinState, token);
+      if (pinSuccess) {
+        setIsPinned(newPinState);
+        if (onPinChange) {
+          onPinChange();
+        }
+        toast.success(`Conversation ${newPinState ? 'pinned' : 'unpinned'} successfully!`);
+      } else {
+        toast.error("Failed to pin conversation.");
       }
-      toast.success("Pinned conversation successfully!");
     } catch (error) {
       console.error("Error pinning conversation:", error);
       toast.error("Failed to pin conversation.");
     }
-  };
-
-  const handleMuteConversation = () => {
-    setIsMuted(!isMuted);
-    toast.success(`${isMuted ? 'Unmuted' : 'Muted'} conversation successfully!`);
   };
 
   if (!isOpen) return null
@@ -154,8 +161,14 @@ const ChatInfo = ({
                   <button
                     className="bg-[#484848] h-10 w-10 rounded-full flex items-center justify-center"
                     onClick={handlePinConversation}
+                  // disabled={pinLoading}
                   >
                     <BsPinAngleFill size={20} color="white" className="text-white" />
+                    {/* {pinLoading ? (
+                      <div>Loading...</div>
+                    ) : (
+                      <BsPinAngleFill size={20} color="white" className="text-white" />
+                    )} */}
                   </button>
                   <span className="whitespace-nowrap">Pin</span>
                 </div>

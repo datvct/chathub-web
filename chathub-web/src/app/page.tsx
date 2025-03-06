@@ -1,5 +1,9 @@
 "use client"
-import { useEffect, useState } from "react"
+
+import { useEffect, useState, useCallback } from "react"
+import { useSelector } from "react-redux";
+import { RootState } from "~/lib/reudx/store";
+import { useConversation } from "~/hooks/use-converstation";
 import ChatList from "../components/chat-list"
 import ChatScreen from "~/components/chat-area"
 import Image from "next/image"
@@ -16,6 +20,21 @@ export default function Home() {
   const [conversationData, setConversationData] = useState<ConversationResponse | null>(null)
   const [isChatSearchOpen, setIsChatSearchOpen] = useState(false)
   const [highlightMessageId, setHighlightMessageId] = useState<number | null>(null)
+  const [needRefetchConversations, setNeedRefetchConversations] = useState(false)
+
+  const token = useSelector((state: RootState) => state.auth.token);
+  const userId = useSelector((state: RootState) => state.auth.userId);
+
+  const handlePinChangeSuccess = useCallback(() => { // Callback function
+    setNeedRefetchConversations(prevState => !prevState); // Toggle state to trigger useEffect in ChatList
+  }, []);
+
+  useEffect(() => {
+    if (selectedChat) {
+      setIsChatInfoOpen(false);
+      setIsChatSearchOpen(false);
+    }
+  }, [selectedChat]);
 
   useEffect(() => {
     if (selectedChat) {
@@ -32,6 +51,7 @@ export default function Home() {
           setSelectedChat={setSelectedChat}
           setIsGroupChat={setIsGroupChat}
           setConversationData={setConversationData}
+        // conversations={conversationsList}
         />
         {selectedChat ? (
           <ChatScreen
@@ -43,6 +63,7 @@ export default function Home() {
             isChatSearchOpen={isChatSearchOpen}
             setIsChatSearchOpen={setIsChatSearchOpen}
             highlightMessageId={highlightMessageId}
+          // onRefetchConversations={handleRefetchConversationsList}
           />
         ) : (
           <>
@@ -69,7 +90,7 @@ export default function Home() {
             isGroupChat={isGroupChat}
             selectedChat={selectedChat}
             setIsChatInfoOpen={setIsChatInfoOpen}
-            onPinChange={() => { }}
+            onPinChange={handlePinChangeSuccess}
           />
         }
       </div>

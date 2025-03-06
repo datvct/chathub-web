@@ -1,7 +1,7 @@
 "use client"
+
 import Image from "next/image"
 import { Images } from "~/constants/images"
-
 import ChatHeader from "./chat-header"
 import ChatInput from "./chat-input"
 import { useSelector } from "react-redux"
@@ -21,6 +21,7 @@ interface ChatScreenProps {
   isChatSearchOpen?: boolean
   setIsChatSearchOpen?: (isOpen: boolean) => void
   highlightMessageId?: number
+  onRefetchConversations: () => void
 }
 
 const ChatScreen = ({
@@ -32,6 +33,7 @@ const ChatScreen = ({
   isChatSearchOpen,
   setIsChatSearchOpen,
   highlightMessageId,
+  onRefetchConversations,
 }: ChatScreenProps) => {
   const token = useSelector((state: RootState) => state.auth.token)
   const userId = useSelector((state: RootState) => state.auth.userId)

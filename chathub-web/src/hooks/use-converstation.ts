@@ -13,6 +13,7 @@ import {
   getChatDetailSectionAPI,
   updateGroupInfoAPI,
   pinConversationAPI,
+  unpinConversationAPI,
   dissolveGroupConversationAPI,
   deleteConversationAPI,
   addMembersToConversationAPI,
@@ -142,6 +143,20 @@ export const useConversation = () => {
     }
   };
 
+  const unpinConversation = async (conversationId: number, userId: number, token: string) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await unpinConversationAPI(conversationId, userId, false, token);
+      return response;
+    } catch (err: any) {
+      setError(err.message || "Failed to unpin conversation");
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const dissolveGroupConversation = async (conversationId: number, userId: number, token: string) => {
     setLoading(true);
     setError(null);
@@ -235,6 +250,7 @@ export const useConversation = () => {
     getChatDetailSection,
     updateGroupInfo,
     pinConversation,
+    unpinConversation,
     dissolveGroupConversation,
     deleteConversation,
     addMembersToConversation,

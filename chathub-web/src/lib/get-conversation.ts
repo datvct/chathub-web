@@ -166,7 +166,37 @@ export const pinConversationAPI = async (
     return { success: true, data: response };
   } catch (error: any) {
     console.error("Error pinning conversation:", error);
-    return { success: false, error: error.message || "Failed to pin conversation" };
+    return {
+      success: false,
+      error: error.message || "Failed to pin conversation"
+    };
+  }
+};
+
+export const unpinConversationAPI = async (
+  conversationId: number,
+  userId: number,
+  isPinned: boolean,
+  token: string,
+) => {
+  try {
+    const response = await conversationInstance.pinConversation(
+      conversationId,
+      { userId, isPinned },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+    return { success: true, data: response };
+
+  } catch (error: any) {
+    console.error("Error unpinning conversation:", error);
+    return {
+      success: false,
+      error: error.message || "Failed to unpin conversation"
+    };
   }
 };
 
