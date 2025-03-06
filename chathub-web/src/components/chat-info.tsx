@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import Image from "next/image"
 import { Images } from "~/constants/images"
 import { GoBell, GoBellSlash } from "react-icons/go"
@@ -62,11 +63,12 @@ const ChatInfo = ({
     error: detailError,
     pinConversation,
     deleteConversation,
-    loading: deleteLoading,
+    loading: deleteLoading
   } = useConversation();
   const [chatDetail, setChatDetail] = useState<ChatDetailSectionResponse | null>(null);
-  const [pinLoading, setPinLoading] = useState(false);
   const [isPinned, setIsPinned] = useState(false);
+  const [isDeletingConversation, setIsDeletingConversation] = useState<boolean>(false);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchChatDetails = async () => {
@@ -103,11 +105,31 @@ const ChatInfo = ({
     }
   };
 
-  if (!isOpen) return null
+  const handleDeleteChatHistory = async () => {
+    if (!selectedChat || !userId || !token) return;
+    setIsDeletingConversation(true);
+    try {
+      const deleteSuccess = await deleteConversation(selectedChat, userId, token);
+      if (deleteSuccess) {
+        setIsChatInfoOpen(false);
+        router.push('/');
+        toast.success("Chat history deleted successfully!");
+      } else {
+        toast.error("Failed to delete chat history.");
+      }
+    } catch (error) {
+      console.error("Error deleting chat history:", error);
+      toast.error("Failed to delete chat history.");
+    } finally {
+      setIsDeletingConversation(false);
+    }
+  };
+
+  if (!isOpen) return null;
 
   const handleAddMembers = (members: Member[]) => {
     setIsAddingMember(false)
-  }
+  };
 
   return (
     <div className="bg-[#292929] text-white h-screen overflow-hidden overflow-y-auto w-1/4 p-4">
@@ -161,7 +183,6 @@ const ChatInfo = ({
                   <button
                     className="bg-[#484848] h-10 w-10 rounded-full flex items-center justify-center"
                     onClick={handlePinConversation}
-                  // disabled={pinLoading}
                   >
                     <BsPinAngleFill size={20} color="white" className="text-white" />
                     {/* {pinLoading ? (
@@ -276,9 +297,15 @@ const ChatInfo = ({
                   </button>
                 )}
 
-                <button className="flex items-center gap-3" onClick={() => setIsOpenLeaveGroup(true)}>
+                <button
+                  className="flex items-center gap-3"
+                  // onClick={() => setIsOpenLeaveGroup(true)}
+                  onClick={handleDeleteChatHistory}
+                >
                   <CgTrashEmpty size={25} color="red" className="text-red font-semibold" />
-                  <span className="text-sm font-semibold leading-[25px] text-[#FF0000]">Delete chat history</span>
+                  <span className="text-sm font-semibold leading-[25px] text-[#FF0000]">
+                    Delete chat history
+                  </span>
                 </button>
               </div>
             </div>
