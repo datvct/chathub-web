@@ -237,10 +237,13 @@ export const deleteConversationAPI = async (
         },
       },
     ).then(res => res.json())) as SuccessResponse;
-    return response;
+    return { success: true, data: response };
   } catch (error) {
     console.error("Error deleting conversation:", error);
-    return null;
+    return {
+      success: false,
+      error: error.message || "Failed to delete conversation"
+    };
   }
 };
 
