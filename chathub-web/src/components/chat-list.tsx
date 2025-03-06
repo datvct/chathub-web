@@ -17,15 +17,17 @@ import { RootState } from "~/lib/reudx/store"
 import { useConversation } from "~/hooks/use-converstation"
 import { ConversationResponse } from "~/codegen/data-contracts"
 
+interface ChatListProps {
+  setSelectedChat: (id: number) => void;
+  setIsGroupChat: (isGroup: boolean) => void;
+  setConversationData?: (data: ConversationResponse) => void;
+}
+
 const ChatList = ({
   setSelectedChat,
   setIsGroupChat,
   setConversationData,
-}: {
-  setSelectedChat: (id: number) => void
-  setIsGroupChat: (isGroup: boolean) => void
-  setConversationData?: (data: ConversationResponse) => void
-}) => {
+}: ChatListProps) => {
   const userId = useSelector((state: RootState) => state.auth.userId)
   const token = useSelector((state: RootState) => state.auth.token)
   const [modalCreateChatOpen, setModalCreateNewChatOpen] = useState(false)
@@ -38,6 +40,7 @@ const ChatList = ({
   const [modalListGroup, setModalListGroup] = useState(false)
   const { getRecentConversation } = useConversation()
   const [dataConversation, setDataConversation] = useState<ConversationResponse[]>([])
+
   useEffect(() => {
     if (userId) {
       setDataConversation([])
@@ -49,7 +52,12 @@ const ChatList = ({
       }
       init()
     }
-  }, [userId, modalCreateChatOpen, modalCreateGroupChatOpen])
+  }, [userId, modalCreateChatOpen, modalCreateGroupChatOpen]);
+
+  const pinnedConversations = dataConversation.filter(chat => chat.pinned);
+  const unpinnedConversations = dataConversation.filter(chat => !chat.pinned);
+
+  const sortedConversations = [...pinnedConversations, ...unpinnedConversations];
 
   const handleOpenChangePassword = () => {
     setIsProfileModalOpen(false)
@@ -71,6 +79,15 @@ const ChatList = ({
     const date = new Date(timestamp)
     return `${date.getHours()}:${date.getMinutes()}`
   }
+
+  const refreshChatList = async () => {
+    if (userId) {
+      const response = await getRecentConversation(userId, token);
+      if (response) {
+        setDataConversation(response);
+      }
+    }
+  };
 
   return (
     <div className="bg-[#202020] text-white w-1/4 h-screen p-4 relative z-50">

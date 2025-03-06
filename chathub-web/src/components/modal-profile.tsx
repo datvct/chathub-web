@@ -86,7 +86,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
     const data: ChangeProfileRequest = {
       id: userId!,
       name: profileData.displayName,
-      avatar: selectedImage || friend?.image || Images.AvatarDefault,
+      avatar: selectedImage || friend?.avatar || Images.AvatarDefault,
       dateOfBirth: formattedDate,
       gender: profileData.gender,
     };

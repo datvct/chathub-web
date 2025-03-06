@@ -23,6 +23,7 @@ export default function Home() {
       setIsChatSearchOpen(false)
     }
   }, [selectedChat])
+
   return (
     <>
       <ToastContainer position="top-center" autoClose={3000} closeOnClick />
@@ -62,7 +63,15 @@ export default function Home() {
             setHighlightMessageId={setHighlightMessageId}
           />
         )}
-        {isChatInfoOpen && <ChatInfo isOpen={isChatInfoOpen} isGroupChat={isGroupChat} selectedChat={selectedChat} />}
+        {isChatInfoOpen &&
+          <ChatInfo
+            isOpen={isChatInfoOpen}
+            isGroupChat={isGroupChat}
+            selectedChat={selectedChat}
+            setIsChatInfoOpen={setIsChatInfoOpen}
+            onPinChange={() => { }}
+          />
+        }
       </div>
     </>
   )

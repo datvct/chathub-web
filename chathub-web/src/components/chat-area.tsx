@@ -110,9 +110,10 @@ const ChatScreen = ({
                     </>
                   ) : (
                     <p
-                      className={`p-3 rounded-lg w-max max-w-xs ${
-                        msg.senderId === userId ? "bg-[#1566A3]" : "bg-[#484848]"
-                      }`}
+                      className={`
+                          p-3 rounded-lg w-max max-w-xs
+                          ${msg.senderId === userId ? "bg-[#1566A3]" : "bg-[#484848]"
+                        }`}
                     >
                       {msg.content}
                       <span className="text-xs text-gray-400 block mt-1">{formatDateTime(msg.sentAt)}</span>

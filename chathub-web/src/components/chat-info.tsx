@@ -23,12 +23,14 @@ import { useConversation } from "~/hooks/use-converstation";
 import { useSelector } from "react-redux";
 import { RootState } from "~/lib/reudx/store";
 import { ChatDetailSectionResponse } from "~/codegen/data-contracts";
+import { toast } from "react-toastify";
 
 interface ChatInfoProps {
   isOpen?: boolean;
   isGroupChat?: boolean;
   selectedChat: number;
   setIsChatInfoOpen: (isOpen: boolean) => void;
+  onPinChange: () => void;
 }
 
 interface Member {
@@ -43,6 +45,7 @@ const ChatInfo = ({
   isGroupChat,
   selectedChat,
   setIsChatInfoOpen,
+  onPinChange,
 }: ChatInfoProps) => {
   const [isOpenLeaveGroup, setIsOpenLeaveGroup] = useState(false)
   const [isAddingMember, setIsAddingMember] = useState(false)
@@ -52,8 +55,14 @@ const ChatInfo = ({
   const token = useSelector((state: RootState) => state.auth.token);
   const userId = useSelector((state: RootState) => state.auth.userId);
 
-  const { getChatDetailSection, loading: detailLoading, error: detailError } = useConversation();
+  const {
+    getChatDetailSection,
+    loading: detailLoading,
+    error: detailError,
+    pinConversation,
+  } = useConversation();
   const [chatDetail, setChatDetail] = useState<ChatDetailSectionResponse | null>(null);
+  const [isPinned, setIsPinned] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchChatDetails = async () => {
@@ -65,23 +74,28 @@ const ChatInfo = ({
     fetchChatDetails();
   }, [selectedChat, userId, token, getChatDetailSection]);
 
+  const handlePinConversation = async () => {
+    if (!selectedChat || !userId || !token) return;
+    try {
+      const newPinState = !isPinned;
+      await pinConversation(selectedChat, userId, newPinState, token);
+      setIsPinned(newPinState);
+      if (onPinChange) {
+        onPinChange();
+      }
+      toast.success("Pinned conversation successfully!");
+    } catch (error) {
+      console.error("Error pinning conversation:", error);
+      toast.error("Failed to pin conversation.");
+    }
+  };
+
+
   if (!isOpen) return null
 
   const handleAddMembers = (members: Member[]) => {
     setIsAddingMember(false)
   }
-
-  // if (detailLoading) {
-  //   return <div className="bg-[#292929] text-white h-screen overflow-hidden overflow-y-auto w-1/4 p-4">
-  //     Loading chat info...
-  //   </div>;
-  // }
-
-  // if (detailError || !chatDetail) {
-  //   return <div className="bg-[#292929] text-white h-screen overflow-hidden overflow-y-auto w-1/4 p-4">
-  //     Error loading chat info.
-  //   </div>;
-  // }
 
   return (
     <div className="bg-[#292929] text-white h-screen overflow-hidden overflow-y-auto w-1/4 p-4">
@@ -123,7 +137,10 @@ const ChatInfo = ({
                   </div>
                 )}
                 <div className="flex items-center flex-col">
-                  <button className="bg-[#484848] h-10 w-10 rounded-full flex items-center justify-center">
+                  <button
+                    className="bg-[#484848] h-10 w-10 rounded-full flex items-center justify-center"
+                    onClick={handlePinConversation}
+                  >
                     <BsPinAngleFill size={20} color="white" className="text-white" />
                   </button>
                   <span className="whitespace-nowrap">Pin</span>
