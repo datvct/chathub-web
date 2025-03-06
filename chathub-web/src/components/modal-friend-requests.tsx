@@ -1,38 +1,56 @@
 "use client"
 
 import { Dialog, DialogPanel, DialogTitle, Transition, TransitionChild } from "@headlessui/react"
-import React, { Fragment, useState } from "react"
+import React, { Fragment, useEffect, useState } from "react"
 import Image from "next/image"
 import { Images } from "../constants/images"
 import { Button } from "./ui/button"
-
-interface Request {
-	name: string
-	message: string
-	image: any
-}
-
-const receivedRequests: Request[] = [
-	{ name: "Arlene McCoy", message: "Nice to meet you!", image: Images.ArleneMcCoy },
-	{ name: "Albert Flores", message: "Hey, let's chat!", image: Images.AlbertFlores },
-	{ name: "Esther Howard", message: "Can we be friends?", image: Images.EstherHoward },
-	{ name: "Darrell Steward", message: "Hi, can I talk to you?", image: Images.GuyHawkins },
-	{ name: "Courtney Henry", message: "Hello", image: Images.MileyCyrus },
-	{ name: "Annette Black", message: "Hi", image: Images.RonaldRichards },
-]
-
-const sentRequests: Request[] = [
-	{ name: "Arlene McCoy", message: "Nice to meet you!", image: Images.ArleneMcCoy },
-	{ name: "Albert Flores", message: "Hey, let's chat!", image: Images.AlbertFlores },
-	{ name: "Esther Howard", message: "Can we be friends?", image: Images.EstherHoward },
-]
+import { FriendRequestResponse } from "~/codegen/data-contracts"
+import { useFriends } from "../hooks/use-friends"
+import { useSelector } from "react-redux"
+import { RootState } from "../lib/reudx/store"
 
 const ModalFriendRequests: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) => void }> = ({
 	isOpen,
 	setIsOpen,
 }) => {
+	const userId = useSelector((state: RootState) => state.auth.userId)
+	const token = useSelector((state: RootState) => state.auth.token)
 	const [activeTab, setActiveTab] = useState("received")
+	const [receivedRequests, setReceivedRequests] = useState<FriendRequestResponse[]>([])
+	const [sentRequests, setSentRequests] = useState<FriendRequestResponse[]>([])
+	const [loading, setLoading] = useState(false)
+	const [error, setError] = useState<string | null>(null)
+	const {getListFriendRequests} = useFriends(userId,token);
 
+	// Fetch danh sách lời mời kết bạn từ API
+	useEffect(() => {
+		const fetchFriendRequests = async () => {
+			setLoading(true)
+			setError(null)
+
+			try {
+				const response = await getListFriendRequests();
+				console.log(response)
+
+				// Phân loại lời mời theo type
+				const received = response.filter((req) => req.type === "RECEIVED")
+				const sent = response.filter((req) => req.type === "SENT")
+
+				setReceivedRequests(received)
+				setSentRequests(sent)
+			} catch (err) {
+				console.error("Error fetching friend requests:", err)
+				setError("Failed to load friend requests.")
+			} finally {
+				setLoading(false)
+			}
+		}
+
+		if (isOpen) fetchFriendRequests()
+	}, [isOpen]) // Gọi API khi modal mở
+
+	// Chọn danh sách hiển thị dựa trên tab đang chọn
 	const requestsToDisplay = activeTab === "received" ? receivedRequests : sentRequests
 
 	return (
@@ -100,36 +118,41 @@ const ModalFriendRequests: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean
 									</div>
 								</div>
 
+								{/* Loading & Error Handling */}
+								{loading && <p className="text-white text-center">Loading...</p>}
+								{error && <p className="text-red-500 text-center">{error}</p>}
+
+								{/* Danh sách lời mời */}
 								<div className="max-h-[55vh] overflow-y-auto custom-scrollbar pr-2">
 									{requestsToDisplay.map((request, index) => (
 										<div
 											key={index}
 											className="flex items-center odd:bg-[#E4DEED] even:bg-[#AF9CC9] rounded-lg p-3 mb-3 space-x-3"
 										>
-											<Image src={request.image} alt={request.name} width={45} height={45} className="rounded-full" />
-											<div className="flex-1">
-												<p className="text-black font-medium">{request.name}</p>
-												<p className="text-gray-600 text-sm italic">{request.message}</p>
-											</div>
-											<div className="space-x-2">
-												{activeTab === "received" && (
-													<>
-														<Button className="px-4 py-2 border border-white rounded-[12px] text-sm text-white bg-gray-500 hover:bg-gray-700">
-															Decline
-														</Button>
-														<Button className="w-20 px-4 py-2 bg-[#7746f5] rounded-[12px] text-lg text-white bg-gradient-to-r from-[#501794] to-[#3E70A1] hover:bg-gradient-to-l">
-															Accept
-														</Button>
-													</>
-												)}
+											<Image src={request.avatar} alt={request.name} width={45} height={45} className="rounded-full" />
+												<div className="flex-1">
+													<p className="text-black font-medium">{request.name}</p>
+													<p className="text-gray-600 text-sm italic">{request.message}</p>
+												</div>
+												<div className="space-x-2">
+													{activeTab === "received" && (
+														<>
+															<Button className="px-4 py-2 border border-white rounded-[12px] text-sm text-white bg-gray-500 hover:bg-gray-700">
+																Decline
+															</Button>
+															<Button className="w-20 px-4 py-2 bg-[#7746f5] rounded-[12px] text-lg text-white bg-gradient-to-r from-[#501794] to-[#3E70A1] hover:bg-gradient-to-l">
+																Accept
+															</Button>
+														</>
+													)}
 
-												{activeTab === "sent" && (
-													<Button className="w-20 px-4 py-2 bg-[#7746f5] rounded-[12px] text-lg text-white bg-gradient-to-r from-[#501794] to-[#3E70A1] hover:bg-gradient-to-l">
-														Unsent
-													</Button>
-												)}
+													{activeTab === "sent" && (
+														<Button className="w-20 px-4 py-2 bg-[#7746f5] rounded-[12px] text-lg text-white bg-gradient-to-r from-[#501794] to-[#3E70A1] hover:bg-gradient-to-l">
+															Unsent
+														</Button>
+													)}
+												</div>
 											</div>
-										</div>
 									))}
 								</div>
 							</DialogPanel>

@@ -75,27 +75,6 @@ export class User<SecurityDataType = unknown> extends HttpClient<SecurityDataTyp
    * No description
    *
    * @tags user-controller
-   * @name FindUserByPhoneNumber
-   * @request GET:/user
-   * @secure
-   */
-  findUserByPhoneNumber = (
-    query: {
-      phoneNumber: string
-    },
-    params: RequestParams = {},
-  ) =>
-    this.request<UserDTO, ErrorResponse>({
-      path: `/user`,
-      method: "GET",
-      query: query,
-      secure: true,
-      ...params,
-    })
-  /**
-   * No description
-   *
-   * @tags user-controller
    * @name Search
    * @request GET:/user/searchUserByNameOrPhone
    * @secure
@@ -110,6 +89,27 @@ export class User<SecurityDataType = unknown> extends HttpClient<SecurityDataTyp
   ) =>
     this.request<UserDTO[], ErrorResponse>({
       path: `/user/searchUserByNameOrPhone`,
+      method: "GET",
+      query: query,
+      secure: true,
+      ...params,
+    })
+  /**
+   * No description
+   *
+   * @tags user-controller
+   * @name FindUserByPhoneNumber
+   * @request GET:/user/findUserByPhoneNumber
+   * @secure
+   */
+  findUserByPhoneNumber = (
+    query: {
+      phoneNumber: string
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<UserDTO, ErrorResponse>({
+      path: `/user/findUserByPhoneNumber`,
       method: "GET",
       query: query,
       secure: true,

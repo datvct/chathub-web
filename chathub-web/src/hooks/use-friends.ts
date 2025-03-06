@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { UserDTO } from "~/codegen/data-contracts";
 import { getListFriends } from "~/lib/get-user";
+import {getListFriendRequest} from "~/lib/get-friend";
 
 export function useFriends(userId: number,token:string) {
   const [friends, setFriends] = useState<UserDTO[] | null>(null);
@@ -27,5 +28,19 @@ export function useFriends(userId: number,token:string) {
     fetchFriends();
   }, [userId]);
 
-  return { friends, loading, error };
+  const getListFriendRequests = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await getListFriendRequest(userId, token);
+      return response || null;
+    } catch (err) {
+      setError("Failed to fetch conversation");
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { friends, loading, error, getListFriendRequests};
 }

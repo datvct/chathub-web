@@ -991,7 +991,7 @@
     prop-types "^15.8.1"
     react-is "^19.0.0"
 
-"@mui/x-date-pickers@^7.26.0", "@mui/x-date-pickers@^7.27.0":
+"@mui/x-date-pickers@^7.27.0":
   version "7.27.0"
   resolved "https://registry.yarnpkg.com/@mui/x-date-pickers/-/x-date-pickers-7.27.0.tgz#d5c90d76d9aeb2bbc9a0d5088927e9db42d41751"
   integrity sha512-wSx8JGk4WQ2hTObfQITc+zlmUKNleQYoH1hGocaQlpWpo1HhauDtcQfX6sDN0J0dPT2eeyxDWGj4uJmiSfQKcw==
@@ -1813,12 +1813,14 @@ chalk@^4.0.0:
     "@firebase/auth" "^1.9.0"
     "@headlessui/react" "^2.2.0"
     "@heroicons/react" "^2.2.0"
-    "@mui/x-date-pickers" "^7.26.0"
+    "@mui/material" "^6.4.4"
+    "@mui/system" "^6.4.3"
+    "@mui/x-date-pickers" "^7.27.0"
     "@radix-ui/react-dialog" "^1.1.4"
     "@radix-ui/react-slot" "^1.1.1"
     "@reduxjs/toolkit" "^2.5.1"
     "@stomp/stompjs" "^7.0.0"
-    chathub-web "file:../../../../Library/Caches/Yarn/v6/npm-chathub-web-0.1.0-ed365a11-95f4-440e-90c4-386969f991d2-1739859475040/node_modules/chathub-web"
+    chathub-web "file:C:/Users/Windows/AppData/Local/Yarn/Cache/v6/npm-chathub-web-0.1.0-3b891087-6c25-40fa-b0cf-178be5b58a80-1741214417723/node_modules/chathub-web"
     class-variance-authority "^0.7.1"
     dayjs "^1.11.13"
     emoji-picker-react "^4.12.0"
