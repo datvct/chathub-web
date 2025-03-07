@@ -141,6 +141,12 @@ const ChatInfo = ({
     setIsAddingMember(false)
   };
 
+  const handleMembersAddedSuccess = () => {
+    if (selectedChat && userId && token) {
+      getChatDetailSection(selectedChat, userId, token);
+    }
+  };
+
   return (
     <div className="bg-[#292929] text-white h-screen overflow-hidden overflow-y-auto w-1/4 p-4">
       {!isAddingMember ? (
@@ -383,13 +389,24 @@ const ChatInfo = ({
       )}
 
       {isOpenAddMembers && (
-        <ModalAddMembers isOpen={isOpenAddMembers} setIsOpen={setIsOpenAddMembers} onAddMembers={handleAddMembers} />
+        <ModalAddMembers
+          isOpen={isOpenAddMembers}
+          setIsOpen={setIsOpenAddMembers}
+          conversationId={selectedChat!}
+          onMembersAdded={handleMembersAddedSuccess}
+        />
       )}
       {isOpenLeaveGroup && (
-        <ModalLeaveGroup isOpen={isOpenLeaveGroup} setIsOpen={setIsOpenLeaveGroup} chatId={selectedChat} />
+        <ModalLeaveGroup
+          isOpen={isOpenLeaveGroup}
+          setIsOpen={setIsOpenLeaveGroup}
+          chatId={selectedChat} />
       )}
       {isOpenDissolveGroup && (
-        <ModalDissolveGroup isOpen={isOpenDissolveGroup} setIsOpen={setIsOpenDissolveGroup} chatId={selectedChat} />
+        <ModalDissolveGroup
+          isOpen={isOpenDissolveGroup}
+          setIsOpen={setIsOpenDissolveGroup}
+          chatId={selectedChat} />
       )}
       {isOpenUpdateGroupInfo && (
         <ModalUpdateGroupInfo
