@@ -4,6 +4,11 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
 import { Images } from "~/constants/images"
+import { useConversation } from "~/hooks/use-converstation";
+import { useSelector } from "react-redux";
+import { RootState } from "~/lib/reudx/store";
+import { ChatDetailSectionResponse } from "~/codegen/data-contracts";
+import { toast } from "react-toastify";
 import { GoBell, GoBellSlash } from "react-icons/go"
 import { BsPinAngleFill } from "react-icons/bs"
 import { FaRegFile } from "react-icons/fa"
@@ -20,11 +25,7 @@ import { Button } from "./ui/button"
 import { LuUserRoundPlus } from "react-icons/lu"
 import ModalAddMembers from "./modal-add-members"
 import ModalDissolveGroup from "./modal-dissolve-group"
-import { useConversation } from "~/hooks/use-converstation";
-import { useSelector } from "react-redux";
-import { RootState } from "~/lib/reudx/store";
-import { ChatDetailSectionResponse } from "~/codegen/data-contracts";
-import { toast } from "react-toastify";
+import ModalUpdateGroupInfo from "./modal-update-group-info"
 
 interface ChatInfoProps {
   isOpen?: boolean;
@@ -53,6 +54,7 @@ const ChatInfo = ({
   const [isOpenAddMembers, setIsOpenAddMembers] = useState(false)
   const [isOpenDissolveGroup, setIsOpenDissolveGroup] = useState(false)
   const [isMuted, setIsMuted] = useState<boolean>(false)
+  const [isOpenUpdateGroupInfo, setIsOpenUpdateGroupInfo] = useState(false)
 
   const token = useSelector((state: RootState) => state.auth.token);
   const userId = useSelector((state: RootState) => state.auth.userId);
@@ -125,6 +127,14 @@ const ChatInfo = ({
     }
   };
 
+  const handleOpenUpdateGroupInfoModal = () => {
+    setIsOpenUpdateGroupInfo(true);
+  };
+
+  const handleGroupInfoUpdatedSuccess = () => {
+    onPinChange();
+  };
+
   if (!isOpen) return null;
 
   const handleAddMembers = (members: Member[]) => {
@@ -195,10 +205,15 @@ const ChatInfo = ({
                 </div>
                 {isGroupChat && (
                   <div className="flex items-center flex-col">
-                    <button className="bg-[#484848] h-10 w-10 rounded-full flex items-center justify-center">
+                    <button
+                      className="bg-[#484848] h-10 w-10 rounded-full flex items-center justify-center"
+                      onClick={handleOpenUpdateGroupInfoModal}
+                    >
                       <IoSettingsOutline size={20} color="white" className="text-white" />
                     </button>
-                    <span className="whitespace-nowrap">Manage group</span>
+                    <span className="whitespace-nowrap">
+                      Manage group
+                    </span>
                   </div>
                 )}
               </div>
@@ -368,6 +383,16 @@ const ChatInfo = ({
       )}
       {isOpenDissolveGroup && (
         <ModalDissolveGroup isOpen={isOpenDissolveGroup} setIsOpen={setIsOpenDissolveGroup} chatId={selectedChat} />
+      )}
+      {isOpenUpdateGroupInfo && (
+        <ModalUpdateGroupInfo
+          isOpen={isOpenUpdateGroupInfo}
+          setIsOpen={setIsOpenUpdateGroupInfo}
+          conversationId={selectedChat!}
+          currentGroupName={chatDetail?.name || ""}
+          currentGroupAvatar={chatDetail?.avatar || ""}
+          onGroupInfoUpdated={handleGroupInfoUpdatedSuccess}
+        />
       )}
     </div>
   )

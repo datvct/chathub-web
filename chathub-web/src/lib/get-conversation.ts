@@ -8,6 +8,7 @@ import {
   UpdateGroupInfoRequest,
   UpdateNickNameRequest,
 } from "~/codegen/data-contracts"
+import { ContentType } from "~/codegen/http-client"
 
 const conversationInstance = new Conversation({ baseUrl: process.env.API_URL })
 
@@ -127,17 +128,18 @@ export const getChatDetailSectionAPI = async (
 
 export const updateGroupInfoAPI = async (
   conversationId: number,
-  request: UpdateGroupInfoRequest,
+  formData: FormData,
   token: string,
 ) => {
   try {
     const response = (await conversationInstance.updateGroupInfo(
       conversationId,
-      { request },
+      { request: {} as UpdateGroupInfoRequest },
       {
         headers: {
           Authorization: `Bearer ${token}`,
         },
+        type: ContentType.FormData,
       },
     ).then(res => res.json())) as SuccessResponse;
     return response;

@@ -119,7 +119,13 @@ export const useConversation = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await updateGroupInfoAPI(conversationId, request, token);
+      const formData = new FormData();
+      for (const key in request) {
+        if (request.hasOwnProperty(key)) {
+          formData.append(key, (request as any)[key]);
+        }
+      }
+      const response = await updateGroupInfoAPI(conversationId, formData, token);
       return response;
     } catch (err: any) {
       setError(err.message || "Failed to update group info");
