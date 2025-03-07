@@ -99,8 +99,8 @@ export interface ConversationResponse {
   /** @format date-time */
   createAt?: string
   participants?: ParticipantDTO[]
-  dissolved?: boolean
   pinned?: boolean
+  dissolved?: boolean
 }
 
 export interface ParticipantDTO {
@@ -133,6 +133,14 @@ export interface AuthResponse {
   /** @format date */
   dateOfBirth?: string
   gender?: string
+}
+
+export interface UpdateNickNameRequest {
+  /** @format int64 */
+  conversationId?: number
+  /** @format int64 */
+  participantId?: number
+  nickName: string
 }
 
 export interface UserDTO {

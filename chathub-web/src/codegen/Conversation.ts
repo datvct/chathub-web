@@ -17,6 +17,7 @@ import {
   MessageFindedResponse,
   SuccessResponse,
   UpdateGroupInfoRequest,
+  UpdateNickNameRequest,
 } from "./data-contracts"
 import { ContentType, HttpClient, RequestParams } from "./http-client"
 
@@ -142,6 +143,23 @@ export class Conversation<SecurityDataType = unknown> extends HttpClient<Securit
     this.request<ConversationResponse, ErrorResponse>({
       path: `/conversation/create`,
       method: "POST",
+      body: data,
+      secure: true,
+      type: ContentType.Json,
+      ...params,
+    })
+  /**
+   * No description
+   *
+   * @tags conversation-controller
+   * @name UpdateNickname
+   * @request PATCH:/conversation/update-nickname
+   * @secure
+   */
+  updateNickname = (data: UpdateNickNameRequest, params: RequestParams = {}) =>
+    this.request<SuccessResponse, ErrorResponse>({
+      path: `/conversation/update-nickname`,
+      method: "PATCH",
       body: data,
       secure: true,
       type: ContentType.Json,
