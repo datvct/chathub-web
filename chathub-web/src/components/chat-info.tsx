@@ -296,13 +296,21 @@ const ChatInfo = ({
               <div className="flex flex-col gap-3 mt-3 px-2">
                 {isGroupChat ? (
                   <>
-                    <button className="flex items-center gap-3" onClick={() => setIsOpenLeaveGroup(true)}>
+                    <button
+                      className="flex items-center gap-3"
+                      onClick={() => setIsOpenLeaveGroup(true)}
+                    >
                       <HiOutlineArrowRightEndOnRectangle size={25} color="red" className="font-semibold" />
                       <span className="text-sm text-[#FF0000] font-semibold leading-[25px]">Leave group</span>
                     </button>
-                    <button className="flex items-center gap-3" onClick={() => setIsOpenDissolveGroup(true)}>
+                    <button
+                      className="flex items-center gap-3"
+                      onClick={() => setIsOpenDissolveGroup(true)}
+                    >
                       <HiOutlineArrowRightEndOnRectangle size={25} color="red" className="font-semibold" />
-                      <span className="text-sm text-[#FF0000] font-semibold leading-[25px]">Dissolve Group</span>
+                      <span className="text-sm text-[#FF0000] font-semibold leading-[25px]">
+                        Dissolve Group
+                      </span>
                     </button>
                   </>
                 ) : (
@@ -314,7 +322,6 @@ const ChatInfo = ({
 
                 <button
                   className="flex items-center gap-3"
-                  // onClick={() => setIsOpenLeaveGroup(true)}
                   onClick={handleDeleteChatHistory}
                 >
                   <CgTrashEmpty size={25} color="red" className="text-red font-semibold" />
