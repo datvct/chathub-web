@@ -10,6 +10,7 @@ import { useMessages } from "~/hooks/use-message"
 import { formatDateTime } from "~/lib/utils"
 import { ConversationResponse } from "~/codegen/data-contracts"
 import { useEffect, useRef } from "react"
+import ".././styles/css-message.css"
 
 interface ChatScreenProps {
   selectedChatId: number | null
@@ -19,6 +20,7 @@ interface ChatScreenProps {
   conversationData?: ConversationResponse | null
   isChatSearchOpen?: boolean
   setIsChatSearchOpen?: (isOpen: boolean) => void
+  highlightMessageId?: number
 }
 
 const ChatScreen = ({
@@ -29,19 +31,33 @@ const ChatScreen = ({
   conversationData,
   isChatSearchOpen,
   setIsChatSearchOpen,
+  highlightMessageId,
 }: ChatScreenProps) => {
   const token = useSelector((state: RootState) => state.auth.token)
   const userId = useSelector((state: RootState) => state.auth.userId)
-  const { messages, loading, error } = useMessages(selectedChatId, token)
+  const { messages, loading } = useMessages(selectedChatId, userId, token)
 
   const messagesEndRef = useRef<HTMLDivElement | null>(null)
 
-  // Auto-scroll to the latest message
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" })
     }
   }, [messages])
+
+  useEffect(() => {
+    if (highlightMessageId) {
+      const messageElement = document.getElementById(`message-${highlightMessageId}`)
+      if (messageElement) {
+        messageElement.scrollIntoView({ behavior: "smooth", block: "center" })
+
+        messageElement.classList.add("highlight")
+        setTimeout(() => {
+          messageElement.classList.remove("highlight")
+        }, 3000)
+      }
+    }
+  }, [highlightMessageId])
 
   if (!selectedChatId)
     return <div className="flex items-center justify-center text-white">Chọn một cuộc trò chuyện</div>
@@ -62,8 +78,12 @@ const ChatScreen = ({
           <div className="flex items-center justify-center text-white">Đang tải...</div>
         ) : messages?.length ? (
           <div className="flex flex-col space-y-3">
-            {messages.map((msg, index) => (
-              <div key={index} className={`flex ${msg.senderId === userId ? "justify-end" : "justify-start"}`}>
+            {messages.map(msg => (
+              <div
+                key={msg.id}
+                id={`message-${msg.id}`}
+                className={`message flex ${msg.senderId === userId ? "justify-end" : "justify-start"}`}
+              >
                 {msg.senderId !== userId && (
                   <Image
                     src={Images.AvatarDefault}

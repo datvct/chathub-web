@@ -1,0 +1,16 @@
+.message {
+  padding: 10px;
+  border-radius: 8px;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.message.highlight {
+  background-color: #f0f0f0; 
+  animation: highlight-fade 3s ease-out;
+  width: 40%;
+}
+
+@keyframes highlight-fade {
+  0% { background-color: #fce4ec; }
+  100% { background-color: transparent; }
+}
