@@ -1,4 +1,6 @@
 "use client"
+
+import React from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog"
 import { Button } from "./ui/button"
 import { useConversation } from "~/hooks/use-converstation"
@@ -16,16 +18,17 @@ const ModalDissolveGroup = ({ isOpen, setIsOpen, chatId }: ModalLeaveGroupProps)
   const { dissolveGroup, loading, error } = useConversation()
   const userId = useSelector((state: RootState) => state.auth.userId)
   const token = useSelector((state: RootState) => state.auth.token)
-  const handleLeaveGroup = async () => {
+
+  const handleDissolveGroup = async () => {
     const response = await dissolveGroup(chatId, userId, token)
 
     if (response?.statusCode === 200) {
       setIsOpen(false)
-      toast.success("Leave group successfully!")
+      toast.success("Dissolve group successfully!")
     } else {
-      toast.error("Error Dissolve group")
+      toast.error("Failed to dissolve group")
       setIsOpen(false)
-      console.error("Failed to leave group:", response?.message || "Unknown error")
+      console.error("Failed to dissolve group: ", response?.message || "Unknown error")
     }
   }
 
@@ -37,14 +40,17 @@ const ModalDissolveGroup = ({ isOpen, setIsOpen, chatId }: ModalLeaveGroupProps)
         </DialogHeader>
 
         <div className="flex items-center justify-around">
-          <Button className="p-4 h-10 bg-white text-[#2D2D2D] rounded-lg text-center" onClick={() => setIsOpen(false)}>
+          <Button
+            className="p-4 h-10 bg-white text-[#2D2D2D] rounded-lg text-center"
+            onClick={() => setIsOpen(false)}
+          >
             Cancel
           </Button>
           <Button
             className="p-4 h-10 bg-[#FF2F2F] text-white rounded-lg text-center"
-            onClick={() => handleLeaveGroup()}
+            onClick={handleDissolveGroup}
           >
-            Dissolve group
+            {loading ? "Dissolving..." : "Dissolve group"}
           </Button>
         </div>
       </DialogContent>
