@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { UserDTO } from "~/codegen/data-contracts";
-import { getListFriends } from "~/lib/get-friend";
-import {getListFriendRequest} from "~/lib/get-friend";
+import { FriendshipRequest, UserDTO } from "~/codegen/data-contracts";
+import { getListFriends, rejectFriendRequest, unsentFriendRequest } from "~/lib/get-friend";
+import {getListFriendRequest, acceptFriendRequest} from "~/lib/get-friend";
 
 export function useFriends(userId: number, token: string) {
   const [friends, setFriends] = useState<UserDTO[] | null>(null);
@@ -42,5 +42,47 @@ export function useFriends(userId: number, token: string) {
     }
   };
 
-  return { friends, loading, error, getListFriendRequests};
+  const acceptFriendRequestHook = async(values: FriendshipRequest)=>{
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await acceptFriendRequest(values,token);
+      return response || null;
+    } catch (err) {
+      setError("Failed to fetch conversation");
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const rejectFriendRequestHook = async(values: FriendshipRequest)=>{
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await rejectFriendRequest(values,token);
+      return response || null;
+    } catch (err) {
+      setError("Failed to fetch conversation");
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const unsentFriendRequestHook = async(friendId: number)=>{
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await unsentFriendRequest(userId,friendId,token);
+      return response || null;
+    } catch (err) {
+      setError("Failed to fetch conversation");
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return { friends, loading, error, getListFriendRequests, acceptFriendRequestHook, rejectFriendRequestHook, unsentFriendRequestHook};
 }
