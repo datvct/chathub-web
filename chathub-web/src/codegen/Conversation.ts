@@ -11,7 +11,6 @@
 
 import {
   ChatDetailSectionResponse,
-  ChatDetailSectionResponse,
   ConversationRequest,
   ConversationResponse,
   ErrorResponse,
@@ -38,17 +37,9 @@ export class Conversation<SecurityDataType = unknown> extends HttpClient<Securit
     },
     params: RequestParams = {},
   ) =>
-  updateGroupInfo = (
-    conversationId: number,
-    query: {
-      request: UpdateGroupInfoRequest
-    },
-    params: RequestParams = {},
-  ) =>
     this.request<SuccessResponse, ErrorResponse>({
       path: `/conversation/${conversationId}/updateGroupInfo`,
       method: "PUT",
-      query: query,
       query: query,
       secure: true,
       ...params,
@@ -161,6 +152,30 @@ export class Conversation<SecurityDataType = unknown> extends HttpClient<Securit
    * No description
    *
    * @tags conversation-controller
+   * @name UpdateNickname
+   * @request PATCH:/conversation/{conversationId}/update-nickname
+   * @secure
+   */
+  updateNickname = (
+    conversationId: number,
+    query: {
+      /** @format int64 */
+      participantId: number
+      newNickname?: string
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<SuccessResponse, ErrorResponse>({
+      path: `/conversation/${conversationId}/update-nickname`,
+      method: "PATCH",
+      query: query,
+      secure: true,
+      ...params,
+    })
+  /**
+   * No description
+   *
+   * @tags conversation-controller
    * @name GetChatDetailSection
    * @request GET:/conversation/{conversationId}/get-chat-details-section
    * @secure
@@ -197,50 +212,6 @@ export class Conversation<SecurityDataType = unknown> extends HttpClient<Securit
   ) =>
     this.request<MessageFindedResponse[], ErrorResponse>({
       path: `/conversation/${conversationId}/find-message`,
-      method: "GET",
-      query: query,
-      secure: true,
-      ...params,
-    })
-  /**
-   * No description
-   *
-   * @tags conversation-controller
-   * @name GetRecentConversations
-   * @request GET:/conversation/getRecentConversationsByUserId
-   * @secure
-   */
-  getRecentConversations = (
-    query: {
-      /** @format int64 */
-      userId: number
-    },
-    params: RequestParams = {},
-  ) =>
-    this.request<ConversationResponse[], ErrorResponse>({
-      path: `/conversation/getRecentConversationsByUserId`,
-      method: "GET",
-      query: query,
-      secure: true,
-      ...params,
-    })
-  /**
-   * No description
-   *
-   * @tags conversation-controller
-   * @name GetGroupConversations
-   * @request GET:/conversation/getGroupConversationsByUserId
-   * @secure
-   */
-  getGroupConversations = (
-    query: {
-      /** @format int64 */
-      userId: number
-    },
-    params: RequestParams = {},
-  ) =>
-    this.request<ConversationResponse[], ErrorResponse>({
-      path: `/conversation/getGroupConversationsByUserId`,
       method: "GET",
       query: query,
       secure: true,

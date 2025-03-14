@@ -5,13 +5,7 @@ import { Fragment } from "react"
 import Image from "next/image"
 import { Images } from "../constants/images"
 import { Ellipsis } from "lucide-react"
-
-interface Friend {
-  name: string
-  phone: string
-  online?: boolean
-  image: any
-}
+import type { Friend } from "../types/types"
 
 interface FriendListDropdownProps {
   friend: Friend

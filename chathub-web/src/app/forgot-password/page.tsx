@@ -12,20 +12,11 @@ import { Images } from "~/constants/images"
 import { useFindUserByPhoneNumber } from "~/hooks/use-user"
 import { auth, signInWithPhoneNumber } from "~/lib/firebase"
 
-const formatPhoneNumber = (input: string) => {
-  let value = input.replace(/\s/g, "")
-  if (!value.startsWith("+84")) {
-    value = "+84" + value.replace(/^0/, "")
-  }
-  return value
-}
-
 const ForgotPasswordPage: React.FC = () => {
   const [phoneNumber, setPhoneNumber] = useState("")
   const [openModal, setOpenModal] = useState(false)
   const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult>()
   const [recaptchaVerifier, setRecaptchaVerifier] = useState<RecaptchaVerifier | null>(null)
-  const { user, loading, error, checkPhoneNumber } = useFindUserByPhoneNumber()
 
   useEffect(() => {
     if (!recaptchaVerifier) {
@@ -55,6 +46,8 @@ const ForgotPasswordPage: React.FC = () => {
       console.error("RecaptchaVerifier is not initialized")
       return
     }
+
+    if (loading) return
 
     await checkPhoneNumber(formatPhoneNumber(phoneNumber))
     if (!user) {

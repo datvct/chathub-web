@@ -1,6 +1,26 @@
 import { useState } from "react";
-import { ConversationRequest } from "~/codegen/data-contracts";
-import { getRecentConversationByUserID, createConversationAPI, leaveConversation, putDissolveGroup, getGroupConversationsByUserId } from "~/lib/get-conversation";
+import {
+  ConversationRequest,
+  UpdateNickNameRequest,
+  UpdateGroupInfoRequest,
+} from "~/codegen/data-contracts";
+import {
+  getRecentConversationByUserID,
+  createConversationAPI,
+  leaveConversation,
+  putDissolveGroup,
+  getGroupConversationsByUserId,
+  getChatDetailSectionAPI,
+  updateGroupInfoAPI,
+  pinConversationAPI,
+  unpinConversationAPI,
+  dissolveGroupConversationAPI,
+  deleteConversationAPI,
+  addMembersToConversationAPI,
+  updateNicknameAPI,
+  removeParticipantFromGroupConversationAPI,
+  leaveGroupConversationAPI,
+} from "~/lib/get-conversation";
 
 export const useConversation = () => {
   const [loading, setLoading] = useState(false);
@@ -81,6 +101,169 @@ export const useConversation = () => {
     }
   }
 
+  const getChatDetailSection = async (conversationId: number, userId: number, token: string) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await getChatDetailSectionAPI(conversationId, userId, token);
+      return response;
+    } catch (err: any) {
+      setError(err.message || "Failed to fetch chat detail section");
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  };
 
-  return { getRecentConversation, createConversation, leaveConversationById, dissolveGroup, getGroupConversations,loading, error };
+  const updateGroupInfo = async (conversationId: number, request: UpdateGroupInfoRequest, token: string) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const formData = new FormData();
+      for (const key in request) {
+        if (request.hasOwnProperty(key)) {
+          formData.append(key, (request as any)[key]);
+        }
+      }
+      const response = await updateGroupInfoAPI(conversationId, formData, token);
+      return response;
+    } catch (err: any) {
+      setError(err.message || "Failed to update group info");
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const pinConversation = async (conversationId: number, userId: number, isPinned: boolean, token: string) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await pinConversationAPI(conversationId, userId, isPinned, token);
+      return response;
+    } catch (err: any) {
+      setError(err.message || "Failed to pin conversation");
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const unpinConversation = async (conversationId: number, userId: number, token: string) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await unpinConversationAPI(conversationId, userId, false, token);
+      return response;
+    } catch (err: any) {
+      setError(err.message || "Failed to unpin conversation");
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const dissolveGroupConversation = async (conversationId: number, userId: number, token: string) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await dissolveGroupConversationAPI(conversationId, userId, token);
+      return response;
+    } catch (err: any) {
+      setError(err.message || "Failed to dissolve group conversation");
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const deleteConversation = async (conversationId: number, userId: number, token: string) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await deleteConversationAPI(conversationId, userId, token);
+      return response;
+    } catch (err: any) {
+      setError(err.message || "Failed to delete conversation");
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const addMembersToConversation = async (conversationId: number, memberIds: number[], token: string) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await addMembersToConversationAPI(conversationId, memberIds, token);
+      return response;
+    } catch (err: any) {
+      setError(err.message || "Failed to add members to conversation");
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const updateNickname = async (data: UpdateNickNameRequest, token: string) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await updateNicknameAPI(data, token);
+      return response;
+    } catch (err: any) {
+      setError(err.message || "Failed to update nickname");
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const removeParticipantFromGroup = async (conversationId: number, userId: number, participantId: number, token: string) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await removeParticipantFromGroupConversationAPI(conversationId, userId, participantId, token);
+      return response;
+    } catch (err: any) {
+      setError(err.message || "Failed to remove participant from group");
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const leaveGroupConversation = async (conversationId: number, userId: number, token: string) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await leaveGroupConversationAPI(conversationId, userId, token);
+      return response;
+    } catch (err: any) {
+      setError(err.message || "Failed to leave group conversation");
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return {
+    getRecentConversation,
+    createConversation,
+    leaveConversationById,
+    dissolveGroup,
+    getGroupConversations,
+    getChatDetailSection,
+    updateGroupInfo,
+    pinConversation,
+    unpinConversation,
+    dissolveGroupConversation,
+    deleteConversation,
+    addMembersToConversation,
+    updateNickname,
+    removeParticipantFromGroup,
+    leaveGroupConversation,
+    loading,
+    error
+  };
 };
