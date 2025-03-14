@@ -358,19 +358,6 @@ const ChatInfo = ({
               List members ({chatDetail?.members?.length || 0})
             </div>
             <div className="mt-3 px-2">
-              {/* {[...Array(5)].map((_, i) => (
-                <div key={i} className="flex items-center gap-3 p-2">
-                  <Image
-                    src={Images.AvatarDefault}
-                    alt={"avatar"}
-                    className="w-[3.125rem] h-[3.125rem] rounded-[30px]"
-                    width={50}
-                    height={50}
-                  />
-                  <span>Member {i + 1}</span>
-                </div>
-              ))} */}
-
               {chatDetail?.members?.map((member, i) => (
                 <div key={i} className="flex items-center gap-3 p-2">
                   <Image

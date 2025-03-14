@@ -9,7 +9,7 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs"
 import { useSelector } from "react-redux"
 import { RootState } from "~/lib/reudx/store"
 import dayjs from "dayjs"
-import type { Friend } from "../types/types"
+import { UserDTO } from "~/codegen/data-contracts"
 
 interface ProfileData {
 	displayName: string
@@ -20,7 +20,7 @@ interface ProfileData {
 interface ProfileViewModalProps {
 	isOpen: boolean
 	setIsOpen: (open: boolean) => void
-	friend: Friend | null
+	friend: UserDTO | null
 }
 
 const ProfileViewModal: React.FC<ProfileViewModalProps> = ({
