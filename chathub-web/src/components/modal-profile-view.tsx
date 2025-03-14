@@ -9,20 +9,12 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs"
 import { useSelector } from "react-redux"
 import { RootState } from "~/lib/reudx/store"
 import dayjs from "dayjs"
+import type { Friend } from "../types/types"
 
 interface ProfileData {
 	displayName: string
 	dateOfBirth?: string | Date
 	gender: string
-}
-
-interface Friend {
-	name: string
-	dateOfBirth?: string | Date
-	gender: "Male" | "Female"
-	phone: string
-	online?: boolean
-	image: any
 }
 
 interface ProfileViewModalProps {
