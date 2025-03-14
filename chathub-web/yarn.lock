@@ -1416,6 +1416,11 @@
   dependencies:
     csstype "^3.0.2"
 
+"@types/sockjs-client@^1.5.4":
+  version "1.5.4"
+  resolved "https://registry.yarnpkg.com/@types/sockjs-client/-/sockjs-client-1.5.4.tgz#2c0b6aadf0cfeb49cd210e4c59995a6608fbd8ea"
+  integrity sha512-zk+uFZeWyvJ5ZFkLIwoGA/DfJ+pYzcZ8eH4H/EILCm2OBZyHH6Hkdna1/UWL/CFruh5wj6ES7g75SvUB0VsH5w==
+
 "@types/use-sync-external-store@^0.0.6":
   version "0.0.6"
   resolved "https://registry.npmjs.org/@types/use-sync-external-store/-/use-sync-external-store-0.0.6.tgz"
@@ -1801,7 +1806,7 @@ chalk@^4.0.0:
     "@radix-ui/react-slot" "^1.1.1"
     "@reduxjs/toolkit" "^2.5.1"
     "@stomp/stompjs" "^7.0.0"
-    chathub-web "file:../../../../Library/Caches/Yarn/v6/npm-chathub-web-0.1.0-dbf5801b-9674-4086-88c2-2971cd6ed83e-1740068488854/node_modules/chathub-web"
+    chathub-web "file:../../../../Library/Caches/Yarn/v6/npm-chathub-web-0.1.0-6c5304bd-cfcd-4125-9ab1-edb169b27850-1741879265496/node_modules/chathub-web"
     class-variance-authority "^0.7.1"
     dayjs "^1.11.13"
     emoji-picker-react "^4.12.0"

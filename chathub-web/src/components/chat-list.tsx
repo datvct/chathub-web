@@ -133,7 +133,7 @@ const ChatList = ({
       </div>
 
       {/* Chat List */}
-      <ul className="space-y-3 overflow-y-scroll custom-scrollbar h-[calc(100%-150px)]">
+      <ul className="space-y-3 overflow-y-auto custom-scrollbar h-[calc(100%-150px)]">
         {dataConversation.length > 0 ? (
           dataConversation.map(chat => (
             <li
@@ -147,10 +147,10 @@ const ChatList = ({
                   alt={chat.chatType === "GROUP" ? chat.groupName : chat.senderName || "Avatar"}
                   width={48}
                   height={48}
-                  className="rounded-full"
+                  className="rounded-full max-w-none"
                 />
               </div>
-              <div className="flex-1">
+              <div className="flex-1 w-3/4">
                 <div className="flex items-center justify-between">
                   <span className="font-semibold">{chat.chatType === "GROUP" ? chat.groupName : chat.senderName}</span>
                   <div className="flex items-center">
@@ -159,7 +159,7 @@ const ChatList = ({
                   </div>
                 </div>
                 <div className="flex justify-between items-center">
-                  <p className="text-sm text-[#838383] truncate">{chat.lastMessage}</p>
+                  <p className="text-sm text-[#838383] truncate w-1/2">{chat.lastMessage}</p>
                   {chat.isSeen === false && (
                     <span className="bg-[#0078D4] text-xs font-bold text-white rounded-[20px] px-1 flex items-center justify-center">
                       NEW

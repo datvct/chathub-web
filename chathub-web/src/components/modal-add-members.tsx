@@ -36,11 +36,11 @@ const ModalAddMember: React.FC<{
 
   const handleMemberToggle = (index: number) => {
     setMembers(prevMembers => {
-      const newMembers = [...prevMembers];
-      newMembers[index] = { ...newMembers[index], selected: !newMembers[index].selected };
-      return newMembers;
-    });
-  };
+      const newMembers = [...prevMembers]
+      newMembers[index] = { ...newMembers[index], selected: !newMembers[index].selected }
+      return newMembers
+    })
+  }
 
   const filteredMembers = members.filter(member => {
     const searchTerm = searchQuery.toLowerCase()
@@ -48,11 +48,11 @@ const ModalAddMember: React.FC<{
   })
 
   const handleAddMembers = () => {
-    const selectedMembers = members.filter(member => member.selected);
-    onAddMembers(selectedMembers);
-    setIsOpen(false);
-    setMembers(members.map(member => ({ ...member, selected: false })));
-  };
+    const selectedMembers = members.filter(member => member.selected)
+    onAddMembers(selectedMembers)
+    setIsOpen(false)
+    setMembers(members.map(member => ({ ...member, selected: false })))
+  }
 
   return (
     <Transition appear show={isOpen} as={Fragment}>
@@ -65,10 +65,7 @@ const ModalAddMember: React.FC<{
                 <span className="text-[25px] font-bold">Add member</span>
               </DialogTitle>
 
-              <button
-                onClick={() => setIsOpen(false)}
-                className="absolute top-2 right-2 w-10 h-10"
-              >
+              <button onClick={() => setIsOpen(false)} className="absolute top-2 right-2 w-10 h-10">
                 <Image src={Images.IconCloseModal} alt="close modal" width={40} height={4} />
               </button>
 
@@ -90,19 +87,19 @@ const ModalAddMember: React.FC<{
                     <li
                       key={index}
                       className={`flex items-center justify-between rounded-lg px-3 py-3 space-x-3 transition duration-150 mb-1 cursor-pointer
-                          ${member.selected
-                          ? "bg-[#93C1D2]"
-                          : "odd:bg-[#E4DEED] even:bg-[#AF9CC9]"
-                        }
-                          ${!member.selected
-                          ? "hover:rounded-lg bg-[#7a99b8]/90"
-                          : ""
-                        }
+                          ${member.selected ? "bg-[#93C1D2]" : "odd:bg-[#E4DEED] even:bg-[#AF9CC9]"}
+                          ${!member.selected ? "hover:rounded-lg bg-[#7a99b8]/90" : ""}
                       `}
                       onClick={() => handleMemberToggle(index)}
                     >
                       <div className="flex items-center gap-x-3">
-                        <Image src={member.image} alt={member.name} width={45} height={45} className="rounded-full" />
+                        <Image
+                          src={member.image}
+                          alt={member.name ?? "avatar"}
+                          width={45}
+                          height={45}
+                          className="rounded-full"
+                        />
                         <div className="text-[#282828]">
                           <p className="font-medium text-sm md:text-base">{member.name}</p>
                           <p className="text-xs text-gray-700 font-normal leading-4">{member.phone}</p>

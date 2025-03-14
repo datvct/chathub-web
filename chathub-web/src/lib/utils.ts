@@ -23,3 +23,26 @@ export const formatDateTime = (isoString: string) => {
 
   return `${timeFormatter.format(date)} ${dateFormatter.format(date)}`;
 };
+
+
+export const formatRelativeTime = (dateString: string) => {
+  const now = new Date();
+  const messageDate = new Date(dateString);
+  const diffInSeconds = Math.floor((now.getTime() - messageDate.getTime()) / 1000);
+
+  if (diffInSeconds < 60) {
+    return `${diffInSeconds} giây trước`;
+  } else if (diffInSeconds < 3600) {
+    return `${Math.floor(diffInSeconds / 60)} phút trước`;
+  } else if (diffInSeconds < 86400) {
+    return `${Math.floor(diffInSeconds / 3600)} giờ trước`;
+  } else if (diffInSeconds < 30 * 86400) {
+    return `${Math.floor(diffInSeconds / 86400)} ngày trước`;
+  } else {
+    return messageDate.toLocaleDateString("vi-VN", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+    });
+  }
+};

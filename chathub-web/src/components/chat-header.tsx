@@ -42,7 +42,7 @@ const ChatHeader = ({
         <div className="flex items-center gap-3">
           <Image
             src={avatar ? avatar : Images.AvatarDefault}
-            alt={name}
+            alt={name ?? "Avatar"}
             className="w-[3.125rem] h-[3.125rem] rounded-[30px]"
             width={50}
             height={50}

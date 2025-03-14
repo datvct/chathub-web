@@ -22,6 +22,7 @@
     "@radix-ui/react-slot": "^1.1.1",
     "@reduxjs/toolkit": "^2.5.1",
     "@stomp/stompjs": "^7.0.0",
+    "@types/sockjs-client": "^1.5.4",
     "chathub-web": "file:",
     "class-variance-authority": "^0.7.1",
     "dayjs": "^1.11.13",
