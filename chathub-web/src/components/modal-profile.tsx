@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { Camera } from "lucide-react"
 import Image from "next/image"
 import { Dialog, DialogPanel, DialogTitle, Transition, TransitionChild } from "@headlessui/react"
@@ -11,19 +11,13 @@ import { DemoContainer } from "@mui/x-date-pickers/internals/demo"
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs"
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider"
 import { DatePicker } from "@mui/x-date-pickers/DatePicker"
-
-interface ProfileData {
-  displayName: string
-  dateOfBirth: Date
-  gender: "Male" | "Female"
-}
-
-interface Friend {
-  name: string
-  phone: string
-  online?: boolean
-  image: any
-}
+import { useSelector } from "react-redux"
+import { RootState } from "~/lib/reudx/store"
+import { useUpdateProfile } from "~/hooks/use-user"
+import { ChangeProfileRequest } from "~/codegen/data-contracts"
+import dayjs from "dayjs"
+import { toast, ToastContainer } from "react-toastify"
+import { Friend, ProfileData } from "~/types/types"
 
 interface ProfileModalProps {
   isOpen: boolean
@@ -32,11 +26,22 @@ interface ProfileModalProps {
   friend: Friend | null
 }
 
-const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, setIsOpen, setIsChangePasswordModalOpen, friend }) => {
+const ProfileModal: React.FC<ProfileModalProps> = ({
+  isOpen,
+  setIsOpen,
+  setIsChangePasswordModalOpen,
+  friend
+}) => {
+  const userId = useSelector((state: RootState) => state.auth.userId);
+  const token = useSelector((state: RootState) => state.auth.token);
+
+  const { updateProfile, loading } = useUpdateProfile();
+  const [errorMessage, setErrorMessage] = useState("")
+
   const [profileData, setProfileData] = useState<ProfileData>({
-    displayName: "Miley Cyrus",
-    dateOfBirth: new Date("1995-05-23"),
-    gender: "Female",
+    displayName: "",
+    dateOfBirth: new Date(),
+    gender: "Male",
   })
 
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
@@ -57,16 +62,47 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, setIsOpen, setIsCha
     setProfileData(prev => ({ ...prev, [field]: value }))
   }
 
-  const [date, setDate] = useState<Date>(profileData.dateOfBirth)
+  const [date, setDate] = useState(dayjs(profileData.dateOfBirth))
 
-  const handleDateOfBirth = (newDate: Date | undefined) => {
-    setDate(newDate || new Date())
-
+  const handleDateOfBirth = (newDate: dayjs.Dayjs | null) => {
+    setDate(newDate || dayjs())
     setProfileData(prev => ({
       ...prev,
-      dateOfBirth: newDate || prev.dateOfBirth,
+      dateOfBirth: newDate ? newDate.toDate() : prev.dateOfBirth,
     }))
   }
+
+  useEffect(() => {
+    setProfileData({
+      displayName: friend?.name || "",
+      dateOfBirth: friend?.dateOfBirth || new Date(),
+      gender: friend?.gender ? "Male" : "Female"
+    })
+  }, [friend]);
+
+  const handleSubmit = async () => {
+    const formattedDate = dayjs(profileData.dateOfBirth).format('YYYY/MM/DD');
+
+    const data: ChangeProfileRequest = {
+      id: userId!,
+      name: profileData.displayName,
+      avatar: selectedImage || friend?.image || Images.AvatarDefault,
+      dateOfBirth: formattedDate,
+      gender: profileData.gender,
+    };
+
+    try {
+      const response = await updateProfile(data, token!);
+      if (response.success) {
+        setIsOpen(false)
+      } else {
+        toast.error('Failed to update profile')
+        setErrorMessage(response.error)
+      }
+    } catch (error: any) {
+      console.log('Failed to update profile')
+    }
+  };
 
   return (
     <Transition appear show={isOpen} as={React.Fragment}>
@@ -95,6 +131,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, setIsOpen, setIsCha
               leaveTo="opacity-0 scale-95"
             >
               <DialogPanel className="w-full max-w-md transform overflow-hidden rounded-[5%] bg-white p-6 text-left align-middle shadow-xl transition-all">
+                <ToastContainer />
                 <DialogTitle
                   as="h3"
                   className="text-lg font-medium leading-6 text-gray-900 flex items-center justify-between"
@@ -149,7 +186,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, setIsOpen, setIsCha
                       <Input
                         id="display-name"
                         type="text"
-                        value={friend?.name || profileData.displayName}
+                        value={friend?.name}
                         className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500"
                         onChange={e => handleChange("displayName", e.target.value)}
                       />
@@ -163,7 +200,12 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, setIsOpen, setIsCha
 
                     <LocalizationProvider dateAdapter={AdapterDayjs}>
                       <DemoContainer components={["DatePicker"]}>
-                        <DatePicker label="mm/dd/yyyy" className="w-full block bg-white border border-slate-300" />
+                        <DatePicker
+                          label="Date of Birth"
+                          value={date}
+                          onChange={handleDateOfBirth}
+                          className="w-full block bg-white border border-slate-300"
+                        />
                       </DemoContainer>
                     </LocalizationProvider>
                   </div>
@@ -214,12 +256,11 @@ const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, setIsOpen, setIsCha
 
                   <div className="flex items-end justify-end gap-4 mt-9 w-full">
                     <Button
-                      onClick={() => {
-                        setIsOpen(false)
-                      }}
+                      onClick={handleSubmit}
+                      disabled={loading}
                       className="w-30 px-4 py-2 bg-[#7746f5] rounded-[12px] text-lg text-white bg-gradient-to-r from-[#501794] to-[#3E70A1] hover:bg-gradient-to-l"
                     >
-                      Save changes
+                      {loading ? "Loading..." : "Save changes"}
                     </Button>
                   </div>
                 </div>

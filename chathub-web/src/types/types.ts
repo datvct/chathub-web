@@ -6,3 +6,17 @@ export enum MessageType {
     DOCUMENT = "DOCUMENT",
     EMOJI = "EMOJI"
 }
+export interface Friend {
+    name: string
+    dateOfBirth?: string | Date
+    gender: "Male" | "Female"
+    phone: string
+    online?: boolean
+    image: any
+}
+
+export interface ProfileData {
+    displayName: string
+    dateOfBirth?: string | Date
+    gender: string
+}
