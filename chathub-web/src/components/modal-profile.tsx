@@ -13,25 +13,11 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider"
 import { DatePicker } from "@mui/x-date-pickers/DatePicker"
 import { useSelector } from "react-redux"
 import { RootState } from "~/lib/reudx/store"
-import { useUpdateProfile } from "~/hooks/use-update-profile"
+import { useUpdateProfile } from "~/hooks/use-user"
 import { ChangeProfileRequest } from "~/codegen/data-contracts"
 import dayjs from "dayjs"
 import { toast, ToastContainer } from "react-toastify"
-
-interface ProfileData {
-  displayName: string
-  dateOfBirth: Date
-  gender: "Male" | "Female"
-}
-
-interface Friend {
-  name: string
-  dateOfBirth: Date
-  gender: boolean
-  phone: string
-  online?: boolean
-  image: any
-}
+import { Friend, ProfileData } from "~/types/types"
 
 interface ProfileModalProps {
   isOpen: boolean

@@ -1,22 +1,35 @@
 import { UserDTO } from "~/codegen/data-contracts";
 import { User } from "~/codegen/User";
+import { ChangeProfileRequest, SuccessResponse } from "../codegen/data-contracts";
 
 const userInstance = new User({ baseUrl: process.env.API_URL });
 
+<<<<<<<<< Temporary merge branch 1
 export async function getListFriends(userId: number, token: string) {
-
-
   try {
-    if (!userId) return null
-
-    const response = (await friendInstance.getListFriend({ userId }, {
+    if (!data.id) return null;
+    const response = await userInstance.updateProfile(data, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
-    }).then(res => res.json())) as UserDTO[]
-    return response
+    }) as SuccessResponse;
+    return response;
   } catch (error) {
-    console.error("Error checking admin token:", error)
-    return null
+    console.error("Error updating profile:", error);
+    throw error;
   }
+=========
+export async function findByPhoneNumber(phoneNumber: string, token?: string) {
+    try {
+        const response = (await userInstance.findUserByPhoneNumber({ phoneNumber }, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        }).then(res => res.json())) as UserDTO
+        return response
+    } catch (error) {
+        console.error("Error checking admin token:", error)
+        return null
+    }
+>>>>>>>>> Temporary merge branch 2
 }

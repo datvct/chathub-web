@@ -228,15 +228,15 @@ const ChatList = ({
       <ModalProfile
         isOpen={modalProfileOpen}
         setIsOpen={setModalProfileOpen}
-        setIsChangePasswordModalOpen={setIsChangePasswordModalOpen}
+        setIsChangePasswordModalOpen={setIsChangePasswordModalOpen} friend={undefined} 
       />
       {isChangePasswordModalOpen ? (
         <ChangePasswordModal isOpen={isChangePasswordModalOpen} setIsOpen={handleCloseChangePassword} />
       ) : (
         <ModalProfile
-          isOpen={isModalProfileOpen}
-          setIsOpen={setIsProfileModalOpen}
-          setIsChangePasswordModalOpen={handleOpenChangePassword}
+            isOpen={isModalProfileOpen}
+            setIsOpen={setIsProfileModalOpen}
+            setIsChangePasswordModalOpen={handleOpenChangePassword} friend={undefined}        
         />
       )}
       <ModalFriendList isOpen={isFriendListModalOpen} setIsOpen={setIsFriendListModalOpen} />

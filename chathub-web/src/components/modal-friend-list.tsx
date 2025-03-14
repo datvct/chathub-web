@@ -8,23 +8,25 @@ import { Search } from "lucide-react"
 import { Button } from "./ui/button"
 import { Input } from "./ui/input"
 import DropdownFriendList from "./dropdown-friend-list"
-import ProfileModal from "./modal-profile"
+import ProfileViewModal from "./modal-profile-view"
 
 interface Friend {
   name: string
   phone: string
   online?: boolean
   image: any
+  dateOfBirth?: string
+  gender?: "Male" | "Female"
 }
 
 const friends: Friend[] = [
-  { name: "Guy Hawkins", phone: "0903112233", online: true, image: Images.GuyHawkins },
-  { name: "Ronald Richards", phone: "0902445566", online: true, image: Images.RonaldRichards },
-  { name: "Esther Howard", phone: "0904998877", image: Images.EstherHoward },
-  { name: "Albert Flores", phone: "0905336699", image: Images.AlbertFlores },
-  { name: "Miley Cyrus", phone: "0909225588", image: Images.MileyCyrus },
-  { name: "Arlene McCoy", phone: "0906114477", image: Images.ArleneMcCoy },
-  { name: "Cameron Williamson", phone: "0902115599", image: Images.CameronWilliamson },
+  { name: "Guy Hawkins", phone: "0903112233", online: true, image: Images.GuyHawkins, dateOfBirth: "1992-01-01", gender: "Male" },
+  { name: "Ronald Richards", phone: "0902445566", online: true, image: Images.RonaldRichards, dateOfBirth: "1994-02-03", gender: "Male" },
+  { name: "Esther Howard", phone: "0904998877", image: Images.EstherHoward, dateOfBirth: "1995-04-07", gender: "Female" },
+  { name: "Albert Flores", phone: "0905336699", image: Images.AlbertFlores, dateOfBirth: "1998-06-25", gender: "Male" },
+  { name: "Miley Cyrus", phone: "0909225588", image: Images.MileyCyrus, dateOfBirth: "1997-02-17", gender: "Female" },
+  { name: "Arlene McCoy", phone: "0906114477", image: Images.ArleneMcCoy, dateOfBirth: "1993-08-27", gender: "Female" },
+  { name: "Cameron Williamson", phone: "0902115599", image: Images.CameronWilliamson, dateOfBirth: "1996-05-19", gender: "Male" },
 ]
 
 const ModalFriendList: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) => void }> = ({ isOpen, setIsOpen }) => {
@@ -103,7 +105,7 @@ const ModalFriendList: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) =>
                   <div className="flex space-x-4 mb-5">
                     <button
                       onClick={() => setActiveTab("all")}
-                      className={`px-4 py-2 rounded-lg text-white font-semibold 
+                      className={`px-4 py-2 rounded-lg text-white font-semibold
                                                     ${activeTab === "all"
                           ? "bg-[#501794]"
                           : "bg-[#8C8595] hover:bg-[#7746F5]"
@@ -113,7 +115,7 @@ const ModalFriendList: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) =>
                     </button>
                     <button
                       onClick={() => setActiveTab("recent")}
-                      className={`px-4 py-2 rounded-lg text-white font-semibold 
+                      className={`px-4 py-2 rounded-lg text-white font-semibold
                                                     ${activeTab === "recent"
                           ? "bg-[#501794]"
                           : "bg-[#8C8595] hover:bg-[#7746F5]"
@@ -156,7 +158,7 @@ const ModalFriendList: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) =>
         </Dialog>
       </Transition>
 
-      <ProfileModal isOpen={isProfileModalOpen} setIsOpen={setIsProfileModalOpen} friend={selectedFriend} />
+      <ProfileViewModal isOpen={isProfileModalOpen} setIsOpen={setIsProfileModalOpen} friend={selectedFriend} />
     </div>
   )
 }
