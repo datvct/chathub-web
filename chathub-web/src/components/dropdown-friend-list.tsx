@@ -5,11 +5,12 @@ import { Fragment } from "react"
 import Image from "next/image"
 import { Images } from "../constants/images"
 import { Ellipsis } from "lucide-react"
-import type { Friend } from "../types/types"
+import { UserDTO } from "~/codegen/data-contracts"
+// import type { Friend } from "../types/types"
 
 interface FriendListDropdownProps {
-  friend: Friend
-  onOpenProfile: (friend: Friend) => void
+  friend: UserDTO
+  onOpenProfile: (friend: UserDTO) => void
 }
 
 const FriendListDropdown: React.FC<FriendListDropdownProps> = ({ friend, onOpenProfile }) => {
