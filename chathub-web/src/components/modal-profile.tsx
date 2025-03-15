@@ -17,7 +17,6 @@ import { useUpdateProfile } from "~/hooks/use-user"
 import { ChangeProfileRequest, UserDTO } from "~/codegen/data-contracts"
 import dayjs from "dayjs"
 import { toast, ToastContainer } from "react-toastify"
-// import { Friend, ProfileData } from "~/types/types"
 
 interface ProfileModalProps {
   isOpen: boolean
@@ -38,7 +37,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
   const { updateProfile, loading } = useUpdateProfile();
   const [errorMessage, setErrorMessage] = useState("")
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
-  const [profileData, setProfileData] = useState<UserDTO | null>(null);
+  const [profileData, setProfileData] = useState<UserDTO | null>(null)
 
   const handleOpenChangePassword = () => {
     setIsOpen(false)
@@ -227,8 +226,8 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
                           type="radio"
                           value="Male"
                           className="w-4 h-4 text-[#6568FF] bg-gray-100 border-gray-300"
-                          checked={profileData.gender === "Male"}
-                          onChange={() => handleChange("gender", "Male")}
+                          checked={profileData?.gender === "MALE"}
+                          onChange={() => handleChange("gender", "MALE")}
                         />
 
                         <label htmlFor="male" className="block text-sm leading-6">
@@ -242,8 +241,8 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
                           type="radio"
                           value="Female"
                           className="w-4 h-4 text-[#6568FF] bg-gray-100 border-gray-300"
-                          checked={profileData.gender === "Female"}
-                          onChange={() => handleChange("gender", "Female")}
+                          checked={profileData?.gender === "FEMALE"}
+                          onChange={() => handleChange("gender", "FEMALE")}
                         />
 
                         <label htmlFor="female" className="block text-sm leading-6">
@@ -265,7 +264,8 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
                     <Button
                       onClick={handleSubmit}
                       disabled={loading}
-                      className="w-30 px-4 py-2 bg-[#7746f5] rounded-[12px] text-lg text-white bg-gradient-to-r from-[#501794] to-[#3E70A1] hover:bg-gradient-to-l"
+                      className="w-30 px-4 py-2 bg-[#7746f5] rounded-[12px] text-lg text-white
+                        bg-gradient-to-r from-[#501794] to-[#3E70A1] hover:bg-gradient-to-l"
                     >
                       {loading ? "Loading..." : "Save changes"}
                     </Button>
