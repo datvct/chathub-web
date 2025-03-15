@@ -5,8 +5,7 @@ import { Fragment } from "react"
 import Image from "next/image"
 import { Images } from "../constants/images"
 import { Ellipsis } from "lucide-react"
-import { UserDTO } from "~/codegen/data-contracts"
-// import type { Friend } from "../types/types"
+import type { Friend } from "../types/types"
 
 interface FriendListDropdownProps {
   friend: UserDTO
