@@ -153,16 +153,23 @@ export class Conversation<SecurityDataType = unknown> extends HttpClient<Securit
    *
    * @tags conversation-controller
    * @name UpdateNickname
-   * @request PATCH:/conversation/update-nickname
+   * @request PATCH:/conversation/{conversationId}/update-nickname
    * @secure
    */
-  updateNickname = (data: UpdateNickNameRequest, params: RequestParams = {}) =>
+  updateNickname = (
+    conversationId: number,
+    query: {
+      /** @format int64 */
+      participantId: number
+      newNickname?: string
+    },
+    params: RequestParams = {},
+  ) =>
     this.request<SuccessResponse, ErrorResponse>({
-      path: `/conversation/update-nickname`,
+      path: `/conversation/${conversationId}/update-nickname`,
       method: "PATCH",
-      body: data,
+      query: query,
       secure: true,
-      type: ContentType.Json,
       ...params,
     })
   /**

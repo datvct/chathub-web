@@ -11,25 +11,33 @@ import { Button } from "./ui/button"
 import { Input } from "./ui/input"
 import DropdownFriendList from "./dropdown-friend-list"
 import ProfileViewModal from "./modal-profile-view"
+import ModalConfirm from "./modal-confirm"
+import ModalSuccess from "./modal-success"
 import { useFriends } from "~/hooks/use-friends"
 import { useUnfriend } from "~/hooks/use-unfriend"
-import type { Friend } from "../types/types"
 import { toast } from "react-toastify"
 import { UserDTO } from "~/codegen/data-contracts"
 
 const ModalFriendList: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) => void }> = ({ isOpen, setIsOpen }) => {
   const userId = useSelector((state: RootState) => state.auth.userId)
   const token = useSelector((state: RootState) => state.auth.token)
+
   const { friends: fetchedFriends, loading, error } = useFriends(userId, token)
   const { unfriend, isUnfriending, unfriendUserId, unfriendError } = useUnfriend()
 
   const [activeTab, setActiveTab] = useState("all")
   const [searchTerm, setSearchTerm] = useState("")
-  const [selectedFriend, setSelectedFriend] = useState<Friend | null>(null)
+  const [selectedFriend, setSelectedFriend] = useState<UserDTO | null>(null)
   const [isDropDownOpen, setIsDropDownOpen] = useState(false)
   const [isProfileViewModalOpen, setIsProfileViewModalOpen] = useState(false)
 
-  const handleOpenProfile = (friend: Friend) => {
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const [friendIdToUnfriend, setFriendIdToUnfriend] = useState<number | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string>("");
+  const [refetchFriends, setRefetchFriends] = useState(false);
+
+  const handleOpenProfile = (friend: UserDTO) => {
     setSelectedFriend({ ...friend, gender: friend.gender as "Male" | "Female" })
     setIsProfileViewModalOpen(true)
   }
@@ -38,14 +46,40 @@ const ModalFriendList: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) =>
 
   const friendsToDisplay = activeTab === "recent" ? filteredFriends.filter(friend => friend.status === "ONLINE") : filteredFriends
 
-  const handleUnfriend = async (friendId: number) => {
+  const handleUnfriendAction = async (friendId: number) => {
     if (!token || !userId || !friendId) return;
     try {
-      await unfriend(token, userId, friendId);
-    } catch (error) {
+      const res = await unfriend(token, userId, friendId);
+      if (res === "Unfriend Success") {
+        setSuccessMessage("Unfriend successfully!");
+        setIsSuccessModalOpen(true);
+      }
+    } catch (error: any) {
       toast.error("Failed to unfriend. Please try again.");
+    } finally {
+      setTimeout(() => {
+        window.location.reload();
+      }, 6000);
     }
-  }
+  };
+
+  const handleConfirmUnfriend = (friendId: number) => {
+    setFriendIdToUnfriend(friendId);
+    setIsConfirmModalOpen(true);
+  };
+
+  const handleConfirmUnfriendYes = () => {
+    if (friendIdToUnfriend !== null) {
+      handleUnfriendAction(friendIdToUnfriend);
+    }
+    setIsConfirmModalOpen(false);
+    setFriendIdToUnfriend(null);
+  };
+
+  const handleConfirmUnfriendCancel = () => {
+    setIsConfirmModalOpen(false);
+    setFriendIdToUnfriend(null);
+  };
 
   return (
     <div>
@@ -130,17 +164,7 @@ const ModalFriendList: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) =>
                     ) : !friendsToDisplay || friendsToDisplay.length === 0 ? (
                       <div>No friends found.</div>
                     ) : (
-                      friendsToDisplay.map((userDTO, index) => {
-                        const friend: Friend = {
-                          userId: userDTO.id?.toString() || "0",
-                          name: userDTO.name || "",
-                          phoneNumber: userDTO.phoneNumber || "",
-                          avatar: userDTO.avatar || Images.AvatarDefault,
-                          dateOfBirth: userDTO.dateOfBirth,
-                          gender: userDTO.gender as "Male" | "Female",
-                          status: userDTO.status as "Online" | "Offline"
-                        };
-
+                      friendsToDisplay.map((friend, index) => {
                         return (
                           <div
                             key={index}
@@ -160,13 +184,18 @@ const ModalFriendList: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) =>
                             </div>
 
                             <Button
-                              className="w-20 px-4 py-2 bg-[#7746f5] rounded-[12px] text-lg text-white bg-gradient-to-r from-[#501794] to-[#3E70A1] hover:bg-gradient-to-l"
-                              onClick={() => handleUnfriend(parseInt(friend.userId.toString()))}
-                              disabled={isUnfriending && parseInt(friend.userId.toString()) === unfriendUserId}
+                              className="w-20 px-4 py-2 bg-[#7746f5] rounded-[12px] text-lg text-white
+                                bg-gradient-to-r from-[#501794] to-[#3E70A1] hover:bg-gradient-to-l"
+                              onClick={() => handleConfirmUnfriend(parseInt(friend.id?.toString() || "0"))}
+                              disabled={isUnfriending && parseInt(friend.id?.toString() || "0") === unfriendUserId}
                             >
-                              {isUnfriending && parseInt(friend.userId.toString()) === unfriendUserId ? "Unfriending..." : "Unfriend"}
+                              {
+                                isUnfriending &&
+                                  parseInt(friend.id?.toString() || "0") === unfriendUserId
+                                  ? "Unfriending..." : "Unfriend"
+                              }
                             </Button>
-                            <DropdownFriendList friend={friend} key={index} onOpenProfile={handleOpenProfile} />
+                            <DropdownFriendList friend={friend as any} key={index} onOpenProfile={handleOpenProfile} />
                           </div>
                         )
                       })
@@ -179,7 +208,24 @@ const ModalFriendList: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) =>
         </Dialog>
       </Transition>
 
-      <ProfileViewModal isOpen={isProfileViewModalOpen} setIsOpen={setIsProfileViewModalOpen} friend={selectedFriend} />
+      <ProfileViewModal
+        isOpen={isProfileViewModalOpen}
+        setIsOpen={setIsProfileViewModalOpen}
+        friend={selectedFriend}
+      />
+      <ModalConfirm
+        isOpen={isConfirmModalOpen}
+        setIsOpen={setIsConfirmModalOpen}
+        onConfirm={handleConfirmUnfriendYes}
+        onCancel={handleConfirmUnfriendCancel}
+        title="Confirm Unfriend"
+        message={`Are you sure you want to unfriend ${selectedFriend?.name}?`}
+      />
+      <ModalSuccess
+        isOpen={isSuccessModalOpen}
+        setIsOpen={setIsSuccessModalOpen}
+        message={successMessage}
+      />
     </div>
   )
 }

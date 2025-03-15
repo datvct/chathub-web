@@ -157,11 +157,11 @@ const ChatList = ({
       {/* Chat List */}
       <ul className="space-y-3 overflow-y-scroll custom-scrollbar h-[calc(100%-150px)]">
         {dataConversation.length > 0 ? (
-          [...dataConversation] // Create a copy to avoid mutating original array
-            .sort((a, b) => { // Sort array
-              if (a.pinned && !b.pinned) return -1; // Pinned items first
-              if (!a.pinned && b.pinned) return 1;  // Then unpinned
-              return 0; // Keep original order if both have same pinned status
+          [...dataConversation]
+            .sort((a, b) => {
+              if (a.pinned && !b.pinned) return -1;
+              if (!a.pinned && b.pinned) return 1;
+              return 0;
             })
             .map(chat => (
               <li
@@ -262,7 +262,7 @@ const ChatList = ({
       <ModalProfile
         isOpen={modalProfileOpen}
         setIsOpen={setModalProfileOpen}
-        setIsChangePasswordModalOpen={setIsChangePasswordModalOpen}
+        setIsChangePasswordModalOpen={setIsChangePasswordModalOpen} friend={undefined}
       />
       {isChangePasswordModalOpen ? (
         <ChangePasswordModal isOpen={isChangePasswordModalOpen} setIsOpen={handleCloseChangePassword} />
@@ -270,7 +270,7 @@ const ChatList = ({
         <ModalProfile
           isOpen={isModalProfileOpen}
           setIsOpen={setIsProfileModalOpen}
-          setIsChangePasswordModalOpen={handleOpenChangePassword}
+          setIsChangePasswordModalOpen={handleOpenChangePassword} friend={undefined}
         />
       )}
       <ModalFriendList isOpen={isFriendListModalOpen} setIsOpen={setIsFriendListModalOpen} />

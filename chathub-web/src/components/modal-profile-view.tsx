@@ -1,25 +1,27 @@
 "use client"
 
 import React, { useState, useEffect } from "react"
-import { Camera } from "lucide-react"
 import Image from "next/image"
 import { Dialog, DialogPanel, DialogTitle, Transition, TransitionChild } from "@headlessui/react"
 import { Input } from "./ui/input"
-import { Button } from "./ui/button"
 import { Images } from "../constants/images"
-import { DemoContainer } from "@mui/x-date-pickers/internals/demo"
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs"
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider"
-import { DatePicker } from "@mui/x-date-pickers/DatePicker"
 import { useSelector } from "react-redux"
 import { RootState } from "~/lib/reudx/store"
 import dayjs from "dayjs"
-import { Friend, ProfileData } from "~/types/types"
+// import type { Friend } from "../types/types"
+import { UserDTO } from "~/codegen/data-contracts"
+
+interface ProfileData {
+	displayName: string
+	dateOfBirth?: string | Date
+	gender: string
+}
 
 interface ProfileViewModalProps {
 	isOpen: boolean
 	setIsOpen: (open: boolean) => void
-	friend: Friend | null
+	friend: UserDTO | null
 }
 
 const ProfileViewModal: React.FC<ProfileViewModalProps> = ({
@@ -40,10 +42,7 @@ const ProfileViewModal: React.FC<ProfileViewModalProps> = ({
 		setProfileData(prev => ({ ...prev, [field]: value }))
 	}
 
-	const [date, setDate] = useState(dayjs(profileData.dateOfBirth))
-
 	const handleDateOfBirth = (newDate: dayjs.Dayjs | null) => {
-		setDate(newDate || dayjs())
 		setProfileData(prev => ({
 			...prev,
 			dateOfBirth: friend?.dateOfBirth || new Date()
@@ -105,9 +104,6 @@ const ProfileViewModal: React.FC<ProfileViewModalProps> = ({
 												height={100}
 												className="mx-auto cursor-pointer w-24 h-24 rounded-[50px] border border-white transition duration-150 transform hover:scale-105 shadow-2xl hover:shadow-cyan"
 											/>
-											<span className="absolute bottom-[-10px] left-[55%] rounded-[50px] bg-[#F1F1F1] hover:bg-slate-300 w-[37px] h-[37px] flex items-center justify-center">
-												<Camera className="text-[#797979] w-5 h-5" strokeWidth={1.5} />
-											</span>
 										</label>
 									</div>
 
@@ -131,17 +127,16 @@ const ProfileViewModal: React.FC<ProfileViewModalProps> = ({
 										<label htmlFor="date-of-birth" className="block text-sm font-medium text-black">
 											Date of Birth
 										</label>
-
-										<LocalizationProvider dateAdapter={AdapterDayjs}>
-											<DemoContainer components={["DatePicker"]}>
-												<DatePicker
-													label="Date of Birth"
-													value={date}
-													onChange={handleDateOfBirth}
-													className="w-full block bg-white border border-slate-300"
+										<div className="mt-1">
+											<div className="mt-1">
+												<Input
+													type="text"
+													value={dayjs(profileData.dateOfBirth).format('MMMM D, YYYY')}
+													readOnly
+													className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400 focus:outline-none"
 												/>
-											</DemoContainer>
-										</LocalizationProvider>
+											</div>
+										</div>
 									</div>
 
 									<div className="mt-4">
