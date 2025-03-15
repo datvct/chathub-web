@@ -5,7 +5,12 @@ import { ChangeProfileRequest, SuccessResponse } from "../codegen/data-contracts
 const userInstance = new User({ baseUrl: process.env.API_URL });
 
 <<<<<<<<< Temporary merge branch 1
+export async function updateProfile(data: ChangeProfileRequest, token: string) {
+=========
 export async function getListFriends(userId: number, token: string) {
+
+
+>>>>>>>>> Temporary merge branch 2
   try {
     if (!data.id) return null;
     const response = await userInstance.updateProfile(data, {
