@@ -58,10 +58,10 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
     }));
   }
 
-  const [date, setDate] = useState<dayjs.Dayjs | null>(dayjs());
+  const [date, setDate] = useState(dayjs(profileData?.dateOfBirth))
 
-  const handleDateOfBirth = (newDate: any) => {
-    setDate(newDate);
+  const handleDateOfBirth = (newDate: dayjs.Dayjs | null) => {
+    setDate(newDate || dayjs())
     setProfileData(prev => ({
       ...prev,
       dateOfBirth: newDate ? newDate.toISOString() : prev?.dateOfBirth,
@@ -70,14 +70,11 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
 
   useEffect(() => {
     if (friend) {
-      const parsedDateOfBirth = friend.dateOfBirth ? dayjs(friend.dateOfBirth) : dayjs();
-      setDate(parsedDateOfBirth);
-
       setProfileData({
         id: friend.id,
         phoneNumber: friend.phoneNumber,
         name: friend.name || "",
-        dateOfBirth: parsedDateOfBirth.toISOString(),
+        dateOfBirth: friend.dateOfBirth,
         gender: friend.gender as "MALE" | "FEMALE",
         avatar: friend.avatar,
         status: friend.status,
@@ -88,7 +85,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
   }, [friend]);
 
   const handleSubmit = async () => {
-    const formattedDate = dayjs(profileData.dateOfBirth).format('YYYY-MM-DD');
+    const formattedDate = dayjs(profileData.dateOfBirth).format('YYYY/MM/DD');
 
     const data: ChangeProfileRequest = {
       id: userId!,
@@ -212,7 +209,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
                         <DatePicker
                           label="Date of Birth"
                           value={date}
-                          onChange={(value) => handleDateOfBirth(dayjs(value))}
+                          onChange={handleDateOfBirth}
                           className="w-full block bg-white border border-slate-300"
                         />
                       </DemoContainer>
