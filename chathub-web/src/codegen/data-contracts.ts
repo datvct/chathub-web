@@ -91,8 +91,11 @@ export interface ConversationResponse {
   groupName?: string
   groupAvatar?: string
   senderAvatar?: string
+  /** @format int64 */
+  senderId?: number
   senderName?: string
   lastMessage?: string
+  lastMessageType?: "TEXT" | "IMAGE" | "VIDEO" | "DOCUMENT" | "EMOJI"
   /** @format date-time */
   lastMessageAt?: string
   isSeen?: boolean
