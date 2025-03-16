@@ -153,7 +153,6 @@ export class Conversation<SecurityDataType = unknown> extends HttpClient<Securit
    *
    * @tags conversation-controller
    * @name UpdateNickname
-<<<<<<<<< Temporary merge branch 1
    * @request PATCH:/conversation/update-nickname
    * @secure
    */
@@ -164,25 +163,6 @@ export class Conversation<SecurityDataType = unknown> extends HttpClient<Securit
       body: data,
       secure: true,
       type: ContentType.Json,
-=========
-   * @request PATCH:/conversation/{conversationId}/update-nickname
-   * @secure
-   */
-  updateNickname = (
-    conversationId: number,
-    query: {
-      /** @format int64 */
-      participantId: number
-      newNickname?: string
-    },
-    params: RequestParams = {},
-  ) =>
-    this.request<SuccessResponse, ErrorResponse>({
-      path: `/conversation/${conversationId}/update-nickname`,
-      method: "PATCH",
-      query: query,
-      secure: true,
->>>>>>>>> Temporary merge branch 2
       ...params,
     })
   /**
