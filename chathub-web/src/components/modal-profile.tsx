@@ -109,7 +109,6 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
         }, 5000);
       }
     } catch (error: any) {
-      console.log('Failed to update profile. Please try again later!');
       toast.error('Failed to update profile. Please try again later!');
     }
   };
