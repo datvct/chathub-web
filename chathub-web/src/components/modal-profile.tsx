@@ -58,7 +58,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
     }));
   }
 
-  const [date, setDate] = useState(dayjs(profileData.dateOfBirth))
+  const [date, setDate] = useState<dayjs.Dayjs | null>(dayjs());
 
   const handleDateOfBirth = (newDate: any) => {
     setDate(newDate);
@@ -69,11 +69,22 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
   }
 
   useEffect(() => {
-    setProfileData({
-      displayName: friend?.name || "",
-      dateOfBirth: friend?.dateOfBirth || new Date(),
-      gender: friend?.gender ? "Male" : "Female"
-    })
+    if (friend) {
+      const parsedDateOfBirth = friend.dateOfBirth ? dayjs(friend.dateOfBirth) : dayjs();
+      setDate(parsedDateOfBirth);
+
+      setProfileData({
+        id: friend.id,
+        phoneNumber: friend.phoneNumber,
+        name: friend.name || "",
+        dateOfBirth: parsedDateOfBirth.toISOString(),
+        gender: friend.gender as "MALE" | "FEMALE",
+        avatar: friend.avatar,
+        status: friend.status,
+      });
+    } else {
+      setProfileData(null);
+    }
   }, [friend]);
 
   const handleSubmit = async () => {
