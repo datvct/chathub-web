@@ -99,14 +99,14 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
 
     try {
       const response = await updateProfile(data, token!);
-      if (response.success) {
-        setIsOpen(false)
-      } else {
-        toast.error('Failed to update profile')
-        setErrorMessage(response.error)
+      if (response) {
+        toast.success('Updated profile successfully');
+        setTimeout(() => {
+          setIsOpen(false);
+        }, 5000);
       }
     } catch (error: any) {
-      console.log('Failed to update profile')
+      toast.error('Failed to update profile. Please try again later!');
     }
   };
 
