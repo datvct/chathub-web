@@ -128,18 +128,17 @@ export const getChatDetailSectionAPI = async (
 
 export const updateGroupInfoAPI = async (
   conversationId: number,
-  formData: FormData,
+  data: UpdateGroupInfoRequest,
   token: string,
 ) => {
   try {
     const response = (await conversationInstance.updateGroupInfo(
       conversationId,
-      { request: {} as UpdateGroupInfoRequest },
+      { request: data },
       {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-        type: ContentType.FormData,
       },
     ).then(res => res.json())) as SuccessResponse;
     return response;
@@ -147,7 +146,7 @@ export const updateGroupInfoAPI = async (
     console.error("Error updating group info:", error);
     return null;
   }
-};
+}
 
 export const pinConversationAPI = async (
   conversationId: number,
