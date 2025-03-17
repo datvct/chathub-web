@@ -86,7 +86,6 @@ const ChatInfo = ({
       if (selectedChat && userId && token) {
         const details = await getChatDetailSection(selectedChat, userId, token);
         setChatDetail(details || null);
-        console.log("Chat Detail Section Data:", details);
       }
     };
     fetchChatDetails();

@@ -13,7 +13,6 @@ import { RootState } from "~/lib/reudx/store";
 import { UpdateGroupInfoRequest } from "~/codegen/data-contracts";
 import { toast } from "react-toastify";
 
-
 interface ModalUpdateGroupInfoProps {
 	isOpen: boolean;
 	setIsOpen: (open: boolean) => void;
@@ -53,10 +52,15 @@ const ModalUpdateGroupInfo: React.FC<ModalUpdateGroupInfoProps> = ({
 
 		setLoading(true);
 		try {
+			let avatarFileToUpload: File | undefined;
+			if (selectedAvatarFile) {
+				avatarFileToUpload = selectedAvatarFile;
+			}
+
 			const updateRequest: UpdateGroupInfoRequest = {
 				userId: userId,
 				groupName: groupName,
-				avatar: selectedAvatarFile ? selectedAvatarFile : undefined
+				avatar: avatarFileToUpload,
 			};
 
 			const updateSuccess = await updateGroupInfo(conversationId, updateRequest, token);
@@ -117,7 +121,7 @@ const ModalUpdateGroupInfo: React.FC<ModalUpdateGroupInfoProps> = ({
 									<div className="relative flex justify-center mb-6">
 										<label htmlFor="group-avatar-upload" className="relative cursor-pointer">
 											<Image
-												src={groupAvatar || currentGroupAvatar || Images.ProfileImage} // Display current or default avatar
+												src={groupAvatar || currentGroupAvatar || Images.ProfileImage}
 												alt="group avatar"
 												width={100}
 												height={100}
@@ -151,7 +155,6 @@ const ModalUpdateGroupInfo: React.FC<ModalUpdateGroupInfoProps> = ({
 											/>
 										</div>
 									</div>
-
 
 									<div className="mt-6 flex justify-end gap-4 w-full">
 										<Button
