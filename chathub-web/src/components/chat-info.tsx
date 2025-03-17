@@ -63,8 +63,10 @@ const ChatInfo = ({
   const [isOpenConfirmRemove, setIsOpenConfirmRemove] = useState(false);
   const [isOpenSuccessRemove, setIsOpenSuccessRemove] = useState(false);
   const [removeSuccessMessage, setRemoveSuccessMessage] = useState("");
-  const [memberToRemove, setMemberToRemove] = useState<MemberDTO | null>(null);
-  const [isOpenListingGroupMembers, setIsOpenListingGroupMembers] = useState(false);
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [memberToRemove, setMemberToRemove] = useState<number | null>(null);
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string>("");
 
   const token = useSelector((state: RootState) => state.auth.token);
   const userId = useSelector((state: RootState) => state.auth.userId);
@@ -139,35 +141,37 @@ const ChatInfo = ({
 
   const handleRemoveMember = async (participantId: number) => {
     if (!selectedChat || !userId || !token) return;
-
     try {
-      const removeSuccess = await removeParticipantFromGroup(selectedChat, userId, participantId, token);
-
-      if (removeSuccess) {
-        setRemoveSuccessMessage("Member removed from group successfully!");
-        setIsOpenSuccessRemove(true);
-        setIsOpenConfirmRemove(false);
-        if (selectedChat && userId && token) {
-          getChatDetailSection(selectedChat, userId, token);
-        }
-        setMemberToRemove(null);
+      const response = await removeParticipantFromGroup(selectedChat, userId, participantId, token);
+      if (response?.statusCode === 200) {
+        setSuccessMessage("Member removed successfully!");
+        setIsSuccessModalOpen(true);
+        getChatDetailSection(selectedChat, userId, token);
       } else {
-        toast.error("Failed to remove member from group.");
+        toast.error("Failed to remove member.");
       }
     } catch (error) {
       console.error("Error removing member:", error);
-      toast.error("Failed to remove member from group.");
+      toast.error("Failed to remove member.");
     }
   };
 
-  const handleConfirmRemoveMember = (member: MemberDTO) => {
-    setMemberToRemove(member);
-    setIsOpenConfirmRemove(true);
+  const handleRemoveMemberConfirm = () => {
+    if (memberToRemove !== null) {
+      handleRemoveMember(memberToRemove);
+    }
+    setIsConfirmModalOpen(false);
+    setMemberToRemove(null);
   };
 
-  const handleCancelRemoveMember = () => {
-    setIsOpenConfirmRemove(false);
+  const handleRemoveMemberCancel = () => {
+    setIsConfirmModalOpen(false);
     setMemberToRemove(null);
+  };
+
+  const handleRemoveMemberAction = (participantId: number) => {
+    setMemberToRemove(participantId);
+    setIsConfirmModalOpen(true);
   };
 
   const handleOpenUpdateGroupInfoModal = () => {
@@ -385,56 +389,55 @@ const ChatInfo = ({
             <div className="mt-4">
               List members ({chatDetail?.members?.length || 0})
             </div>
-            {/* <div className="mt-3 px-2">
-              {chatDetail?.members?.map((member, i) => (
-                <div key={i} className="flex items-center gap-3 p-2">
-                  <Image
-                    src={member.avatar || Images.AvatarDefault}
-                    alt={"avatar"}
-                    className="w-[3.125rem] h-[3.125rem] rounded-[30px]"
-                    width={50}
-                    height={50}
-                  />
-                  <span>{member.name}</span>
-                </div>
-              ))}
-            </div> */}
 
-            <div className="mt-3 px-2">
-              {chatDetail?.members?.map((member, i) => {
-                const isAdmin = member.is_admin;
-                const isCurrentUserAdmin = chatDetail?.members?.find(m => m.id === userId)?.is_admin || false;
-                const isCurrentUser = member.id === userId;
+            {isGroupChat && (
+              <div className="mt-3 px-2">
+                {chatDetail?.members?.map((member, i) => {
+                  const isAdmin = chatDetail?.members?.find(m => m.id === userId)?.is_admin;
 
-                console.log(`Member: ${member.name}, isAdmin: ${isAdmin}, isCurrentUserAdmin: ${isCurrentUserAdmin}, isCurrentUser: ${isCurrentUser}`);
-
-                return (
-                  <div key={i} className="flex items-center gap-3 p-2 justify-between">
-                    <div className="flex items-center gap-3">
-                      <Image
-                        src={member.avatar || Images.AvatarDefault}
-                        alt={"avatar"}
-                        className="w-[3.125rem] h-[3.125rem] rounded-[30px]"
-                        width={50}
-                        height={50}
-                      />
-                      <div>
-                        <span>{member.name}</span>
-                        {isAdmin && <span className="text-xs text-gray-400 ml-1">(Admin)</span>}
+                  if (member.id === userId) {
+                    return (
+                      <div key={i} className="flex items-center gap-3 p-2 justify-between">
+                        <div className="flex items-center gap-3">
+                          <Image
+                            src={member.avatar || Images.AvatarDefault}
+                            alt={"avatar"}
+                            className="w-[3.125rem] h-[3.125rem] rounded-[30px]"
+                            width={50}
+                            height={50}
+                          />
+                          <span>{member.name} (You) {member.is_admin ? "(Admin)" : ""}</span>
+                        </div>
                       </div>
+                    )
+                  }
+
+                  return (
+                    <div key={i} className="flex items-center gap-3 p-2 justify-between">
+                      <div className="flex items-center gap-3">
+                        <Image
+                          src={member.avatar || Images.AvatarDefault}
+                          alt={"avatar"}
+                          className="w-[3.125rem] h-[3.125rem] rounded-[30px]"
+                          width={50}
+                          height={50}
+                        />
+                        <span>{member.name} {member.is_admin ? "(Admin)" : ""}</span>
+                      </div>
+                      {isAdmin && !member.is_admin && (
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => handleRemoveMemberAction(Number(member.id))}
+                        >
+                          Remove
+                        </Button>
+                      )}
                     </div>
-                    {isGroupChat && isCurrentUserAdmin && !isCurrentUser && !isAdmin && (
-                      <button
-                        onClick={() => handleConfirmRemoveMember(member)}
-                        className="text-red-500 hover:text-red-700"
-                      >
-                        <FaTimesCircle size={20} />
-                      </button>
-                    )}
-                  </div>
-                )
-              })}
-            </div>
+                  )
+                })}
+              </div>
+            )}
           </div>
         </>
       )}
@@ -470,21 +473,17 @@ const ChatInfo = ({
         />
       )}
       <ModalConfirm
-        isOpen={isOpenConfirmRemove}
-        setIsOpen={setIsOpenConfirmRemove}
-        onConfirm={() => {
-          if (memberToRemove) {
-            handleRemoveMember(memberToRemove.id || 0);
-          }
-        }}
-        onCancel={handleCancelRemoveMember}
-        title="Confirm Remove Member"
-        message={`Are you sure you want to remove ${memberToRemove?.name} from the group?`}
+        isOpen={isConfirmModalOpen}
+        setIsOpen={setIsConfirmModalOpen}
+        onConfirm={handleRemoveMemberConfirm}
+        onCancel={handleRemoveMemberCancel}
+        title="Remove Member"
+        message={`Are you sure you want to remove this member from the group?`}
       />
       <ModalSuccess
-        isOpen={isOpenSuccessRemove}
-        setIsOpen={setIsOpenSuccessRemove}
-        message={removeSuccessMessage}
+        isOpen={isSuccessModalOpen}
+        setIsOpen={setIsSuccessModalOpen}
+        message={successMessage}
       />
     </div>
   )
