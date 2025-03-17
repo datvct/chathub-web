@@ -11,7 +11,13 @@ const nextConfig: NextConfig = {
         protocol: 'https',
         hostname: 'chathubbucket0710.s3.amazonaws.com',
         port: '',
-        pathname: '/**', // Cho phép tất cả path
+        pathname: '/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'chathubbucket0710.s3.us-east-1.amazonaws.com',
+        port: '',
+        pathname: '/**',
       },
     ]
   },

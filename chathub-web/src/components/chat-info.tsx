@@ -26,6 +26,8 @@ import { LuUserRoundPlus } from "react-icons/lu"
 import ModalAddMembers from "./modal-add-members"
 import ModalDissolveGroup from "./modal-dissolve-group"
 import ModalUpdateGroupInfo from "./modal-update-group-info"
+import ModalConfirm from "./modal-confirm"
+import ModalSuccess from "./modal-success"
 
 interface ChatInfoProps {
   isOpen?: boolean;
@@ -36,10 +38,10 @@ interface ChatInfoProps {
 }
 
 interface Member {
-  name: string
-  phone: string
-  image: any
-  selected?: boolean
+  name: string;
+  phone: string;
+  image: any;
+  selected?: boolean;
 }
 
 const ChatInfo = ({
@@ -49,34 +51,42 @@ const ChatInfo = ({
   setIsChatInfoOpen,
   onPinChange,
 }: ChatInfoProps) => {
-  const [isOpenLeaveGroup, setIsOpenLeaveGroup] = useState(false)
-  const [isAddingMember, setIsAddingMember] = useState(false)
-  const [isOpenAddMembers, setIsOpenAddMembers] = useState(false)
-  const [isOpenDissolveGroup, setIsOpenDissolveGroup] = useState(false)
-  const [isMuted, setIsMuted] = useState<boolean>(false)
-  const [isOpenUpdateGroupInfo, setIsOpenUpdateGroupInfo] = useState(false)
+  const router = useRouter();
+
+  const [isOpenLeaveGroup, setIsOpenLeaveGroup] = useState(false);
+  const [isAddingMember, setIsAddingMember] = useState(false);
+  const [isOpenAddMembers, setIsOpenAddMembers] = useState(false);
+  const [isOpenDissolveGroup, setIsOpenDissolveGroup] = useState(false);
+  const [isMuted, setIsMuted] = useState<boolean>(false);
+  const [isOpenUpdateGroupInfo, setIsOpenUpdateGroupInfo] = useState(false);
+  const [isOpenConfirmRemove, setIsOpenConfirmRemove] = useState(false);
+  const [isOpenSuccessRemove, setIsOpenSuccessRemove] = useState(false);
+  const [removeSuccessMessage, setRemoveSuccessMessage] = useState("");
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+  const [memberToRemove, setMemberToRemove] = useState<number | null>(null);
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const [successMessage, setSuccessMessage] = useState<string>("");
 
   const token = useSelector((state: RootState) => state.auth.token);
   const userId = useSelector((state: RootState) => state.auth.userId);
 
   const {
     getChatDetailSection,
-    loading: detailLoading,
-    error: detailError,
+    removeParticipantFromGroup,
     pinConversation,
     deleteConversation,
-    loading: deleteLoading
   } = useConversation();
   const [chatDetail, setChatDetail] = useState<ChatDetailSectionResponse | null>(null);
   const [isPinned, setIsPinned] = useState(false);
   const [isDeletingConversation, setIsDeletingConversation] = useState<boolean>(false);
-  const router = useRouter();
+  const isCurrentUserAdmin = chatDetail?.members?.find((m) => m.id === userId)?.is_admin || false;
 
   useEffect(() => {
     const fetchChatDetails = async () => {
       if (selectedChat && userId && token) {
         const details = await getChatDetailSection(selectedChat, userId, token);
         setChatDetail(details || null);
+        console.log("Chat Detail Section Data:", details);
       }
     };
     fetchChatDetails();
@@ -84,7 +94,7 @@ const ChatInfo = ({
 
   const handleMuteConversation = () => {
     setIsMuted(!isMuted);
-    toast.success(`${isMuted ? 'Unmuted' : 'Muted'} conversation successfully!`);
+    toast.success(`${isMuted ? "Unmuted" : "Muted"} conversation successfully!`);
   };
 
   const handlePinConversation = async () => {
@@ -97,7 +107,7 @@ const ChatInfo = ({
         if (onPinChange) {
           onPinChange();
         }
-        toast.success(`Conversation ${newPinState ? 'pinned' : 'unpinned'} successfully!`);
+        toast.success(`Conversation ${newPinState ? "pinned" : "unpinned"} successfully!`);
       } else {
         toast.error("Failed to pin conversation.");
       }
@@ -114,7 +124,7 @@ const ChatInfo = ({
       const deleteSuccess = await deleteConversation(selectedChat, userId, token);
       if (deleteSuccess) {
         setIsChatInfoOpen(false);
-        router.push('/');
+        router.push("/");
         toast.success("Chat history deleted successfully!");
       } else {
         toast.error("Failed to delete chat history.");
@@ -127,6 +137,42 @@ const ChatInfo = ({
     }
   };
 
+  const handleRemoveMember = async (participantId: number) => {
+    if (!selectedChat || !userId || !token) return;
+    try {
+      const response = await removeParticipantFromGroup(selectedChat, userId, participantId, token);
+      if (response?.statusCode === 200) {
+        setSuccessMessage("Member removed successfully!");
+        setIsSuccessModalOpen(true);
+        getChatDetailSection(selectedChat, userId, token);
+      } else {
+        toast.error("Failed to remove member.");
+      }
+    } catch (error) {
+      console.error("Error removing member:", error);
+      toast.error("Failed to remove member.");
+    }
+  };
+
+  const handleRemoveMemberConfirm = () => {
+    if (memberToRemove !== null) {
+      handleRemoveMember(memberToRemove);
+    }
+    setIsConfirmModalOpen(false);
+    setMemberToRemove(null);
+  };
+
+  const handleRemoveMemberCancel = () => {
+    setIsConfirmModalOpen(false);
+    setMemberToRemove(null);
+  };
+
+  const handleRemoveMemberAction = (participantId: number) => {
+    setMemberToRemove(participantId);
+    setIsConfirmModalOpen(true);
+  };
+
+
   const handleOpenUpdateGroupInfoModal = () => {
     setIsOpenUpdateGroupInfo(true);
   };
@@ -138,7 +184,7 @@ const ChatInfo = ({
   if (!isOpen) return null;
 
   const handleAddMembers = (members: Member[]) => {
-    setIsAddingMember(false)
+    setIsAddingMember(false);
   };
 
   const handleMembersAddedSuccess = () => {
@@ -146,6 +192,7 @@ const ChatInfo = ({
       getChatDetailSection(selectedChat, userId, token);
     }
   };
+
 
   return (
     <div className="bg-[#292929] text-white h-screen overflow-hidden overflow-y-auto w-1/4 p-4">
@@ -180,9 +227,7 @@ const ChatInfo = ({
                       <GoBell size={20} color="white" className="text-white" />
                     )}
                   </button>
-                  <span>
-                    {isMuted ? 'Unmute' : 'Mute'}
-                  </span>
+                  <span>{isMuted ? "Unmute" : "Mute"}</span>
                 </div>
                 {isGroupChat && (
                   <div className="flex items-center flex-col">
@@ -201,11 +246,6 @@ const ChatInfo = ({
                     onClick={handlePinConversation}
                   >
                     <BsPinAngleFill size={20} color="white" className="text-white" />
-                    {/* {pinLoading ? (
-                      <div>Loading...</div>
-                    ) : (
-                      <BsPinAngleFill size={20} color="white" className="text-white" />
-                    )} */}
                   </button>
                   <span className="whitespace-nowrap">Pin</span>
                 </div>
@@ -217,9 +257,7 @@ const ChatInfo = ({
                     >
                       <IoSettingsOutline size={20} color="white" className="text-white" />
                     </button>
-                    <span className="whitespace-nowrap">
-                      Manage group
-                    </span>
+                    <span className="whitespace-nowrap">Manage group</span>
                   </div>
                 )}
               </div>
@@ -227,29 +265,72 @@ const ChatInfo = ({
 
             {isGroupChat && (
               <div className="mt-4">
-                <h3 className="text-md font-semibold">Group Members</h3>
-                <button className="mt-3 px-3 w-full flex gap-2" onClick={() => setIsAddingMember(true)}>
-                  <LuUserRound size={20} color="white" />
-                  <span>
-                    {chatDetail?.members?.length} Memebers
-                  </span>
-                </button>
+                <h3 className="text-md font-semibold">
+                  Listing Members ({chatDetail?.members?.length} Members)
+                </h3>
+                <Button className="mt-3 px-3 w-full flex gap-2" onClick={() => setIsOpenAddMembers(true)}>
+                  <LuUserRoundPlus size={20} color="white" />
+                  <span className="text-sm">Add member</span>
+                </Button>
+                <div className="mt-3 px-2">
+                  {chatDetail?.members?.map((member, i) => {
+                    const isAdmin = chatDetail?.members?.find((m) => m.id === userId)?.is_admin;
+
+                    if (member.id === userId) {
+                      return (
+                        <div key={i} className="flex items-center gap-3 p-2 justify-between">
+                          <div className="flex items-center gap-3">
+                            <Image
+                              src={member.avatar || Images.AvatarDefault}
+                              alt={"avatar"}
+                              className="w-[3.125rem] h-[3.125rem] rounded-[30px]"
+                              width={50}
+                              height={50}
+                            />
+                            <span>
+                              {member.name} (You) {member.is_admin ? "(Admin)" : ""}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    }
+
+                    return (
+                      <div
+                        key={i}
+                        className="flex items-center gap-3 p-2 justify-between"
+                      >
+                        <div className="flex items-center gap-3">
+                          <Image
+                            src={member.avatar || Images.AvatarDefault}
+                            alt={"avatar"}
+                            className="w-[3.125rem] h-[3.125rem] rounded-[30px]"
+                            width={50}
+                            height={50}
+                          />
+                          <span>
+                            {member.name} {member.is_admin ? "(Admin)" : ""}
+                          </span>
+                        </div>
+                        {isAdmin && !member.is_admin && (
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => handleRemoveMemberAction(Number(member.id))}
+                          >
+                            Remove
+                          </Button>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             )}
 
             <div className="mt-4">
               <h3 className="text-md font-semibold">Photos/ Videos</h3>
               <div className="grid grid-cols-4 gap-x-2 gap-y-4 mt-3 px-2">
-                {/* {[...Array(8)].map((_, i) => (
-                  <Image
-                    key={i}
-                    src={Images.ImageDefault}
-                    className="w-20 h-20 object-cover"
-                    alt="Media"
-                    width={80}
-                    height={80}
-                  />
-                ))} */}
                 {chatDetail?.list_media?.map((media, index) => (
                   <Image
                     key={index}
@@ -267,9 +348,16 @@ const ChatInfo = ({
               <h3 className="text-md font-semibold">File</h3>
               <div className="flex flex-col gap-3 mt-3 px-2">
                 {[...Array(2)].map((_, i) => (
-                  <div key={i} className="flex items-center gap-3 justify-between">
+                  <div
+                    key={i}
+                    className="flex items-center gap-3 justify-between"
+                  >
                     <div className="flex items-center gap-3">
-                      <FaRegFile size={40} color="white" className="text-white" />
+                      <FaRegFile
+                        size={40}
+                        color="white"
+                        className="text-white"
+                      />
                       <div>
                         <p className="text-lg">File Name</p>
                         <p className="text-xs text-[#838383]">1.2 MB</p>
@@ -284,7 +372,10 @@ const ChatInfo = ({
               <h3 className="text-md font-semibold">Link</h3>
               <div className="flex flex-col gap-3 mt-3 px-2">
                 {[...Array(2)].map((_, i) => (
-                  <div key={i} className="flex items-center gap-3 justify-between">
+                  <div
+                    key={i}
+                    className="flex items-center gap-3 justify-between"
+                  >
                     <div className="flex items-center gap-3">
                       <FaLink size={40} color="white" className="text-white" />
                       <div>
@@ -306,14 +397,24 @@ const ChatInfo = ({
                       className="flex items-center gap-3"
                       onClick={() => setIsOpenLeaveGroup(true)}
                     >
-                      <HiOutlineArrowRightEndOnRectangle size={25} color="red" className="font-semibold" />
-                      <span className="text-sm text-[#FF0000] font-semibold leading-[25px]">Leave group</span>
+                      <HiOutlineArrowRightEndOnRectangle
+                        size={25}
+                        color="red"
+                        className="font-semibold"
+                      />
+                      <span className="text-sm text-[#FF0000] font-semibold leading-[25px]">
+                        Leave group
+                      </span>
                     </button>
                     <button
                       className="flex items-center gap-3"
                       onClick={() => setIsOpenDissolveGroup(true)}
                     >
-                      <HiOutlineArrowRightEndOnRectangle size={25} color="red" className="font-semibold" />
+                      <HiOutlineArrowRightEndOnRectangle
+                        size={25}
+                        color="red"
+                        className="font-semibold"
+                      />
                       <span className="text-sm text-[#FF0000] font-semibold leading-[25px]">
                         Dissolve Group
                       </span>
@@ -321,8 +422,14 @@ const ChatInfo = ({
                   </>
                 ) : (
                   <button className="flex items-center gap-3">
-                    <MdBlock size={25} color="white" className="text-white font-semibold" />
-                    <span className="text-sm font-semibold leading-[25px]">Block</span>
+                    <MdBlock
+                      size={25}
+                      color="white"
+                      className="text-white font-semibold"
+                    />
+                    <span className="text-sm font-semibold leading-[25px]">
+                      Block
+                    </span>
                   </button>
                 )}
 
@@ -330,7 +437,11 @@ const ChatInfo = ({
                   className="flex items-center gap-3"
                   onClick={handleDeleteChatHistory}
                 >
-                  <CgTrashEmpty size={25} color="red" className="text-red font-semibold" />
+                  <CgTrashEmpty
+                    size={25}
+                    color="red"
+                    className="text-red font-semibold"
+                  />
                   <span className="text-sm font-semibold leading-[25px] text-[#FF0000]">
                     Delete chat history
                   </span>
@@ -346,11 +457,14 @@ const ChatInfo = ({
               <FaChevronLeft size={20} color="white" />
             </button>
             <div className="text-2xl ml-[35%] text-center font-semibold flex justify-center">
-              <span>Memeber</span>
+              <span>Member</span>
             </div>
           </div>
           <div className="mt-4">
-            <Button className="w-full bg-[#D9D9D9] hover:bg-white" onClick={() => setIsOpenAddMembers(true)}>
+            <Button
+              className="w-full bg-[#D9D9D9] hover:bg-white"
+              onClick={() => setIsOpenAddMembers(true)}
+            >
               <LuUserRoundPlus size={30} color="black" />
               <span className="text-black text-sm">Add member</span>
             </Button>
@@ -358,18 +472,60 @@ const ChatInfo = ({
               List members ({chatDetail?.members?.length || 0})
             </div>
             <div className="mt-3 px-2">
-              {chatDetail?.members?.map((member, i) => (
-                <div key={i} className="flex items-center gap-3 p-2">
-                  <Image
-                    src={member.avatar || Images.AvatarDefault}
-                    alt={"avatar"}
-                    className="w-[3.125rem] h-[3.125rem] rounded-[30px]"
-                    width={50}
-                    height={50}
-                  />
-                  <span>{member.name}</span>
-                </div>
-              ))}
+              {chatDetail?.members?.map((member, i) => {
+                const isAdmin = chatDetail?.members?.find((m) => m.id === userId)?.is_admin;
+
+                if (member.id === userId) {
+                  return (
+                    <div
+                      key={i}
+                      className="flex items-center gap-3 p-2 justify-between"
+                    >
+                      <div className="flex items-center gap-3">
+                        <Image
+                          src={member.avatar || Images.AvatarDefault}
+                          alt={"avatar"}
+                          className="w-[3.125rem] h-[3.125rem] rounded-[30px]"
+                          width={50}
+                          height={50}
+                        />
+                        <span>
+                          {member.name} (You) {member.is_admin ? "(Admin)" : ""}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                }
+
+                return (
+                  <div
+                    key={i}
+                    className="flex items-center gap-3 p-2 justify-between"
+                  >
+                    <div className="flex items-center gap-3">
+                      <Image
+                        src={member.avatar || Images.AvatarDefault}
+                        alt={"avatar"}
+                        className="w-[3.125rem] h-[3.125rem] rounded-[30px]"
+                        width={50}
+                        height={50}
+                      />
+                      <span>
+                        {member.name} {member.is_admin ? "(Admin)" : ""}
+                      </span>
+                    </div>
+                    {isAdmin && !member.is_admin && (
+                      <Button
+                        variant="destructive"
+                        size="sm"
+                        onClick={() => handleRemoveMemberAction(Number(member.id))}
+                      >
+                        Remove
+                      </Button>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
         </>
@@ -387,13 +543,15 @@ const ChatInfo = ({
         <ModalLeaveGroup
           isOpen={isOpenLeaveGroup}
           setIsOpen={setIsOpenLeaveGroup}
-          chatId={selectedChat} />
+          chatId={selectedChat}
+        />
       )}
       {isOpenDissolveGroup && (
         <ModalDissolveGroup
           isOpen={isOpenDissolveGroup}
           setIsOpen={setIsOpenDissolveGroup}
-          chatId={selectedChat} />
+          chatId={selectedChat}
+        />
       )}
       {isOpenUpdateGroupInfo && (
         <ModalUpdateGroupInfo
@@ -405,8 +563,21 @@ const ChatInfo = ({
           onGroupInfoUpdated={handleGroupInfoUpdatedSuccess}
         />
       )}
+      <ModalConfirm
+        isOpen={isConfirmModalOpen}
+        setIsOpen={setIsConfirmModalOpen}
+        onConfirm={handleRemoveMemberConfirm}
+        onCancel={handleRemoveMemberCancel}
+        title="Remove Member"
+        message={`Are you sure you want to remove this member from the group?`}
+      />
+      <ModalSuccess
+        isOpen={isSuccessModalOpen}
+        setIsOpen={setIsSuccessModalOpen}
+        message={successMessage}
+      />
     </div>
-  )
-}
+  );
+};
 
-export default ChatInfo
+export default ChatInfo;
