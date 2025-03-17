@@ -163,9 +163,9 @@ const ChatList = ({
               if (!a.pinned && b.pinned) return 1;
               return 0;
             })
-            .map(chat => (
+            .map((chat, index) => (
               <li
-                key={chat.id}
+                key={`${chat.id}-${index}`}
                 className={`flex items-center gap-3 p-2 rounded-lg hover:cursor-pointer`}
                 onClick={() => handleSelectChat(chat.id, chat, chat.chatType === "GROUP")}
               >

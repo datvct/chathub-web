@@ -7,7 +7,7 @@ import { Images } from "~/constants/images"
 import { useConversation } from "~/hooks/use-converstation";
 import { useSelector } from "react-redux";
 import { RootState } from "~/lib/reudx/store";
-import { ChatDetailSectionResponse } from "~/codegen/data-contracts";
+import { ChatDetailSectionResponse, MemberDTO, UserDTO } from "~/codegen/data-contracts";
 import { toast } from "react-toastify";
 import { GoBell, GoBellSlash } from "react-icons/go"
 import { BsPinAngleFill } from "react-icons/bs"
@@ -21,11 +21,14 @@ import { LuUserRound } from "react-icons/lu"
 import { HiOutlineArrowRightEndOnRectangle } from "react-icons/hi2"
 import ModalLeaveGroup from "./modal-leave-group"
 import { FaChevronLeft } from "react-icons/fa6"
+import { FaTimesCircle } from "react-icons/fa";
 import { Button } from "./ui/button"
 import { LuUserRoundPlus } from "react-icons/lu"
 import ModalAddMembers from "./modal-add-members"
 import ModalDissolveGroup from "./modal-dissolve-group"
 import ModalUpdateGroupInfo from "./modal-update-group-info"
+import ModalConfirm from "./modal-confirm"
+import ModalSuccess from "./modal-success"
 
 interface ChatInfoProps {
   isOpen?: boolean;
@@ -49,34 +52,41 @@ const ChatInfo = ({
   setIsChatInfoOpen,
   onPinChange,
 }: ChatInfoProps) => {
+  const router = useRouter();
+
   const [isOpenLeaveGroup, setIsOpenLeaveGroup] = useState(false)
   const [isAddingMember, setIsAddingMember] = useState(false)
   const [isOpenAddMembers, setIsOpenAddMembers] = useState(false)
   const [isOpenDissolveGroup, setIsOpenDissolveGroup] = useState(false)
   const [isMuted, setIsMuted] = useState<boolean>(false)
   const [isOpenUpdateGroupInfo, setIsOpenUpdateGroupInfo] = useState(false)
+  const [isOpenConfirmRemove, setIsOpenConfirmRemove] = useState(false);
+  const [isOpenSuccessRemove, setIsOpenSuccessRemove] = useState(false);
+  const [removeSuccessMessage, setRemoveSuccessMessage] = useState("");
+  const [memberToRemove, setMemberToRemove] = useState<MemberDTO | null>(null);
+  const [isOpenListingGroupMembers, setIsOpenListingGroupMembers] = useState(false);
 
   const token = useSelector((state: RootState) => state.auth.token);
   const userId = useSelector((state: RootState) => state.auth.userId);
 
   const {
     getChatDetailSection,
-    loading: detailLoading,
-    error: detailError,
+    removeParticipantFromGroup,
     pinConversation,
     deleteConversation,
-    loading: deleteLoading
   } = useConversation();
   const [chatDetail, setChatDetail] = useState<ChatDetailSectionResponse | null>(null);
   const [isPinned, setIsPinned] = useState(false);
   const [isDeletingConversation, setIsDeletingConversation] = useState<boolean>(false);
-  const router = useRouter();
+  const isCurrentUserAdmin = chatDetail?.members?.find(m => m.id === userId)?.is_admin || false;
+
 
   useEffect(() => {
     const fetchChatDetails = async () => {
       if (selectedChat && userId && token) {
         const details = await getChatDetailSection(selectedChat, userId, token);
         setChatDetail(details || null);
+        console.log("Chat Detail Section Data:", details);
       }
     };
     fetchChatDetails();
@@ -125,6 +135,39 @@ const ChatInfo = ({
     } finally {
       setIsDeletingConversation(false);
     }
+  };
+
+  const handleRemoveMember = async (participantId: number) => {
+    if (!selectedChat || !userId || !token) return;
+
+    try {
+      const removeSuccess = await removeParticipantFromGroup(selectedChat, userId, participantId, token);
+
+      if (removeSuccess) {
+        setRemoveSuccessMessage("Member removed from group successfully!");
+        setIsOpenSuccessRemove(true);
+        setIsOpenConfirmRemove(false);
+        if (selectedChat && userId && token) {
+          getChatDetailSection(selectedChat, userId, token);
+        }
+        setMemberToRemove(null);
+      } else {
+        toast.error("Failed to remove member from group.");
+      }
+    } catch (error) {
+      console.error("Error removing member:", error);
+      toast.error("Failed to remove member from group.");
+    }
+  };
+
+  const handleConfirmRemoveMember = (member: MemberDTO) => {
+    setMemberToRemove(member);
+    setIsOpenConfirmRemove(true);
+  };
+
+  const handleCancelRemoveMember = () => {
+    setIsOpenConfirmRemove(false);
+    setMemberToRemove(null);
   };
 
   const handleOpenUpdateGroupInfoModal = () => {
@@ -201,11 +244,6 @@ const ChatInfo = ({
                     onClick={handlePinConversation}
                   >
                     <BsPinAngleFill size={20} color="white" className="text-white" />
-                    {/* {pinLoading ? (
-                      <div>Loading...</div>
-                    ) : (
-                      <BsPinAngleFill size={20} color="white" className="text-white" />
-                    )} */}
                   </button>
                   <span className="whitespace-nowrap">Pin</span>
                 </div>
@@ -240,16 +278,6 @@ const ChatInfo = ({
             <div className="mt-4">
               <h3 className="text-md font-semibold">Photos/ Videos</h3>
               <div className="grid grid-cols-4 gap-x-2 gap-y-4 mt-3 px-2">
-                {/* {[...Array(8)].map((_, i) => (
-                  <Image
-                    key={i}
-                    src={Images.ImageDefault}
-                    className="w-20 h-20 object-cover"
-                    alt="Media"
-                    width={80}
-                    height={80}
-                  />
-                ))} */}
                 {chatDetail?.list_media?.map((media, index) => (
                   <Image
                     key={index}
@@ -357,7 +385,7 @@ const ChatInfo = ({
             <div className="mt-4">
               List members ({chatDetail?.members?.length || 0})
             </div>
-            <div className="mt-3 px-2">
+            {/* <div className="mt-3 px-2">
               {chatDetail?.members?.map((member, i) => (
                 <div key={i} className="flex items-center gap-3 p-2">
                   <Image
@@ -370,6 +398,42 @@ const ChatInfo = ({
                   <span>{member.name}</span>
                 </div>
               ))}
+            </div> */}
+
+            <div className="mt-3 px-2">
+              {chatDetail?.members?.map((member, i) => {
+                const isAdmin = member.is_admin;
+                const isCurrentUserAdmin = chatDetail?.members?.find(m => m.id === userId)?.is_admin || false;
+                const isCurrentUser = member.id === userId;
+
+                console.log(`Member: ${member.name}, isAdmin: ${isAdmin}, isCurrentUserAdmin: ${isCurrentUserAdmin}, isCurrentUser: ${isCurrentUser}`);
+
+                return (
+                  <div key={i} className="flex items-center gap-3 p-2 justify-between">
+                    <div className="flex items-center gap-3">
+                      <Image
+                        src={member.avatar || Images.AvatarDefault}
+                        alt={"avatar"}
+                        className="w-[3.125rem] h-[3.125rem] rounded-[30px]"
+                        width={50}
+                        height={50}
+                      />
+                      <div>
+                        <span>{member.name}</span>
+                        {isAdmin && <span className="text-xs text-gray-400 ml-1">(Admin)</span>}
+                      </div>
+                    </div>
+                    {isGroupChat && isCurrentUserAdmin && !isCurrentUser && !isAdmin && (
+                      <button
+                        onClick={() => handleConfirmRemoveMember(member)}
+                        className="text-red-500 hover:text-red-700"
+                      >
+                        <FaTimesCircle size={20} />
+                      </button>
+                    )}
+                  </div>
+                )
+              })}
             </div>
           </div>
         </>
@@ -405,6 +469,23 @@ const ChatInfo = ({
           onGroupInfoUpdated={handleGroupInfoUpdatedSuccess}
         />
       )}
+      <ModalConfirm
+        isOpen={isOpenConfirmRemove}
+        setIsOpen={setIsOpenConfirmRemove}
+        onConfirm={() => {
+          if (memberToRemove) {
+            handleRemoveMember(memberToRemove.id || 0);
+          }
+        }}
+        onCancel={handleCancelRemoveMember}
+        title="Confirm Remove Member"
+        message={`Are you sure you want to remove ${memberToRemove?.name} from the group?`}
+      />
+      <ModalSuccess
+        isOpen={isOpenSuccessRemove}
+        setIsOpen={setIsOpenSuccessRemove}
+        message={removeSuccessMessage}
+      />
     </div>
   )
 }

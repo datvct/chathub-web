@@ -61,6 +61,8 @@ export interface BlockRequest {
 
 export interface ReactionRequest {
   /** @format int64 */
+  conversationId?: number
+  /** @format int64 */
   messageId?: number
   /** @format int64 */
   userId?: number
