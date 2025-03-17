@@ -119,6 +119,21 @@ export class User<SecurityDataType = unknown> extends HttpClient<SecurityDataTyp
    * No description
    *
    * @tags user-controller
+   * @name FindUserByUserId
+   * @request GET:/user/findUserById/{userId}
+   * @secure
+   */
+  findUserByUserId = (userId: number, params: RequestParams = {}) =>
+    this.request<UserDTO, ErrorResponse>({
+      path: `/user/findUserById/${userId}`,
+      method: "GET",
+      secure: true,
+      ...params,
+    })
+  /**
+   * No description
+   *
+   * @tags user-controller
    * @name UnblockUser
    * @request DELETE:/user/unblock-user
    * @secure
