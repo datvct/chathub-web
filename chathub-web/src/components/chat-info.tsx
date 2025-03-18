@@ -10,6 +10,8 @@ import { RootState } from "~/lib/reudx/store";
 import { ChatDetailSectionResponse, ConversationResponse } from "~/codegen/data-contracts";
 import { toast } from "react-toastify";
 import { GoBell, GoBellSlash } from "react-icons/go"
+import { BsPinAngleFill } from "react-icons/bs"
+import { RiUnpinFill } from "react-icons/ri"
 import { FaRegFile } from "react-icons/fa"
 import { FaLink } from "react-icons/fa6"
 import { MdBlock } from "react-icons/md"
@@ -27,8 +29,7 @@ import ModalDissolveGroup from "./modal-dissolve-group"
 import ModalUpdateGroupInfo from "./modal-update-group-info"
 import ModalConfirm from "./modal-confirm"
 import ModalSuccess from "./modal-success"
-import { BsPinAngleFill } from "react-icons/bs"
-import { RiUnpinFill } from "react-icons/ri"
+import { getRecentConversationByUserID } from "~/lib/get-conversation"
 
 interface ChatInfoProps {
   isOpen?: boolean;
@@ -90,7 +91,21 @@ const ChatInfo = ({
       }
     };
     fetchChatDetails();
-  }, [selectedChat, userId, token, getChatDetailSection]);
+  }, [selectedChat, userId, token]);
+
+  useEffect(() => {
+    const fetchRecentConversations = async () => {
+      if (userId && token) {
+        const recentConversations = await getRecentConversationByUserID(userId, token);
+        console.log("Recent Conversations:", recentConversations);
+        if (recentConversations) {
+          const pinnedConversation = recentConversations.find(convo => convo.id === selectedChat);
+          setIsPinned(pinnedConversation?.pinned || false);
+        }
+      }
+    };
+    fetchRecentConversations();
+  }, [userId, token, selectedChat]);
 
   const handleMuteConversation = () => {
     setIsMuted(!isMuted);
@@ -107,11 +122,11 @@ const ChatInfo = ({
         if (onPinChange) {
           onPinChange();
         }
-        toast.success(`Conversation ${newPinState ? 'pinned' : 'unpinned'} successfully!`);
+        toast.success(`Conversation ${newPinState ? "pinned" : "unpinned"} successfully!`);
       } else {
         toast.error("Failed to pin conversation.");
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error("Error pinning conversation:", error);
       toast.error("Failed to pin conversation.");
     }
@@ -245,14 +260,14 @@ const ChatInfo = ({
                     className="bg-[#484848] h-10 w-10 rounded-full flex items-center justify-center"
                     onClick={handlePinConversation}
                   >
-                    {!isPinned ? (
-                      <BsPinAngleFill size={20} color="white" className="text-white" />
-                    ) : (
+                    {isPinned ? (
                       <RiUnpinFill size={20} color="white" className="text-white" />
+                    ) : (
+                      <BsPinAngleFill size={20} color="white" className="text-white" />
                     )}
                   </button>
                   <span className="whitespace-nowrap">
-                    {!isPinned ? "Pin" : "Unpin"}
+                    {isPinned ? "Unpin" : "Pin"}
                   </span>
                 </div>
                 {isGroupChat && (
