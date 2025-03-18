@@ -7,10 +7,9 @@ import { Images } from "~/constants/images"
 import { useConversation } from "~/hooks/use-converstation";
 import { useSelector } from "react-redux";
 import { RootState } from "~/lib/reudx/store";
-import { ChatDetailSectionResponse } from "~/codegen/data-contracts";
+import { ChatDetailSectionResponse, ConversationResponse } from "~/codegen/data-contracts";
 import { toast } from "react-toastify";
 import { GoBell, GoBellSlash } from "react-icons/go"
-import { BsPinAngleFill } from "react-icons/bs"
 import { FaRegFile } from "react-icons/fa"
 import { FaLink } from "react-icons/fa6"
 import { MdBlock } from "react-icons/md"
@@ -28,6 +27,8 @@ import ModalDissolveGroup from "./modal-dissolve-group"
 import ModalUpdateGroupInfo from "./modal-update-group-info"
 import ModalConfirm from "./modal-confirm"
 import ModalSuccess from "./modal-success"
+import { BsPinAngleFill } from "react-icons/bs"
+import { RiUnpinFill } from "react-icons/ri"
 
 interface ChatInfoProps {
   isOpen?: boolean;
@@ -86,7 +87,6 @@ const ChatInfo = ({
       if (selectedChat && userId && token) {
         const details = await getChatDetailSection(selectedChat, userId, token);
         setChatDetail(details || null);
-        console.log("Chat Detail Section Data:", details);
       }
     };
     fetchChatDetails();
@@ -107,11 +107,11 @@ const ChatInfo = ({
         if (onPinChange) {
           onPinChange();
         }
-        toast.success(`Conversation ${newPinState ? "pinned" : "unpinned"} successfully!`);
+        toast.success(`Conversation ${newPinState ? 'pinned' : 'unpinned'} successfully!`);
       } else {
         toast.error("Failed to pin conversation.");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error pinning conversation:", error);
       toast.error("Failed to pin conversation.");
     }
@@ -245,9 +245,15 @@ const ChatInfo = ({
                     className="bg-[#484848] h-10 w-10 rounded-full flex items-center justify-center"
                     onClick={handlePinConversation}
                   >
-                    <BsPinAngleFill size={20} color="white" className="text-white" />
+                    {!isPinned ? (
+                      <BsPinAngleFill size={20} color="white" className="text-white" />
+                    ) : (
+                      <RiUnpinFill size={20} color="white" className="text-white" />
+                    )}
                   </button>
-                  <span className="whitespace-nowrap">Pin</span>
+                  <span className="whitespace-nowrap">
+                    {!isPinned ? "Pin" : "Unpin"}
+                  </span>
                 </div>
                 {isGroupChat && (
                   <div className="flex items-center flex-col">
