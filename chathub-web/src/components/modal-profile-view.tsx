@@ -122,13 +122,14 @@ const ProfileViewModal: React.FC<ProfileViewModalProps> = ({ isOpen, setIsOpen, 
 										<label htmlFor="date-of-birth" className="block text-sm font-medium text-black">
 											Date of Birth
 										</label>
-										<div className="mt-1">
-											<div className="mt-1">
-												<Input
-													type="text"
-													value={dayjs(profileData.dateOfBirth).format("MMMM D, YYYY")}
-													readOnly
-													className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400 focus:outline-none"
+
+										<LocalizationProvider dateAdapter={AdapterDayjs}>
+											<DemoContainer components={["DatePicker"]}>
+												<DatePicker
+													label="Date of Birth"
+													value={date}
+													onChange={handleDateOfBirth}
+													className="w-full block bg-white border border-slate-300"
 												/>
 											</div>
 										</div>

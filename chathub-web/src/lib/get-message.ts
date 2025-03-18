@@ -4,11 +4,11 @@ import { Message } from "~/codegen/Message";
 const messageInstance = new Message({ baseUrl: process.env.API_URL });
 
 
-export const getMessageByConversationId = async (conversationId: number, token: string) => {
+export const getMessageByConversationId = async (conversationId: number, userId: number, token: string) => {
     try {
         if (!conversationId) return null;
 
-        const response = await messageInstance.getMessages(conversationId, {
+        const response = await messageInstance.getMessages(conversationId, { userId: userId }, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
