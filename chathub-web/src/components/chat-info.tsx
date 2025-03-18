@@ -97,11 +97,8 @@ const ChatInfo = ({
     const fetchRecentConversations = async () => {
       if (userId && token) {
         const recentConversations = await getRecentConversationByUserID(userId, token);
-        console.log("Recent Conversations:", recentConversations);
-        if (recentConversations) {
-          const pinnedConversation = recentConversations.find(convo => convo.id === selectedChat);
-          setIsPinned(pinnedConversation?.pinned || false);
-        }
+        const pinnedConversations = recentConversations.filter(conversation => conversation.pinned);
+        console.log("Pinned Conversations:", pinnedConversations);
       }
     };
     fetchRecentConversations();

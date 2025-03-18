@@ -12,18 +12,18 @@ import ChangePasswordModal from "./modal-change-password"
 import ModalFriendList from "./modal-friend-list"
 import ModalFriendRequests from "./modal-friend-requests"
 import ModalListGroup from "./modal-list-group"
-import ChatInfo from "./chat-info"
 import { useSelector } from "react-redux"
 import { RootState } from "~/lib/reudx/store"
 import { useConversation } from "~/hooks/use-converstation"
 import { ConversationResponse } from "~/codegen/data-contracts"
 import { BsPinAngleFill } from "react-icons/bs"
+import { RiUnpinFill } from "react-icons/ri"
 
 interface ChatListProps {
   setSelectedChat: (id: number) => void;
   setIsGroupChat: (isGroup: boolean) => void;
   setConversationData?: (data: ConversationResponse) => void;
-  onPinChange: () => boolean;
+  onPinChange: () => void;
 }
 
 const ChatList = ({
@@ -34,7 +34,6 @@ const ChatList = ({
 }: ChatListProps) => {
   const userId = useSelector((state: RootState) => state.auth.userId)
   const token = useSelector((state: RootState) => state.auth.token)
-
   const [modalCreateChatOpen, setModalCreateNewChatOpen] = useState(false)
   const [modalCreateGroupChatOpen, setModalCreateNewGroupChatOpen] = useState(false)
   const [modalProfileOpen, setModalProfileOpen] = useState(false)
@@ -43,8 +42,6 @@ const ChatList = ({
   const [isFriendListModalOpen, setIsFriendListModalOpen] = useState(false)
   const [isFriendRequestModalOpen, setIsFriendRequestModalOpen] = useState(false)
   const [modalListGroup, setModalListGroup] = useState(false)
-  const [selectedChat, setSelectedChatId] = useState<number | null>(null)
-  const [isChatInfoOpen, setIsChatInfoOpen] = useState(false)
   const { getRecentConversation } = useConversation()
   const [dataConversation, setDataConversation] = useState<ConversationResponse[]>([])
   const [needRefetchConversations, setNeedRefetchConversations] = useState(false)
@@ -93,17 +90,11 @@ const ChatList = ({
     setSelectedChat(id)
     setConversationData(converstation)
     setIsGroupChat(isGroup || false)
-    setIsChatInfoOpen(true)
   }
 
   const formatTime = (timestamp: string) => {
     const date = new Date(timestamp)
     return `${date.getHours()}:${date.getMinutes()}`
-  }
-
-  const handlePinChange = (isPinned: boolean) => {
-    setNeedRefetchConversations(prev => !prev);
-    onPinChange();
   }
 
   return (
@@ -195,18 +186,9 @@ const ChatList = ({
                     <span className="font-semibold">{chat.chatType === "GROUP" ? chat.groupName : chat.senderName}</span>
                     <div className="flex items-center">
                       <span className="text-[14px] text-[#838383] mr-2">{formatTime(chat.lastMessageAt)}</span>
-                      <button
-                        className="ml-2 text-sm text-[#838383] hover:text-white"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          chat.pinned = !chat.pinned;
-                          setNeedRefetchConversations(!needRefetchConversations);
-                        }}
-                      >
-                        {chat.pinned && (
-                          <BsPinAngleFill size={20} color="white" className="text-white" />
-                        )}
-                      </button>
+                      {chat.pinned && (
+                        <BsPinAngleFill size={20} color="white" className="text-white" />
+                      )}
                     </div>
                   </div>
                   <div className="flex justify-between items-center">
@@ -216,33 +198,10 @@ const ChatList = ({
                         NEW
                       </span>
                     )}
-                    <button
-                      className="ml-2 text-sm text-[#838383] hover:text-white"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        chat.pinned = !chat.pinned;
-                        setNeedRefetchConversations(!needRefetchConversations);
-                      }}
-                    >
-                      {chat.pinned && (
-                        <BsPinAngleFill size={20} color="white" className="text-white" />
-                      )}
-                    </button>
                   </div>
                   <div className="flex items-center">
+                    {chat.pinned && <Image src={Images.IconPin} alt="Pin Icon" width={20} height={20} />}
                     <span className="text-[14px] text-[#838383] ml-2">{formatTime(chat.lastMessageAt)}</span>
-                    <button
-                      className="ml-2 text-sm text-[#838383] hover:text-white"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        chat.pinned = !chat.pinned;
-                        setNeedRefetchConversations(!needRefetchConversations);
-                      }}
-                    >
-                      {chat.pinned && (
-                        <BsPinAngleFill size={20} color="white" className="text-white" />
-                      )}
-                    </button>
                   </div>
                 </div>
               </li>
@@ -322,14 +281,6 @@ const ChatList = ({
       <ModalFriendList isOpen={isFriendListModalOpen} setIsOpen={setIsFriendListModalOpen} />
       <ModalFriendRequests isOpen={isFriendRequestModalOpen} setIsOpen={setIsFriendRequestModalOpen} />
       <ModalListGroup isOpen={modalListGroup} setIsOpen={setModalListGroup} isAdmin={true} />
-      {selectedChat && (
-        <ChatInfo
-          isOpen={isChatInfoOpen}
-          selectedChat={selectedChat}
-          setIsChatInfoOpen={setIsChatInfoOpen}
-          onPinChange={handlePinChange}
-        />
-      )}
     </div>
   )
 }
