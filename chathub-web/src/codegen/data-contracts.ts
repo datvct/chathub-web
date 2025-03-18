@@ -95,6 +95,8 @@ export interface ConversationResponse {
   senderAvatar?: string
   /** @format int64 */
   senderId?: number
+  /** @format int64 */
+  adminId?: number
   senderName?: string
   lastMessage?: string
   lastMessageType?: "TEXT" | "IMAGE" | "VIDEO" | "DOCUMENT" | "EMOJI"

@@ -164,13 +164,10 @@ export const pinConversationAPI = async (
         },
       },
     );
-    return { success: true, data: response };
+    return response;
   } catch (error: any) {
     console.error("Error pinning conversation:", error);
-    return {
-      success: false,
-      error: error.message || "Failed to pin conversation"
-    };
+    return null;
   }
 };
 

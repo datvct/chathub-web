@@ -16,6 +16,7 @@ import { useSelector } from "react-redux"
 import { RootState } from "~/lib/reudx/store"
 import { useConversation } from "~/hooks/use-converstation"
 import { ConversationResponse } from "~/codegen/data-contracts"
+import { BsPinAngleFill } from "react-icons/bs"
 
 interface ChatListProps {
   setSelectedChat: (id: number) => void;
@@ -28,7 +29,7 @@ const ChatList = ({
   setSelectedChat,
   setIsGroupChat,
   setConversationData,
-  onPinChange
+  onPinChange,
 }: ChatListProps) => {
   const userId = useSelector((state: RootState) => state.auth.userId)
   const token = useSelector((state: RootState) => state.auth.token)
@@ -42,6 +43,7 @@ const ChatList = ({
   const [modalListGroup, setModalListGroup] = useState(false)
   const { getRecentConversation } = useConversation()
   const [dataConversation, setDataConversation] = useState<ConversationResponse[]>([])
+  const [needRefetchConversations, setNeedRefetchConversations] = useState(false)
 
   const fetchDataConversation = async () => {
     if (userId) {
@@ -58,7 +60,7 @@ const ChatList = ({
 
   useEffect(() => {
     fetchDataConversation();
-  }, [userId, modalCreateChatOpen, modalCreateGroupChatOpen]);
+  }, [userId, modalCreateChatOpen, modalCreateGroupChatOpen, needRefetchConversations]);
 
   useEffect(() => {
     if (userId) {
@@ -92,6 +94,14 @@ const ChatList = ({
   const formatTime = (timestamp: string) => {
     const date = new Date(timestamp)
     return `${date.getHours()}:${date.getMinutes()}`
+  }
+
+  const handlePinChange = (chatId: number, pinned: boolean) => {
+    setDataConversation(prevData =>
+      prevData.map(chat =>
+        chat.id === chatId ? { ...chat, pinned } : chat
+      )
+    );
   }
 
   return (
@@ -183,7 +193,9 @@ const ChatList = ({
                     <span className="font-semibold">{chat.chatType === "GROUP" ? chat.groupName : chat.senderName}</span>
                     <div className="flex items-center">
                       <span className="text-[14px] text-[#838383] mr-2">{formatTime(chat.lastMessageAt)}</span>
-                      {chat.pinned && <Image src={Images.IconPin} alt="Pin Icon" width={20} height={20} />}
+                      {chat.pinned && (
+                        <BsPinAngleFill size={20} color="white" className="text-white" />
+                      )}
                     </div>
                   </div>
                   <div className="flex justify-between items-center">
@@ -193,10 +205,15 @@ const ChatList = ({
                         NEW
                       </span>
                     )}
+                    {chat.pinned && (
+                      <BsPinAngleFill size={20} color="white" className="text-white" />
+                    )}
                   </div>
                   <div className="flex items-center">
-                    {chat.pinned && <Image src={Images.IconPin} alt="Pin Icon" width={20} height={20} />}
                     <span className="text-[14px] text-[#838383] ml-2">{formatTime(chat.lastMessageAt)}</span>
+                    {chat.pinned && (
+                      <BsPinAngleFill size={20} color="white" className="text-white" />
+                    )}
                   </div>
                 </div>
               </li>

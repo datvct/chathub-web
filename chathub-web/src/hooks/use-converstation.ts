@@ -86,7 +86,6 @@ export const useConversation = () => {
     }
   };
 
-
   const getGroupConversations = async (userId: number, token: string) => {
     setLoading(true);
     setError(null);
@@ -123,7 +122,6 @@ export const useConversation = () => {
     setLoading(true);
     setError(null);
     try {
-      console.log("useConversation - updateGroupInfo - Token:", token);
       const response = await updateGroupInfoAPI(conversationId, request, token);
       return response;
     } catch (err: any) {
