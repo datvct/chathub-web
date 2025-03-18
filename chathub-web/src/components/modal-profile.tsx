@@ -14,16 +14,15 @@ import { DatePicker } from "@mui/x-date-pickers/DatePicker"
 import { useSelector } from "react-redux"
 import { RootState } from "~/lib/reudx/store"
 import { useUpdateProfile } from "~/hooks/use-user"
-import { ChangeProfileRequest } from "~/codegen/data-contracts"
+import { ChangeProfileRequest, UserDTO } from "~/codegen/data-contracts"
 import dayjs from "dayjs"
 import { toast, ToastContainer } from "react-toastify"
-import { Friend, ProfileData } from "~/types/types"
 
 interface ProfileModalProps {
   isOpen: boolean
   setIsOpen: (open: boolean) => void
   setIsChangePasswordModalOpen?: any
-  friend: Friend | null
+  friend: UserDTO | null
 }
 
 const ProfileModal: React.FC<ProfileModalProps> = ({
@@ -37,14 +36,8 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
 
   const { updateProfile, loading } = useUpdateProfile();
   const [errorMessage, setErrorMessage] = useState("")
-
-  const [profileData, setProfileData] = useState<ProfileData>({
-    displayName: "",
-    dateOfBirth: new Date(),
-    gender: "Male",
-  })
-
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
+  const [profileData, setProfileData] = useState<UserDTO | null>(null)
 
   const handleOpenChangePassword = () => {
     setIsOpen(false)
@@ -58,49 +51,65 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
     }
   }
 
-  const handleChange = (field: keyof ProfileData, value: string | Date | "Male" | "Female") => {
-    setProfileData(prev => ({ ...prev, [field]: value }))
-  }
-
-  const [date, setDate] = useState(dayjs(profileData.dateOfBirth))
-
-  const handleDateOfBirth = (newDate: dayjs.Dayjs | null) => {
-    setDate(newDate || dayjs())
+  const handleChange = (field: keyof UserDTO, value: string | Date | "MALE" | "FEMALE") => {
     setProfileData(prev => ({
       ...prev,
-      dateOfBirth: newDate ? newDate.toDate() : prev.dateOfBirth,
+      ...(prev && { [field]: value })
+    }));
+  }
+
+  const [date, setDate] = useState<dayjs.Dayjs | null>(dayjs());
+
+  const handleDateOfBirth = (newDate: any) => {
+    setDate(newDate);
+    setProfileData(prev => ({
+      ...prev,
+      dateOfBirth: newDate ? newDate.toISOString() : prev?.dateOfBirth,
     }))
   }
 
   useEffect(() => {
-    setProfileData({
-      displayName: friend?.name || "",
-      dateOfBirth: friend?.dateOfBirth || new Date(),
-      gender: friend?.gender ? "Male" : "Female"
-    })
+    if (friend) {
+      const parsedDateOfBirth = friend.dateOfBirth ? dayjs(friend.dateOfBirth) : dayjs();
+      setDate(parsedDateOfBirth);
+
+      setProfileData({
+        id: friend.id,
+        phoneNumber: friend.phoneNumber,
+        name: friend.name || "",
+        dateOfBirth: parsedDateOfBirth.toISOString(),
+        gender: friend.gender as "MALE" | "FEMALE",
+        avatar: friend.avatar,
+        status: friend.status,
+      });
+    } else {
+      setProfileData(null);
+    }
   }, [friend]);
 
   const handleSubmit = async () => {
-    const formattedDate = dayjs(profileData.dateOfBirth).format('YYYY/MM/DD');
+    const formattedDate = dayjs(profileData.dateOfBirth).format('YYYY-MM-DD');
 
     const data: ChangeProfileRequest = {
       id: userId!,
-      name: profileData.displayName,
-      avatar: selectedImage || friend?.image || Images.AvatarDefault,
+      name: profileData?.name || "",
+      avatar: selectedImage
+        ? await fetch(selectedImage).then(res => res.blob()).then(blob => new File([blob], "avatar.jpg", { type: blob.type }))
+        : new File([await fetch(friend?.avatar || Images.AvatarDefault.src).then(res => res.blob())], "avatar.jpg", { type: "image/jpeg" }),
       dateOfBirth: formattedDate,
-      gender: profileData.gender,
+      gender: profileData?.gender as "MALE" | "FEMALE" || "MALE",
     };
 
     try {
       const response = await updateProfile(data, token!);
-      if (response.success) {
-        setIsOpen(false)
-      } else {
-        toast.error('Failed to update profile')
-        setErrorMessage(response.error)
+      if (response) {
+        toast.success('Updated profile successfully');
+        setTimeout(() => {
+          setIsOpen(false);
+        }, 5000);
       }
     } catch (error: any) {
-      console.log('Failed to update profile')
+      toast.error('Failed to update profile. Please try again later!');
     }
   };
 
@@ -155,7 +164,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
                         />
                       ) : (
                         <Image
-                          src={Images.ProfileImage}
+                          src={profileData?.avatar || Images.ProfileImage}
                           alt="profile default"
                           width={100}
                           height={100}
@@ -188,7 +197,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
                         type="text"
                         value={friend?.name}
                         className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500"
-                        onChange={e => handleChange("displayName", e.target.value)}
+                        onChange={e => handleChange("name", e.target.value)}
                       />
                     </div>
                   </div>
@@ -203,7 +212,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
                         <DatePicker
                           label="Date of Birth"
                           value={date}
-                          onChange={handleDateOfBirth}
+                          onChange={(value) => handleDateOfBirth(dayjs(value))}
                           className="w-full block bg-white border border-slate-300"
                         />
                       </DemoContainer>
@@ -220,8 +229,8 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
                           type="radio"
                           value="Male"
                           className="w-4 h-4 text-[#6568FF] bg-gray-100 border-gray-300"
-                          checked={profileData.gender === "Male"}
-                          onChange={() => handleChange("gender", "Male")}
+                          checked={profileData?.gender === "MALE"}
+                          onChange={() => handleChange("gender", "MALE")}
                         />
 
                         <label htmlFor="male" className="block text-sm leading-6">
@@ -235,8 +244,8 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
                           type="radio"
                           value="Female"
                           className="w-4 h-4 text-[#6568FF] bg-gray-100 border-gray-300"
-                          checked={profileData.gender === "Female"}
-                          onChange={() => handleChange("gender", "Female")}
+                          checked={profileData?.gender === "FEMALE"}
+                          onChange={() => handleChange("gender", "FEMALE")}
                         />
 
                         <label htmlFor="female" className="block text-sm leading-6">
@@ -258,7 +267,8 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
                     <Button
                       onClick={handleSubmit}
                       disabled={loading}
-                      className="w-30 px-4 py-2 bg-[#7746f5] rounded-[12px] text-lg text-white bg-gradient-to-r from-[#501794] to-[#3E70A1] hover:bg-gradient-to-l"
+                      className="w-30 px-4 py-2 bg-[#7746f5] rounded-[12px] text-lg text-white
+                        bg-gradient-to-r from-[#501794] to-[#3E70A1] hover:bg-gradient-to-l"
                     >
                       {loading ? "Loading..." : "Save changes"}
                     </Button>

@@ -8,7 +8,8 @@ import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { Input } from "./ui/input"
 import { Button } from "./ui/button"
-import { ChangePasswordRequest } from "~/codegen/data-contracts"
+import { ChangePasswordRequest, SuccessResponse } from "~/codegen/data-contracts"
+import { changePassword } from "../lib/get-change-password"
 import { useChangePassword } from "../hooks/use-change-password"
 import { useSelector } from "react-redux"
 import { RootState } from "~/lib/reudx/store"
@@ -33,7 +34,7 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ isOpen, setIs
     setIsOpen(false)
   }
 
-  const handleSubmit = async () => {
+  const handleChangePassword = async () => {
     setLoading(true)
     setErrorMessage("")
 
@@ -53,8 +54,8 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ isOpen, setIs
       id: userId,
       oldPassword,
       newPassword,
-      changeType: "UPDATE",
-    }
+      changeType: 'UPDATE'
+    };
 
     const response = await changePassword(data, token)
     if (response.success) {
@@ -157,10 +158,9 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ isOpen, setIs
                     <Button
                       type="button"
                       className="w-30 px-4 py-2 bg-[#7746f5] rounded-[12px] text-lg text-white bg-gradient-to-r from-[#501794] to-[#3E70A1] hover:bg-gradient-to-l"
-                      onClick={handleSubmit}
-                      disabled={loading}
+                      onClick={handleChangePassword}
                     >
-                      {loading ? "Changing Password..." : "Change Password"}
+                      {loading ? "Changing" : "Change"}
                     </Button>
                   </div>
                 </div>
