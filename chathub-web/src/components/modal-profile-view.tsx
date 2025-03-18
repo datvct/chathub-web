@@ -1,52 +1,46 @@
 "use client"
 
 import React, { useState, useEffect } from "react"
-import { Camera } from "lucide-react"
 import Image from "next/image"
 import { Dialog, DialogPanel, DialogTitle, Transition, TransitionChild } from "@headlessui/react"
 import { Input } from "./ui/input"
-import { Button } from "./ui/button"
 import { Images } from "../constants/images"
-import { DemoContainer } from "@mui/x-date-pickers/internals/demo"
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs"
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider"
-import { DatePicker } from "@mui/x-date-pickers/DatePicker"
 import { useSelector } from "react-redux"
 import { RootState } from "~/lib/reudx/store"
 import dayjs from "dayjs"
-import { Friend, ProfileData } from "~/types/types"
+import { UserDTO } from "~/codegen/data-contracts"
+
+interface ProfileData {
+	displayName: string
+	dateOfBirth?: string | Date
+	gender: string
+}
 
 interface ProfileViewModalProps {
 	isOpen: boolean
 	setIsOpen: (open: boolean) => void
-	friend: Friend | null
+	friend: UserDTO | null
 }
 
-const ProfileViewModal: React.FC<ProfileViewModalProps> = ({
-	isOpen,
-	setIsOpen,
-	friend
-}) => {
-	const userId = useSelector((state: RootState) => state.auth.userId);
-	const token = useSelector((state: RootState) => state.auth.token);
+const ProfileViewModal: React.FC<ProfileViewModalProps> = ({ isOpen, setIsOpen, friend }) => {
+	const userId = useSelector((state: RootState) => state.auth.userId)
+	const token = useSelector((state: RootState) => state.auth.token)
 
 	const [profileData, setProfileData] = useState<ProfileData>({
 		displayName: friend?.name || "",
 		dateOfBirth: friend?.dateOfBirth || new Date(),
-		gender: friend?.gender || "Male"
+		gender: friend?.gender || "MALE",
 	})
 
-	const handleChange = (field: keyof ProfileData, value: string | Date | "Male" | "Female") => {
+	const handleChange = (field: keyof ProfileData, value: string | Date | "MALE" | "FEMALE") => {
 		setProfileData(prev => ({ ...prev, [field]: value }))
 	}
 
-	const [date, setDate] = useState(dayjs(profileData.dateOfBirth))
-
 	const handleDateOfBirth = (newDate: dayjs.Dayjs | null) => {
-		setDate(newDate || dayjs())
 		setProfileData(prev => ({
 			...prev,
-			dateOfBirth: friend?.dateOfBirth || new Date()
+			dateOfBirth: friend?.dateOfBirth || new Date(),
 		}))
 	}
 
@@ -54,9 +48,9 @@ const ProfileViewModal: React.FC<ProfileViewModalProps> = ({
 		setProfileData({
 			displayName: friend?.name || "",
 			dateOfBirth: friend?.dateOfBirth || new Date(),
-			gender: friend?.gender || "Male"
+			gender: friend?.gender || "MALE",
 		})
-	}, [friend]);
+	}, [friend])
 
 	return (
 		<Transition appear show={isOpen} as={React.Fragment}>
@@ -99,15 +93,12 @@ const ProfileViewModal: React.FC<ProfileViewModalProps> = ({
 									<div className="relative">
 										<label htmlFor="profile-upload" className="relative cursor-pointer">
 											<Image
-												src={friend?.image ?? Images.ProfileImage}
+												src={friend?.avatar ?? Images.ProfileImage}
 												alt="profile default"
 												width={100}
 												height={100}
 												className="mx-auto cursor-pointer w-24 h-24 rounded-[50px] border border-white transition duration-150 transform hover:scale-105 shadow-2xl hover:shadow-cyan"
 											/>
-											<span className="absolute bottom-[-10px] left-[55%] rounded-[50px] bg-[#F1F1F1] hover:bg-slate-300 w-[37px] h-[37px] flex items-center justify-center">
-												<Camera className="text-[#797979] w-5 h-5" strokeWidth={1.5} />
-											</span>
 										</label>
 									</div>
 
@@ -131,64 +122,57 @@ const ProfileViewModal: React.FC<ProfileViewModalProps> = ({
 										<label htmlFor="date-of-birth" className="block text-sm font-medium text-black">
 											Date of Birth
 										</label>
-
-										<LocalizationProvider dateAdapter={AdapterDayjs}>
-											<DemoContainer components={["DatePicker"]}>
-												<DatePicker
-													label="Date of Birth"
-													value={date}
-													onChange={handleDateOfBirth}
-													className="w-full block bg-white border border-slate-300"
+										<div className="mt-1">
+											<div className="mt-1">
+												<Input
+													type="text"
+													value={dayjs(profileData.dateOfBirth).format("MMMM D, YYYY")}
+													readOnly
+													className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400 focus:outline-none"
 												/>
-											</DemoContainer>
-										</LocalizationProvider>
+											</div>
+										</div>
 									</div>
-
 									<div className="mt-4">
 										<label className="block text-sm font-medium text-black">Gender</label>
-
 										<div className="mt-2">
 											<div className="flex items-center gap-x-3 mb-2.5">
 												<input
 													id="male"
 													type="radio"
-													value="Male"
+													value="MALE"
 													disabled
 													className="w-4 h-4 text-[#6568FF] bg-gray-100 border-gray-300"
-													checked={profileData.gender === "Male"}
-													onChange={() => handleChange("gender", "Male")}
+													checked={profileData.gender === "MALE"}
+													onChange={() => handleChange("gender", "MALE")}
 												/>
-
 												<label htmlFor="male" className="block text-sm leading-6">
 													Male
 												</label>
 											</div>
-
 											<div className="flex items-center gap-x-3">
 												<input
 													id="female"
 													type="radio"
-													value="Female"
+													value="FEMALE"
 													disabled
 													className="w-4 h-4 text-[#6568FF] bg-gray-100 border-gray-300"
-													checked={profileData.gender === "Female"}
-													onChange={() => handleChange("gender", "Female")}
+													checked={profileData.gender === "FEMALE"}
+													onChange={() => handleChange("gender", "FEMALE")}
 												/>
-
 												<label htmlFor="female" className="block text-sm leading-6">
 													Female
 												</label>
 											</div>
 										</div>
 									</div>
-
 								</div>
 							</DialogPanel>
 						</TransitionChild>
 					</div>
 				</div>
 			</Dialog>
-		</Transition >
+		</Transition>
 	)
 }
 
