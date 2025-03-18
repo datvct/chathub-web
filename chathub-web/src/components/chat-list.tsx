@@ -23,7 +23,7 @@ interface ChatListProps {
   setSelectedChat: (id: number) => void;
   setIsGroupChat: (isGroup: boolean) => void;
   setConversationData?: (data: ConversationResponse) => void;
-  onPinChange: () => void;
+  onPinChange: () => boolean;
 }
 
 const ChatList = ({
@@ -101,7 +101,7 @@ const ChatList = ({
     return `${date.getHours()}:${date.getMinutes()}`
   }
 
-  const handlePinChange = () => {
+  const handlePinChange = (isPinned: boolean) => {
     setNeedRefetchConversations(prev => !prev);
     onPinChange();
   }
@@ -195,9 +195,18 @@ const ChatList = ({
                     <span className="font-semibold">{chat.chatType === "GROUP" ? chat.groupName : chat.senderName}</span>
                     <div className="flex items-center">
                       <span className="text-[14px] text-[#838383] mr-2">{formatTime(chat.lastMessageAt)}</span>
-                      {chat.pinned && (
-                        <BsPinAngleFill size={20} color="white" className="text-white" />
-                      )}
+                      <button
+                        className="ml-2 text-sm text-[#838383] hover:text-white"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          chat.pinned = !chat.pinned;
+                          setNeedRefetchConversations(!needRefetchConversations);
+                        }}
+                      >
+                        {chat.pinned && (
+                          <BsPinAngleFill size={20} color="white" className="text-white" />
+                        )}
+                      </button>
                     </div>
                   </div>
                   <div className="flex justify-between items-center">
@@ -207,15 +216,33 @@ const ChatList = ({
                         NEW
                       </span>
                     )}
-                    {chat.pinned && (
-                      <BsPinAngleFill size={20} color="white" className="text-white" />
-                    )}
+                    <button
+                      className="ml-2 text-sm text-[#838383] hover:text-white"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        chat.pinned = !chat.pinned;
+                        setNeedRefetchConversations(!needRefetchConversations);
+                      }}
+                    >
+                      {chat.pinned && (
+                        <BsPinAngleFill size={20} color="white" className="text-white" />
+                      )}
+                    </button>
                   </div>
                   <div className="flex items-center">
                     <span className="text-[14px] text-[#838383] ml-2">{formatTime(chat.lastMessageAt)}</span>
-                    {chat.pinned && (
-                      <BsPinAngleFill size={20} color="white" className="text-white" />
-                    )}
+                    <button
+                      className="ml-2 text-sm text-[#838383] hover:text-white"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        chat.pinned = !chat.pinned;
+                        setNeedRefetchConversations(!needRefetchConversations);
+                      }}
+                    >
+                      {chat.pinned && (
+                        <BsPinAngleFill size={20} color="white" className="text-white" />
+                      )}
+                    </button>
                   </div>
                 </div>
               </li>

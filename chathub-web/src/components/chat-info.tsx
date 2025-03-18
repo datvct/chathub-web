@@ -36,7 +36,7 @@ interface ChatInfoProps {
   isGroupChat?: boolean;
   selectedChat: number;
   setIsChatInfoOpen: (isOpen: boolean) => void;
-  onPinChange: () => void;
+  onPinChange: (isPinned: boolean) => void;
 }
 
 interface Member {
@@ -120,7 +120,7 @@ const ChatInfo = ({
       if (pinSuccess) {
         setIsPinned(newPinState);
         if (onPinChange) {
-          onPinChange();
+          onPinChange(newPinState);
         }
         toast.success(`Conversation ${newPinState ? "pinned" : "unpinned"} successfully!`);
       } else {
@@ -193,7 +193,7 @@ const ChatInfo = ({
   };
 
   const handleGroupInfoUpdatedSuccess = () => {
-    onPinChange();
+    onPinChange(isPinned);
   };
 
   if (!isOpen) return null;
@@ -258,7 +258,10 @@ const ChatInfo = ({
                 <div className="flex items-center flex-col">
                   <button
                     className="bg-[#484848] h-10 w-10 rounded-full flex items-center justify-center"
-                    onClick={handlePinConversation}
+                    onClick={async () => {
+                      await handlePinConversation();
+                      onPinChange(isPinned);
+                    }}
                   >
                     {isPinned ? (
                       <RiUnpinFill size={20} color="white" className="text-white" />
