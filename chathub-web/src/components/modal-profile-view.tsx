@@ -122,20 +122,21 @@ const ProfileViewModal: React.FC<ProfileViewModalProps> = ({ isOpen, setIsOpen, 
 										<label htmlFor="date-of-birth" className="block text-sm font-medium text-black">
 											Date of Birth
 										</label>
-
-										<LocalizationProvider dateAdapter={AdapterDayjs}>
-											<DemoContainer components={["DatePicker"]}>
-												<DatePicker
-													label="Date of Birth"
-													value={date}
-													onChange={handleDateOfBirth}
-													className="w-full block bg-white border border-slate-300"
+										<div className="mt-1">
+											<div className="mt-1">
+												<Input
+													type="text"
+													value={dayjs(profileData.dateOfBirth).format("MMMM D, YYYY")}
+													readOnly
+													className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400 focus:outline-none"
 												/>
 											</div>
 										</div>
 									</div>
+
 									<div className="mt-4">
 										<label className="block text-sm font-medium text-black">Gender</label>
+
 										<div className="mt-2">
 											<div className="flex items-center gap-x-3 mb-2.5">
 												<input
@@ -147,10 +148,12 @@ const ProfileViewModal: React.FC<ProfileViewModalProps> = ({ isOpen, setIsOpen, 
 													checked={profileData.gender === "MALE"}
 													onChange={() => handleChange("gender", "MALE")}
 												/>
+
 												<label htmlFor="male" className="block text-sm leading-6">
 													Male
 												</label>
 											</div>
+
 											<div className="flex items-center gap-x-3">
 												<input
 													id="female"
@@ -161,6 +164,7 @@ const ProfileViewModal: React.FC<ProfileViewModalProps> = ({ isOpen, setIsOpen, 
 													checked={profileData.gender === "FEMALE"}
 													onChange={() => handleChange("gender", "FEMALE")}
 												/>
+
 												<label htmlFor="female" className="block text-sm leading-6">
 													Female
 												</label>
