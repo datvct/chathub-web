@@ -86,7 +86,6 @@ export const useConversation = () => {
     }
   };
 
-
   const getGroupConversations = async (userId: number, token: string) => {
     setLoading(true);
     setError(null);
@@ -115,17 +114,15 @@ export const useConversation = () => {
     }
   };
 
-  const updateGroupInfo = async (conversationId: number, request: UpdateGroupInfoRequest, token: string) => {
+  const updateGroupInfo = async (
+    conversationId: number,
+    request: UpdateGroupInfoRequest,
+    token: string,
+  ) => {
     setLoading(true);
     setError(null);
     try {
-      const formData = new FormData();
-      for (const key in request) {
-        if (request.hasOwnProperty(key)) {
-          formData.append(key, (request as any)[key]);
-        }
-      }
-      const response = await updateGroupInfoAPI(conversationId, formData, token);
+      const response = await updateGroupInfoAPI(conversationId, request, token);
       return response;
     } catch (err: any) {
       setError(err.message || "Failed to update group info");

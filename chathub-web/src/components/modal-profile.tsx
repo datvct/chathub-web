@@ -80,7 +80,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
         status: friend.status,
       });
     } else {
-      setProfileData(null);
+      setProfileData(friend);
     }
   }, [friend]);
 
