@@ -160,7 +160,6 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ isOpen, setIs
                       className="w-30 px-4 py-2 bg-[#7746f5] rounded-[12px] text-lg text-white bg-gradient-to-r from-[#501794] to-[#3E70A1] hover:bg-gradient-to-l"
                       onClick={handleChangePassword}
                     >
-                      {/* Change */}
                       {loading ? "Changing" : "Change"}
                     </Button>
                   </div>
