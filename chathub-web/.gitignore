@@ -10,9 +10,6 @@
 !.yarn/releases
 !.yarn/versions
 
-# user-specific files
-/AppData/
-
 # testing
 /coverage
 
