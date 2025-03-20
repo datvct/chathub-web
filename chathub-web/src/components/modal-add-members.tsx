@@ -61,13 +61,22 @@ const ModalAddMembers: React.FC<ModalAddMembersProps> = ({ isOpen, setIsOpen, co
     }
 
     try {
+      setLoading(true);
       const memberIdsToAdd = selectedMembers.map(member => member.id || 0).filter(id => id !== 0)
       if (memberIdsToAdd.length === 0) {
         toast.warning("Please select valid members to add.")
         return
       }
 
+      console.log("Calling addMembersToConversation API with:", {
+        conversationId,
+        memberIdsToAdd,
+        token,
+      });
+
       const success = await addMembersToConversation(conversationId, memberIdsToAdd, token)
+      console.log("addMembersToConversation API Response:", success);
+
       if (success) {
         toast.success("Members added to group successfully!")
         setIsOpen(false)
@@ -78,8 +87,12 @@ const ModalAddMembers: React.FC<ModalAddMembersProps> = ({ isOpen, setIsOpen, co
     } catch (error) {
       console.error("Error adding members to conversation:", error)
       toast.error("Failed to add members to group.")
+    } finally {
+      setLoading(false);
     }
   }
+
+  const [loading, setLoading] = useState(false);
 
   return (
     <Transition appear show={isOpen} as={Fragment}>
@@ -163,11 +176,11 @@ const ModalAddMembers: React.FC<ModalAddMembersProps> = ({ isOpen, setIsOpen, co
 
                 <Button
                   onClick={handleAddMembersToGroup}
-                  className={`bg-gradient-to-r from-[#501794] to-[#3E70A1] text-white rounded-[12px] px-4 py-2 hover:bg-gradient-to-l ${addMembersLoading ? "opacity-50 cursor-not-allowed" : ""
+                  className={`bg-gradient-to-r from-[#501794] to-[#3E70A1] text-white rounded-[12px] px-4 py-2 hover:bg-gradient-to-l ${loading ? "opacity-50 cursor-not-allowed" : ""
                     }`}
-                  disabled={addMembersLoading}
+                  disabled={loading}
                 >
-                  {addMembersLoading ? "Adding..." : "Add"}
+                  {loading ? "Adding..." : "Add"}
                 </Button>
               </div>
             </DialogPanel>
