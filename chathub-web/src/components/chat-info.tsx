@@ -78,6 +78,7 @@ const ChatInfo = ({
     removeParticipantFromGroup,
     pinConversation,
     deleteConversation,
+    leaveGroupConversation
   } = useConversation();
   const [chatDetail, setChatDetail] = useState<ChatDetailSectionResponse | null>(null);
   const [isPinned, setIsPinned] = useState(false);
@@ -93,6 +94,23 @@ const ChatInfo = ({
     };
     fetchChatDetails();
   }, [selectedChat, userId, token]);
+
+  const handleLeaveGroup = async () => {
+    if (!selectedChat || !userId || !token) return;
+    try {
+      const response = await leaveGroupConversation(selectedChat, userId, token);
+      if (response?.statusCode === 200) {
+        toast.success("Left group successfully!");
+        setIsChatInfoOpen(false);
+        router.push("/");
+      } else {
+        toast.error("Failed to leave group.");
+      }
+    } catch (error) {
+      console.error("Error leaving group:", error);
+      toast.error("Failed to leave group.");
+    }
+  };
 
   useEffect(() => {
     const fetchRecentConversations = async () => {

@@ -62,11 +62,9 @@ export const useConversation = () => {
     setLoading(true);
     setError(null);
     try {
-      const response = await leaveConversation(conversationId, userId, token);
-      return response;
-    } catch (error) {
+      await leaveConversation(conversationId, userId, token);
+    } catch (err) {
       setError("Failed to leave conversation");
-      return { statusCode: 400, message: "Failed to leave conversation" };
     } finally {
       setLoading(false);
     }
