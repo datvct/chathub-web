@@ -69,6 +69,7 @@ const ChatInfo = ({
   const [memberToRemove, setMemberToRemove] = useState<number | null>(null);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string>("");
+  const [selectedChatId, setSelectedChatId] = useState<number | null>(null);
 
   const token = useSelector((state: RootState) => state.auth.token);
   const userId = useSelector((state: RootState) => state.auth.userId);
@@ -118,10 +119,12 @@ const ChatInfo = ({
         const recentConversations = await getRecentConversationByUserID(userId, token);
         const pinnedConversations = recentConversations.filter(conversation => conversation.pinned);
         console.log("Pinned Conversations:", pinnedConversations);
+        setIsPinned(pinnedConversations.some(conversation => conversation.id === selectedChat));
       }
     };
     fetchRecentConversations();
   }, [userId, token, selectedChat]);
+
 
   const handleMuteConversation = () => {
     setIsMuted(!isMuted);
@@ -524,6 +527,7 @@ const ChatInfo = ({
           isOpen={isOpenLeaveGroup}
           setIsOpen={setIsOpenLeaveGroup}
           chatId={selectedChat}
+          setSelectedChatId={setSelectedChatId}
         />
       )}
       {isOpenDissolveGroup && (

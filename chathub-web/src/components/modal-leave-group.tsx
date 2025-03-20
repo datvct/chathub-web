@@ -1,4 +1,7 @@
 "use client"
+
+import { Dispatch, SetStateAction } from "react"
+import { useRouter } from 'next/navigation'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog"
 import { Button } from "./ui/button"
 import { useConversation } from "~/hooks/use-converstation"
@@ -10,16 +13,19 @@ interface ModalLeaveGroupProps {
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
   chatId: number;
+  setSelectedChatId: Dispatch<SetStateAction<number | null>>;
 }
 
 const ModalLeaveGroup = ({
   isOpen,
   setIsOpen,
   chatId,
+  setSelectedChatId,
 }: ModalLeaveGroupProps) => {
   const { leaveConversationById, loading, error } = useConversation()
   const userId = useSelector((state: RootState) => state.auth.userId)
   const token = useSelector((state: RootState) => state.auth.token)
+  const router = useRouter()
 
   const handleLeaveGroup = async () => {
     if (!chatId || !userId || !token) return;
