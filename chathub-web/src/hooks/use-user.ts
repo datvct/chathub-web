@@ -41,20 +41,12 @@ export const useUpdateProfile = () => {
 
     try {
       const response = await updateProfileAPI(values, token);
-      console.log("Update profile response: ", response);
-      if (response.statusCode === 200) {
-        toast.success("Updated profile successfully!");
-        return { success: true, data: response };
-      } else {
-        toast.error("Failed to update profile!");
-        return { success: false, error: response };
-      }
-    } catch (error: any) {
+      return response || null;
+    } catch (error) {
       console.error("Update profile error: ", error);
       const errorMsg = error.message || "Something went wrong. Please try again later!";
       setErrorMessage(errorMsg);
-      toast.error("Failed to update profile!");
-      return { success: false, error: errorMsg };
+      return null;
     } finally {
       setLoading(false);
     }

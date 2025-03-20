@@ -1,7 +1,15 @@
 "use client"
+
+import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import Image from "next/image"
 import { Images } from "~/constants/images"
-import { GoBell } from "react-icons/go"
+import { useConversation } from "~/hooks/use-converstation";
+import { useSelector } from "react-redux";
+import { RootState } from "~/lib/reudx/store";
+import { ChatDetailSectionResponse } from "~/codegen/data-contracts";
+import { toast } from "react-toastify";
+import { GoBell, GoBellSlash } from "react-icons/go"
 import { BsPinAngleFill } from "react-icons/bs"
 import { FaRegFile } from "react-icons/fa"
 import { FaLink } from "react-icons/fa6"
@@ -15,9 +23,17 @@ import ModalLeaveGroup from "./modal-leave-group"
 import { FaChevronLeft } from "react-icons/fa6"
 import { Button } from "./ui/button"
 import { LuUserRoundPlus } from "react-icons/lu"
-import ModalAddMembers from "./modal-add-members" // Adjust path if needed
+import ModalAddMembers from "./modal-add-members"
 import ModalDissolveGroup from "./modal-dissolve-group"
-import { useState } from "react"
+import ModalUpdateGroupInfo from "./modal-update-group-info"
+
+interface ChatInfoProps {
+  isOpen?: boolean;
+  isGroupChat?: boolean;
+  selectedChat: number;
+  setIsChatInfoOpen: (isOpen: boolean) => void;
+  onPinChange: () => void;
+}
 
 interface Member {
   name: string
@@ -30,31 +46,106 @@ const ChatInfo = ({
   isOpen,
   isGroupChat,
   selectedChat,
-}: {
-  isOpen?: boolean
-  isGroupChat?: boolean
-  selectedChat: number
-}) => {
+  setIsChatInfoOpen,
+  onPinChange,
+}: ChatInfoProps) => {
   const [isOpenLeaveGroup, setIsOpenLeaveGroup] = useState(false)
-  const [isAddingMember, setIsAddingMember] = useState(false) // Thêm state này
+  const [isAddingMember, setIsAddingMember] = useState(false)
   const [isOpenAddMembers, setIsOpenAddMembers] = useState(false)
   const [isOpenDissolveGroup, setIsOpenDissolveGroup] = useState(false)
-  if (!isOpen) return null
-  const [groupMembers, setGroupMembers] = useState<Member[]>([
-    { name: "Guy Hawkins", phone: "0903112233", image: Images.GuyHawkins, selected: false },
-    { name: "Ronald Richards", phone: "0902445566", image: Images.RonaldRichards, selected: false },
-    { name: "Esther Howard", phone: "0904998877", image: Images.EstherHoward, selected: false },
-    { name: "Albert Flores", phone: "0905336699", image: Images.AlbertFlores, selected: false },
-    { name: "Miley Cyrus", phone: "0909225588", image: Images.MileyCyrus, selected: false },
-    { name: "Arlene McCoy", phone: "0906114477", image: Images.ArleneMcCoy, selected: false },
-    { name: "Cameron Williamson", phone: "0902115599", image: Images.CameronWilliamson, selected: false },
-  ])
+  const [isMuted, setIsMuted] = useState<boolean>(false)
+  const [isOpenUpdateGroupInfo, setIsOpenUpdateGroupInfo] = useState(false)
+
+  const token = useSelector((state: RootState) => state.auth.token);
+  const userId = useSelector((state: RootState) => state.auth.userId);
+
+  const {
+    getChatDetailSection,
+    loading: detailLoading,
+    error: detailError,
+    pinConversation,
+    deleteConversation,
+    loading: deleteLoading
+  } = useConversation();
+  const [chatDetail, setChatDetail] = useState<ChatDetailSectionResponse | null>(null);
+  const [isPinned, setIsPinned] = useState(false);
+  const [isDeletingConversation, setIsDeletingConversation] = useState<boolean>(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    const fetchChatDetails = async () => {
+      if (selectedChat && userId && token) {
+        const details = await getChatDetailSection(selectedChat, userId, token);
+        setChatDetail(details || null);
+      }
+    };
+    fetchChatDetails();
+  }, [selectedChat, userId, token, getChatDetailSection]);
+
+  const handleMuteConversation = () => {
+    setIsMuted(!isMuted);
+    toast.success(`${isMuted ? 'Unmuted' : 'Muted'} conversation successfully!`);
+  };
+
+  const handlePinConversation = async () => {
+    if (!selectedChat || !userId || !token) return;
+    try {
+      const newPinState = !isPinned;
+      const pinSuccess = await pinConversation(selectedChat, userId, newPinState, token);
+      if (pinSuccess) {
+        setIsPinned(newPinState);
+        if (onPinChange) {
+          onPinChange();
+        }
+        toast.success(`Conversation ${newPinState ? 'pinned' : 'unpinned'} successfully!`);
+      } else {
+        toast.error("Failed to pin conversation.");
+      }
+    } catch (error) {
+      console.error("Error pinning conversation:", error);
+      toast.error("Failed to pin conversation.");
+    }
+  };
+
+  const handleDeleteChatHistory = async () => {
+    if (!selectedChat || !userId || !token) return;
+    setIsDeletingConversation(true);
+    try {
+      const deleteSuccess = await deleteConversation(selectedChat, userId, token);
+      if (deleteSuccess) {
+        setIsChatInfoOpen(false);
+        router.push('/');
+        toast.success("Chat history deleted successfully!");
+      } else {
+        toast.error("Failed to delete chat history.");
+      }
+    } catch (error) {
+      console.error("Error deleting chat history:", error);
+      toast.error("Failed to delete chat history.");
+    } finally {
+      setIsDeletingConversation(false);
+    }
+  };
+
+  const handleOpenUpdateGroupInfoModal = () => {
+    setIsOpenUpdateGroupInfo(true);
+  };
+
+  const handleGroupInfoUpdatedSuccess = () => {
+    onPinChange();
+  };
+
+  if (!isOpen) return null;
 
   const handleAddMembers = (members: Member[]) => {
-    // setSelectedMembers(members)
-    setGroupMembers([...groupMembers, ...members])
     setIsAddingMember(false)
-  }
+  };
+
+  const handleMembersAddedSuccess = () => {
+    if (selectedChat && userId && token) {
+      getChatDetailSection(selectedChat, userId, token);
+    }
+  };
 
   return (
     <div className="bg-[#292929] text-white h-screen overflow-hidden overflow-y-auto w-1/4 p-4">
@@ -67,20 +158,31 @@ const ChatInfo = ({
             <div className="flex justify-between items-center flex-col gap-4">
               <div className="flex flex-col items-center">
                 <Image
-                  src={Images.ImageDefault}
+                  src={chatDetail?.avatar || Images.ImageDefault}
                   className="w-20 h-20 rounded-full"
                   alt="Avatar"
                   width={80}
                   height={80}
                 />
-                <p className="mt-2 text-lg font-semibold">Name</p>
+                <p className="mt-2 text-lg font-semibold">
+                  {chatDetail?.name || "Conversation Name"}
+                </p>
               </div>
               <div className="flex items-center gap-5">
                 <div className="flex items-center flex-col">
-                  <button className="bg-[#484848] h-10 w-10 rounded-full flex items-center justify-center">
-                    <GoBell size={20} color="white" className="text-white" />
+                  <button
+                    className="bg-[#484848] h-10 w-10 rounded-full flex items-center justify-center"
+                    onClick={handleMuteConversation}
+                  >
+                    {isMuted ? (
+                      <GoBellSlash size={20} color="white" className="text-white" />
+                    ) : (
+                      <GoBell size={20} color="white" className="text-white" />
+                    )}
                   </button>
-                  <span>Mute</span>
+                  <span>
+                    {isMuted ? 'Unmute' : 'Mute'}
+                  </span>
                 </div>
                 {isGroupChat && (
                   <div className="flex items-center flex-col">
@@ -94,17 +196,30 @@ const ChatInfo = ({
                   </div>
                 )}
                 <div className="flex items-center flex-col">
-                  <button className="bg-[#484848] h-10 w-10 rounded-full flex items-center justify-center">
+                  <button
+                    className="bg-[#484848] h-10 w-10 rounded-full flex items-center justify-center"
+                    onClick={handlePinConversation}
+                  >
                     <BsPinAngleFill size={20} color="white" className="text-white" />
+                    {/* {pinLoading ? (
+                      <div>Loading...</div>
+                    ) : (
+                      <BsPinAngleFill size={20} color="white" className="text-white" />
+                    )} */}
                   </button>
                   <span className="whitespace-nowrap">Pin</span>
                 </div>
                 {isGroupChat && (
                   <div className="flex items-center flex-col">
-                    <button className="bg-[#484848] h-10 w-10 rounded-full flex items-center justify-center">
+                    <button
+                      className="bg-[#484848] h-10 w-10 rounded-full flex items-center justify-center"
+                      onClick={handleOpenUpdateGroupInfoModal}
+                    >
                       <IoSettingsOutline size={20} color="white" className="text-white" />
                     </button>
-                    <span className="whitespace-nowrap">Manage group</span>
+                    <span className="whitespace-nowrap">
+                      Manage group
+                    </span>
                   </div>
                 )}
               </div>
@@ -112,10 +227,12 @@ const ChatInfo = ({
 
             {isGroupChat && (
               <div className="mt-4">
-                <h3 className="text-md font-semibold">Group Member</h3>
+                <h3 className="text-md font-semibold">Group Members</h3>
                 <button className="mt-3 px-3 w-full flex gap-2" onClick={() => setIsAddingMember(true)}>
                   <LuUserRound size={20} color="white" />
-                  <span>5 Memebers</span>
+                  <span>
+                    {chatDetail?.members?.length} Memebers
+                  </span>
                 </button>
               </div>
             )}
@@ -123,10 +240,20 @@ const ChatInfo = ({
             <div className="mt-4">
               <h3 className="text-md font-semibold">Photos/ Videos</h3>
               <div className="grid grid-cols-4 gap-x-2 gap-y-4 mt-3 px-2">
-                {[...Array(8)].map((_, i) => (
+                {/* {[...Array(8)].map((_, i) => (
                   <Image
                     key={i}
                     src={Images.ImageDefault}
+                    className="w-20 h-20 object-cover"
+                    alt="Media"
+                    width={80}
+                    height={80}
+                  />
+                ))} */}
+                {chatDetail?.list_media?.map((media, index) => (
+                  <Image
+                    key={index}
+                    src={media.url || Images.ImageDefault}
                     className="w-20 h-20 object-cover"
                     alt="Media"
                     width={80}
@@ -175,13 +302,21 @@ const ChatInfo = ({
               <div className="flex flex-col gap-3 mt-3 px-2">
                 {isGroupChat ? (
                   <>
-                    <button className="flex items-center gap-3" onClick={() => setIsOpenLeaveGroup(true)}>
+                    <button
+                      className="flex items-center gap-3"
+                      onClick={() => setIsOpenLeaveGroup(true)}
+                    >
                       <HiOutlineArrowRightEndOnRectangle size={25} color="red" className="font-semibold" />
                       <span className="text-sm text-[#FF0000] font-semibold leading-[25px]">Leave group</span>
                     </button>
-                    <button className="flex items-center gap-3" onClick={() => setIsOpenDissolveGroup(true)}>
+                    <button
+                      className="flex items-center gap-3"
+                      onClick={() => setIsOpenDissolveGroup(true)}
+                    >
                       <HiOutlineArrowRightEndOnRectangle size={25} color="red" className="font-semibold" />
-                      <span className="text-sm text-[#FF0000] font-semibold leading-[25px]">Dissolve Group</span>
+                      <span className="text-sm text-[#FF0000] font-semibold leading-[25px]">
+                        Dissolve Group
+                      </span>
                     </button>
                   </>
                 ) : (
@@ -191,9 +326,14 @@ const ChatInfo = ({
                   </button>
                 )}
 
-                <button className="flex items-center gap-3" onClick={() => setIsOpenLeaveGroup(true)}>
+                <button
+                  className="flex items-center gap-3"
+                  onClick={handleDeleteChatHistory}
+                >
                   <CgTrashEmpty size={25} color="red" className="text-red font-semibold" />
-                  <span className="text-sm font-semibold leading-[25px] text-[#FF0000]">Delete chat history</span>
+                  <span className="text-sm font-semibold leading-[25px] text-[#FF0000]">
+                    Delete chat history
+                  </span>
                 </button>
               </div>
             </div>
@@ -214,18 +354,20 @@ const ChatInfo = ({
               <LuUserRoundPlus size={30} color="black" />
               <span className="text-black text-sm">Add member</span>
             </Button>
-            <div className="mt-4">List memeber (5)</div>
+            <div className="mt-4">
+              List members ({chatDetail?.members?.length || 0})
+            </div>
             <div className="mt-3 px-2">
-              {[...Array(5)].map((_, i) => (
+              {chatDetail?.members?.map((member, i) => (
                 <div key={i} className="flex items-center gap-3 p-2">
                   <Image
-                    src={Images.AvatarDefault}
+                    src={member.avatar || Images.AvatarDefault}
                     alt={"avatar"}
                     className="w-[3.125rem] h-[3.125rem] rounded-[30px]"
                     width={50}
                     height={50}
                   />
-                  <span>Member {i + 1}</span>
+                  <span>{member.name}</span>
                 </div>
               ))}
             </div>
@@ -234,13 +376,34 @@ const ChatInfo = ({
       )}
 
       {isOpenAddMembers && (
-        <ModalAddMembers isOpen={isOpenAddMembers} setIsOpen={setIsOpenAddMembers} onAddMembers={handleAddMembers} />
+        <ModalAddMembers
+          isOpen={isOpenAddMembers}
+          setIsOpen={setIsOpenAddMembers}
+          conversationId={selectedChat!}
+          onMembersAdded={handleMembersAddedSuccess}
+        />
       )}
       {isOpenLeaveGroup && (
-        <ModalLeaveGroup isOpen={isOpenLeaveGroup} setIsOpen={setIsOpenLeaveGroup} chatId={selectedChat} />
+        <ModalLeaveGroup
+          isOpen={isOpenLeaveGroup}
+          setIsOpen={setIsOpenLeaveGroup}
+          chatId={selectedChat} />
       )}
       {isOpenDissolveGroup && (
-        <ModalDissolveGroup isOpen={isOpenDissolveGroup} setIsOpen={setIsOpenDissolveGroup} chatId={selectedChat} />
+        <ModalDissolveGroup
+          isOpen={isOpenDissolveGroup}
+          setIsOpen={setIsOpenDissolveGroup}
+          chatId={selectedChat} />
+      )}
+      {isOpenUpdateGroupInfo && (
+        <ModalUpdateGroupInfo
+          isOpen={isOpenUpdateGroupInfo}
+          setIsOpen={setIsOpenUpdateGroupInfo}
+          conversationId={selectedChat!}
+          currentGroupName={chatDetail?.name || ""}
+          currentGroupAvatar={chatDetail?.avatar || ""}
+          onGroupInfoUpdated={handleGroupInfoUpdatedSuccess}
+        />
       )}
     </div>
   )

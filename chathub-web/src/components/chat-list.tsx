@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState, useCallback } from "react"
 import Image from "next/image"
 import { Images } from "../constants/images"
 import "../styles/custom-scroll.css"
@@ -17,15 +17,19 @@ import { RootState } from "~/lib/reudx/store"
 import { useConversation } from "~/hooks/use-converstation"
 import { ConversationResponse } from "~/codegen/data-contracts"
 
+interface ChatListProps {
+  setSelectedChat: (id: number) => void;
+  setIsGroupChat: (isGroup: boolean) => void;
+  setConversationData?: (data: ConversationResponse) => void;
+  onPinChange: () => void;
+}
+
 const ChatList = ({
   setSelectedChat,
   setIsGroupChat,
   setConversationData,
-}: {
-  setSelectedChat: (id: number) => void
-  setIsGroupChat: (isGroup: boolean) => void
-  setConversationData?: (data: ConversationResponse) => void
-}) => {
+  onPinChange
+}: ChatListProps) => {
   const userId = useSelector((state: RootState) => state.auth.userId)
   const token = useSelector((state: RootState) => state.auth.token)
   const [modalCreateChatOpen, setModalCreateNewChatOpen] = useState(false)
@@ -38,6 +42,24 @@ const ChatList = ({
   const [modalListGroup, setModalListGroup] = useState(false)
   const { getRecentConversation } = useConversation()
   const [dataConversation, setDataConversation] = useState<ConversationResponse[]>([])
+
+  const fetchDataConversation = async () => {
+    if (userId) {
+      setDataConversation([])
+      const init = async () => {
+        const response = await getRecentConversation(userId, token)
+        if (response) {
+          setDataConversation(response);
+        }
+      };
+      init();
+    }
+  };
+
+  useEffect(() => {
+    fetchDataConversation();
+  }, [userId, modalCreateChatOpen, modalCreateGroupChatOpen]);
+
   useEffect(() => {
     if (userId) {
       setDataConversation([])
@@ -49,7 +71,7 @@ const ChatList = ({
       }
       init()
     }
-  }, [userId, modalCreateChatOpen, modalCreateGroupChatOpen])
+  }, [userId, modalCreateChatOpen, modalCreateGroupChatOpen]);
 
   const handleOpenChangePassword = () => {
     setIsProfileModalOpen(false)
@@ -135,43 +157,55 @@ const ChatList = ({
       {/* Chat List */}
       <ul className="space-y-3 overflow-y-scroll custom-scrollbar h-[calc(100%-150px)]">
         {dataConversation.length > 0 ? (
-          dataConversation.map(chat => (
-            <li
-              key={chat.id}
-              className={`flex items-center gap-3 p-2 rounded-lg hover:cursor-pointer`}
-              onClick={() => handleSelectChat(chat.id, chat, chat.chatType === "GROUP")}
-            >
-              <div className="w-12 h-12 rounded-full bg-gray-500 flex items-center justify-center">
-                <Image
-                  src={chat.chatType === "GROUP" ? chat.groupAvatar : chat.senderAvatar || Images.AvatarDefault}
-                  alt={chat.chatType === "GROUP" ? chat.groupName : chat.senderName || "Avatar"}
-                  width={48}
-                  height={48}
-                  className="rounded-full"
-                />
-              </div>
-              <div className="flex-1">
-                <div className="flex items-center justify-between">
-                  <span className="font-semibold">{chat.chatType === "GROUP" ? chat.groupName : chat.senderName}</span>
+          [...dataConversation]
+            .sort((a, b) => {
+              if (a.pinned && !b.pinned) return -1;
+              if (!a.pinned && b.pinned) return 1;
+              return 0;
+            })
+            .map(chat => (
+              <li
+                key={chat.id}
+                className={`flex items-center gap-3 p-2 rounded-lg hover:cursor-pointer`}
+                onClick={() => handleSelectChat(chat.id, chat, chat.chatType === "GROUP")}
+              >
+                <div className="w-12 h-12 rounded-full bg-gray-500 flex items-center justify-center">
+                  <Image
+                    src={chat.chatType === "GROUP" ? chat.groupAvatar : chat.senderAvatar || Images.AvatarDefault}
+                    alt={chat.chatType === "GROUP" ? chat.groupName : chat.senderName || "Avatar"}
+                    width={48}
+                    height={48}
+                    className="rounded-full"
+                  />
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center justify-between">
+                    <span className="font-semibold">{chat.chatType === "GROUP" ? chat.groupName : chat.senderName}</span>
+                    <div className="flex items-center">
+                      <span className="text-[14px] text-[#838383] mr-2">{formatTime(chat.lastMessageAt)}</span>
+                      {chat.pinned && <Image src={Images.IconPin} alt="Pin Icon" width={20} height={20} />}
+                    </div>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <p className="text-sm text-[#838383] truncate">{chat.lastMessage}</p>
+                    {chat.isSeen === false && (
+                      <span className="bg-[#0078D4] text-xs font-bold text-white rounded-[20px] px-1 flex items-center justify-center">
+                        NEW
+                      </span>
+                    )}
+                  </div>
                   <div className="flex items-center">
-                    <span className="text-[14px] text-[#838383] mr-2">{formatTime(chat.lastMessageAt)}</span>
                     {chat.pinned && <Image src={Images.IconPin} alt="Pin Icon" width={20} height={20} />}
+                    <span className="text-[14px] text-[#838383] ml-2">{formatTime(chat.lastMessageAt)}</span>
                   </div>
                 </div>
-                <div className="flex justify-between items-center">
-                  <p className="text-sm text-[#838383] truncate">{chat.lastMessage}</p>
-                  {chat.isSeen === false && (
-                    <span className="bg-[#0078D4] text-xs font-bold text-white rounded-[20px] px-1 flex items-center justify-center">
-                      NEW
-                    </span>
-                  )}
-                </div>
-              </div>
-            </li>
-          ))
+              </li>
+            ))
         ) : (
           <>Loading...</>
         )}
+
+
       </ul>
 
       {/* Floating Button */}
@@ -228,7 +262,7 @@ const ChatList = ({
       <ModalProfile
         isOpen={modalProfileOpen}
         setIsOpen={setModalProfileOpen}
-        setIsChangePasswordModalOpen={setIsChangePasswordModalOpen}
+        setIsChangePasswordModalOpen={setIsChangePasswordModalOpen} friend={undefined}
       />
       {isChangePasswordModalOpen ? (
         <ChangePasswordModal isOpen={isChangePasswordModalOpen} setIsOpen={handleCloseChangePassword} />
@@ -236,7 +270,7 @@ const ChatList = ({
         <ModalProfile
           isOpen={isModalProfileOpen}
           setIsOpen={setIsProfileModalOpen}
-          setIsChangePasswordModalOpen={handleOpenChangePassword}
+          setIsChangePasswordModalOpen={handleOpenChangePassword} friend={undefined}
         />
       )}
       <ModalFriendList isOpen={isFriendListModalOpen} setIsOpen={setIsFriendListModalOpen} />
