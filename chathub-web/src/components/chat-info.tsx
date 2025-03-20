@@ -19,6 +19,7 @@ import { CgTrashEmpty } from "react-icons/cg"
 import { AiOutlineUsergroupAdd } from "react-icons/ai"
 import { IoSettingsOutline } from "react-icons/io5"
 import { LuUserRound } from "react-icons/lu"
+import { FaUserFriends } from "react-icons/fa"
 import { HiOutlineArrowRightEndOnRectangle } from "react-icons/hi2"
 import ModalLeaveGroup from "./modal-leave-group"
 import { FaChevronLeft } from "react-icons/fa6"
@@ -277,6 +278,16 @@ const ChatInfo = ({
                     <span className="whitespace-nowrap">Manage group</span>
                   </div>
                 )}
+              </div>
+            </div>
+
+            <div className="mt-4">
+              <h3 className="text-md font-semibold">Group members</h3>
+              <div className="flex items-center justify-between mt-2 cursor-pointer" onClick={() => setIsAddingMember(true)}>
+                <div className="flex items-center gap-2">
+                  <FaUserFriends size={20} color="white" className="text-white" />
+                  <span>{chatDetail?.members?.length} members</span>
+                </div>
               </div>
             </div>
 

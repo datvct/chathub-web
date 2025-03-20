@@ -89,6 +89,9 @@ const ModalAddMembers: React.FC<ModalAddMembersProps> = ({ isOpen, setIsOpen, co
       toast.error("Failed to add members to group.")
     } finally {
       setLoading(false);
+      setTimeout(() => {
+        window.location.reload();
+      }, 6000);
     }
   }
 
