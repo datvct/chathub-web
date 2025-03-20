@@ -38,6 +38,7 @@ interface ChatInfoProps {
   selectedChat: number;
   setIsChatInfoOpen: (isOpen: boolean) => void;
   onPinChange: (isPinned: boolean) => void;
+  onHistoryDeleted: () => void;
 }
 
 interface Member {
@@ -53,6 +54,7 @@ const ChatInfo = ({
   selectedChat,
   setIsChatInfoOpen,
   onPinChange,
+  onHistoryDeleted,
 }: ChatInfoProps) => {
   const router = useRouter();
 
@@ -103,7 +105,9 @@ const ChatInfo = ({
       if (response?.statusCode === 200) {
         toast.success("Left group successfully!");
         setIsChatInfoOpen(false);
-        router.push("/");
+        setTimeout(() => {
+          router.push("/");
+        }, 6000);
       }
     } catch (error: any) {
       console.error("Error leaving group:", error);
@@ -156,12 +160,13 @@ const ChatInfo = ({
       const deleteSuccess = await deleteConversation(selectedChat, userId, token);
       if (deleteSuccess) {
         setIsChatInfoOpen(false);
-        router.push("/");
+        onHistoryDeleted();
         toast.success("Chat history deleted successfully!");
-      } else {
-        toast.error("Failed to delete chat history.");
+        setTimeout(() => {
+          router.push("/");
+        }, 6000);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error deleting chat history:", error);
       toast.error("Failed to delete chat history.");
     } finally {

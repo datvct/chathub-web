@@ -30,6 +30,10 @@ export default function Home() {
     return true;
   }, []);
 
+  const handleHistoryDeletedSuccess = useCallback(() => {
+    setSelectedChat(null);
+  }, []);
+
   useEffect(() => {
     if (selectedChat) {
       setIsChatInfoOpen(false);
@@ -92,6 +96,7 @@ export default function Home() {
             selectedChat={selectedChat}
             setIsChatInfoOpen={setIsChatInfoOpen}
             onPinChange={handlePinChangeSuccess}
+            onHistoryDeleted={handleHistoryDeletedSuccess}
           />
         }
       </div>

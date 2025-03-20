@@ -75,7 +75,7 @@ const ChatHeader = ({
           </button>
         </div>
       </div>
-      {/* 
+      {/*
       {isOpen && (
         <div ref={menuRef} className="absolute right-0 top-16 z-50 w-full max-w-xs">
           <ChatInfo isOpen={isOpen} setIsOpen={setIsOpen} />
