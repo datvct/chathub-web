@@ -104,10 +104,8 @@ const ChatInfo = ({
         toast.success("Left group successfully!");
         setIsChatInfoOpen(false);
         router.push("/");
-      } else {
-        toast.error("Failed to leave group.");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error leaving group:", error);
       toast.error("Failed to leave group.");
     }
@@ -379,7 +377,7 @@ const ChatInfo = ({
                   <>
                     <button
                       className="flex items-center gap-3"
-                      onClick={() => setIsOpenLeaveGroup(true)}
+                      onClick={() => { setIsOpenLeaveGroup(true); handleLeaveGroup(); }}
                     >
                       <HiOutlineArrowRightEndOnRectangle
                         size={25}
@@ -512,41 +510,50 @@ const ChatInfo = ({
             )}
           </div>
         </>
-      )}
+      )
+      }
 
-      {isOpenAddMembers && (
-        <ModalAddMembers
-          isOpen={isOpenAddMembers}
-          setIsOpen={setIsOpenAddMembers}
-          conversationId={selectedChat!}
-          onMembersAdded={handleMembersAddedSuccess}
-        />
-      )}
-      {isOpenLeaveGroup && (
-        <ModalLeaveGroup
-          isOpen={isOpenLeaveGroup}
-          setIsOpen={setIsOpenLeaveGroup}
-          chatId={selectedChat}
-          setSelectedChatId={setSelectedChatId}
-        />
-      )}
-      {isOpenDissolveGroup && (
-        <ModalDissolveGroup
-          isOpen={isOpenDissolveGroup}
-          setIsOpen={setIsOpenDissolveGroup}
-          chatId={selectedChat}
-        />
-      )}
-      {isOpenUpdateGroupInfo && (
-        <ModalUpdateGroupInfo
-          isOpen={isOpenUpdateGroupInfo}
-          setIsOpen={setIsOpenUpdateGroupInfo}
-          conversationId={selectedChat!}
-          currentGroupName={chatDetail?.name || ""}
-          currentGroupAvatar={chatDetail?.avatar || ""}
-          onGroupInfoUpdated={handleGroupInfoUpdatedSuccess}
-        />
-      )}
+      {
+        isOpenAddMembers && (
+          <ModalAddMembers
+            isOpen={isOpenAddMembers}
+            setIsOpen={setIsOpenAddMembers}
+            conversationId={selectedChat!}
+            onMembersAdded={handleMembersAddedSuccess}
+          />
+        )
+      }
+      {
+        isOpenLeaveGroup && (
+          <ModalLeaveGroup
+            isOpen={isOpenLeaveGroup}
+            setIsOpen={setIsOpenLeaveGroup}
+            chatId={selectedChat}
+            setSelectedChatId={setSelectedChatId}
+          />
+        )
+      }
+      {
+        isOpenDissolveGroup && (
+          <ModalDissolveGroup
+            isOpen={isOpenDissolveGroup}
+            setIsOpen={setIsOpenDissolveGroup}
+            chatId={selectedChat}
+          />
+        )
+      }
+      {
+        isOpenUpdateGroupInfo && (
+          <ModalUpdateGroupInfo
+            isOpen={isOpenUpdateGroupInfo}
+            setIsOpen={setIsOpenUpdateGroupInfo}
+            conversationId={selectedChat!}
+            currentGroupName={chatDetail?.name || ""}
+            currentGroupAvatar={chatDetail?.avatar || ""}
+            onGroupInfoUpdated={handleGroupInfoUpdatedSuccess}
+          />
+        )
+      }
       <ModalConfirm
         isOpen={isConfirmModalOpen}
         setIsOpen={setIsConfirmModalOpen}
@@ -560,7 +567,7 @@ const ChatInfo = ({
         setIsOpen={setIsSuccessModalOpen}
         message={successMessage}
       />
-    </div>
+    </div >
   );
 };
 
