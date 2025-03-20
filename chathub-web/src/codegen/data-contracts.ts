@@ -106,8 +106,8 @@ export interface ConversationResponse {
   /** @format date-time */
   createAt?: string
   participants?: ParticipantDTO[]
-  pinned?: boolean
   dissolved?: boolean
+  pinned?: boolean
 }
 
 export interface ParticipantDTO {
