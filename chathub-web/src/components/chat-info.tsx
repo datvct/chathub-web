@@ -195,10 +195,6 @@ const ChatInfo = ({
 
   if (!isOpen) return null;
 
-  const handleAddMembers = (members: Member[]) => {
-    setIsAddingMember(false);
-  };
-
   const handleMembersAddedSuccess = () => {
     if (selectedChat && userId && token) {
       getChatDetailSection(selectedChat, userId, token);
@@ -283,71 +279,6 @@ const ChatInfo = ({
                 )}
               </div>
             </div>
-
-            {isGroupChat && (
-              <div className="mt-4">
-                <h3 className="text-md font-semibold">
-                  Listing Members ({chatDetail?.members?.length} Members)
-                </h3>
-                <Button className="mt-3 px-3 w-full flex gap-2" onClick={() => setIsOpenAddMembers(true)}>
-                  <LuUserRoundPlus size={20} color="white" />
-                  <span className="text-sm">Add member</span>
-                </Button>
-                <div className="mt-3 px-2">
-                  {chatDetail?.members?.map((member, i) => {
-                    const isAdmin = chatDetail?.members?.find((m) => m.id === userId)?.is_admin;
-
-                    if (member.id === userId) {
-                      return (
-                        <div key={i} className="flex items-center gap-3 p-2 justify-between">
-                          <div className="flex items-center gap-3">
-                            <Image
-                              src={member.avatar || Images.AvatarDefault}
-                              alt={"avatar"}
-                              className="w-[3.125rem] h-[3.125rem] rounded-[30px]"
-                              width={50}
-                              height={50}
-                            />
-                            <span>
-                              {member.name} (You) {member.is_admin ? "(Admin)" : ""}
-                            </span>
-                          </div>
-                        </div>
-                      );
-                    }
-
-                    return (
-                      <div
-                        key={i}
-                        className="flex items-center gap-3 p-2 justify-between"
-                      >
-                        <div className="flex items-center gap-3">
-                          <Image
-                            src={member.avatar || Images.AvatarDefault}
-                            alt={"avatar"}
-                            className="w-[3.125rem] h-[3.125rem] rounded-[30px]"
-                            width={50}
-                            height={50}
-                          />
-                          <span>
-                            {member.name} {member.is_admin ? "(Admin)" : ""}
-                          </span>
-                        </div>
-                        {isAdmin && !member.is_admin && (
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            onClick={() => handleRemoveMemberAction(Number(member.id))}
-                          >
-                            Remove
-                          </Button>
-                        )}
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
 
             <div className="mt-4">
               <h3 className="text-md font-semibold">Photos/ Videos</h3>
@@ -482,72 +413,71 @@ const ChatInfo = ({
             </div>
           </div>
           <div className="mt-4">
-            <Button
-              className="w-full bg-[#D9D9D9] hover:bg-white"
-              onClick={() => setIsOpenAddMembers(true)}
-            >
-              <LuUserRoundPlus size={30} color="black" />
-              <span className="text-black text-sm">Add member</span>
-            </Button>
-            <div className="mt-4">
-              List members ({chatDetail?.members?.length || 0})
-            </div>
-            <div className="mt-3 px-2">
-              {chatDetail?.members?.map((member, i) => {
-                const isAdmin = chatDetail?.members?.find((m) => m.id === userId)?.is_admin;
+            {isGroupChat && (
+              <div className="mt-4">
+                <h3 className="text-md font-semibold">
+                  Listing Members ({chatDetail?.members?.length} Members)
+                </h3>
+                <Button className="w-full bg-[#D9D9D9] hover:bg-white mt-3"
+                  onClick={() => setIsOpenAddMembers(true)}>
+                  <LuUserRoundPlus size={20} color="black" />
+                  <span className="text-black text-sm">Add member</span>
+                </Button>
+                <div className="mt-3 px-2">
+                  {chatDetail?.members?.map((member, i) => {
+                    const isAdmin = chatDetail?.members?.find((m) => m.id === userId)?.is_admin;
 
-                if (member.id === userId) {
-                  return (
-                    <div
-                      key={i}
-                      className="flex items-center gap-3 p-2 justify-between"
-                    >
-                      <div className="flex items-center gap-3">
-                        <Image
-                          src={member.avatar || Images.AvatarDefault}
-                          alt={"avatar"}
-                          className="w-[3.125rem] h-[3.125rem] rounded-[30px]"
-                          width={50}
-                          height={50}
-                        />
-                        <span>
-                          {member.name} (You) {member.is_admin ? "(Admin)" : ""}
-                        </span>
-                      </div>
-                    </div>
-                  );
-                }
+                    if (member.id === userId) {
+                      return (
+                        <div key={i} className="flex items-center gap-3 p-2 justify-between">
+                          <div className="flex items-center gap-3">
+                            <Image
+                              src={member.avatar || Images.AvatarDefault}
+                              alt={"avatar"}
+                              className="w-[3.125rem] h-[3.125rem] rounded-[30px]"
+                              width={50}
+                              height={50}
+                            />
+                            <span>
+                              {member.name} (You) {member.is_admin ? "(Admin)" : ""}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    }
 
-                return (
-                  <div
-                    key={i}
-                    className="flex items-center gap-3 p-2 justify-between"
-                  >
-                    <div className="flex items-center gap-3">
-                      <Image
-                        src={member.avatar || Images.AvatarDefault}
-                        alt={"avatar"}
-                        className="w-[3.125rem] h-[3.125rem] rounded-[30px]"
-                        width={50}
-                        height={50}
-                      />
-                      <span>
-                        {member.name} {member.is_admin ? "(Admin)" : ""}
-                      </span>
-                    </div>
-                    {isAdmin && !member.is_admin && (
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={() => handleRemoveMemberAction(Number(member.id))}
+                    return (
+                      <div
+                        key={i}
+                        className="flex items-center gap-3 p-2 justify-between"
                       >
-                        Remove
-                      </Button>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
+                        <div className="flex items-center gap-3">
+                          <Image
+                            src={member.avatar || Images.AvatarDefault}
+                            alt={"avatar"}
+                            className="w-[3.125rem] h-[3.125rem] rounded-[30px]"
+                            width={50}
+                            height={50}
+                          />
+                          <span>
+                            {member.name} {member.is_admin ? "(Admin)" : ""}
+                          </span>
+                        </div>
+                        {isAdmin && !member.is_admin && (
+                          <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => handleRemoveMemberAction(Number(member.id))}
+                          >
+                            Remove
+                          </Button>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
         </>
       )}
