@@ -54,8 +54,8 @@ export async function leaveConversation(conversationId: number, userId: number, 
     }).then(res => res.json())) as SuccessResponse
     return response
   } catch (error) {
-    console.error("Error checking admin token:", error)
-    return null
+    console.error("Error leaving conversation:", error);
+    return null;
   }
 }
 

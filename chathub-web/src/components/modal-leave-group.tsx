@@ -7,12 +7,16 @@ import { RootState } from "~/lib/reudx/store"
 import { toast } from "react-toastify"
 
 interface ModalLeaveGroupProps {
-  isOpen: boolean
-  setIsOpen: (isOpen: boolean) => void
-  chatId: number
+  isOpen: boolean;
+  setIsOpen: (isOpen: boolean) => void;
+  chatId: number;
 }
 
-const ModalLeaveGroup = ({ isOpen, setIsOpen, chatId }: ModalLeaveGroupProps) => {
+const ModalLeaveGroup = ({
+  isOpen,
+  setIsOpen,
+  chatId,
+}: ModalLeaveGroupProps) => {
   const { leaveConversationById, loading, error } = useConversation()
   const userId = useSelector((state: RootState) => state.auth.userId)
   const token = useSelector((state: RootState) => state.auth.token)
