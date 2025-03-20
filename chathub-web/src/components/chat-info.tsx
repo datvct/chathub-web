@@ -159,27 +159,6 @@ const ChatInfo = ({
     setIsOpenDeleteChatHistory(true);
   };
 
-  // const handleDeleteChatHistory = async () => {
-  //   if (!selectedChat || !userId || !token) return;
-  //   setIsDeletingConversation(true);
-  //   try {
-  //     const deleteSuccess = await deleteConversation(selectedChat, userId, token);
-  //     if (deleteSuccess) {
-  //       setIsChatInfoOpen(false);
-  //       onHistoryDeleted();
-  //       toast.success("Chat history deleted successfully!");
-  //       setTimeout(() => {
-  //         router.push("/");
-  //       }, 6000);
-  //     }
-  //   } catch (error: any) {
-  //     console.error("Error deleting chat history:", error);
-  //     toast.error("Failed to delete chat history.");
-  //   } finally {
-  //     setIsDeletingConversation(false);
-  //   }
-  // };
-
   const handleRemoveMember = async (participantId: number) => {
     if (!selectedChat || !userId || !token) return;
     try {
