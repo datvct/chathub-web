@@ -171,6 +171,7 @@ export interface MessageResponse {
   senderId?: number
   senderName?: string
   content?: string
+  avatar?: string
   messageType?: "TEXT" | "IMAGE" | "VIDEO" | "DOCUMENT" | "EMOJI"
   /** @format date-time */
   sentAt?: string
