@@ -1,5 +1,6 @@
 "use client"
 
+import React from "react"
 import { Menu, MenuButton, MenuItem, MenuItems, Transition } from "@headlessui/react"
 import { Fragment } from "react"
 import Image from "next/image"
@@ -14,7 +15,7 @@ interface FriendListDropdownProps {
 
 const FriendListDropdown: React.FC<FriendListDropdownProps> = ({ friend, onOpenProfile }) => {
   return (
-    <Menu as="div" className="relative inline-block text-left gap-y-2">
+    <Menu as="div" className="relative inline-block text-left gap-y-2 z-20">
       <MenuButton as="button">
         <Ellipsis className="w-6 h-6 ml-2 text-[#8994A3] cursor-pointer hover:text-[#3E70A1]" />
       </MenuButton>
