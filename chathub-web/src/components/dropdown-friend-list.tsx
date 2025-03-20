@@ -1,6 +1,6 @@
 "use client"
 
-import React from "react"
+import React, { useState, useRef, useEffect } from "react"
 import { Menu, MenuButton, MenuItem, MenuItems, Transition } from "@headlessui/react"
 import { Fragment } from "react"
 import Image from "next/image"
@@ -14,8 +14,31 @@ interface FriendListDropdownProps {
 }
 
 const FriendListDropdown: React.FC<FriendListDropdownProps> = ({ friend, onOpenProfile }) => {
+  const [position, setPosition] = useState<'top' | 'bottom'>('bottom');
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handlePosition = () => {
+      if (menuRef.current) {
+        const rect = menuRef.current.getBoundingClientRect();
+        const spaceAbove = rect.top;
+        const spaceBelow = window.innerHeight - rect.bottom;
+
+        if (spaceBelow < 150 && spaceAbove > spaceBelow) {
+          setPosition('top');
+        } else {
+          setPosition('bottom');
+        }
+      }
+    };
+
+    handlePosition();
+    window.addEventListener('resize', handlePosition);
+    return () => window.removeEventListener('resize', handlePosition);
+  }, []);
+
   return (
-    <Menu as="div" className="relative inline-block text-left gap-y-2 z-20">
+    <Menu as="div" className="relative inline-block text-left gap-y-2 z-20" ref={menuRef}>
       <MenuButton as="button">
         <Ellipsis className="w-6 h-6 ml-2 text-[#8994A3] cursor-pointer hover:text-[#3E70A1]" />
       </MenuButton>
@@ -31,7 +54,7 @@ const FriendListDropdown: React.FC<FriendListDropdownProps> = ({ friend, onOpenP
       >
         <MenuItems
           as="ul"
-          className="absolute right-0 mt-2 w-40 rounded-lg shadow-lg bg-gradient-to-r from-[#501794] to-[#3E70A1] ring-1 ring-black ring-opacity-5 focus:outline-none z-50"
+          className={`absolute right-0 mt-2 w-40 rounded-lg shadow-lg bg-gradient-to-r from-[#501794] to-[#3E70A1] ring-1 ring-black ring-opacity-5 focus:outline-none z-50 ${position === 'top' ? 'bottom-full mb-2' : 'top-full mt-2'}`}
         >
           <div className="px-2 py-2">
             <MenuItem
