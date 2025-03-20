@@ -284,7 +284,7 @@ const ChatInfo = ({
             <div className="mt-4">
               <h3 className="text-md font-semibold">Group members</h3>
               <div className="flex items-center justify-between mt-2 cursor-pointer" onClick={() => setIsAddingMember(true)}>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-3 rounded-lg p-2 hover:bg-[#484848] w-full">
                   <FaUserFriends size={20} color="white" className="text-white" />
                   <span>{chatDetail?.members?.length} members</span>
                 </div>
