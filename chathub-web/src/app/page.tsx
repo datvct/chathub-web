@@ -27,6 +27,7 @@ export default function Home() {
 
   const handlePinChangeSuccess = useCallback(() => {
     setNeedRefetchConversations(prevState => !prevState);
+    return true;
   }, []);
 
   useEffect(() => {
