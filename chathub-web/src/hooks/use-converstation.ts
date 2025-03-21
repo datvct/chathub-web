@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   ConversationRequest,
   UpdateNickNameRequest,
   UpdateGroupInfoRequest,
+  ConversationResponse,
 } from "~/codegen/data-contracts";
 import {
   getRecentConversationByUserID,
@@ -20,11 +21,31 @@ import {
   updateNicknameAPI,
   removeParticipantFromGroupConversationAPI,
   leaveGroupConversationAPI,
+  findGroupsAPI,
 } from "~/lib/get-conversation";
 
-export const useConversation = () => {
+export const useConversation = (userId: number, token: string) => {
+  const [groups, setGroups] = useState<ConversationResponse[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!userId) return;
+
+    const fetchGroups = async () => {
+      setLoading(true);
+      try {
+        const data = await getGroupConversations(userId, token);
+        setGroups(data);
+      } catch {
+        setError("Failed to fetch groups.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchGroups();
+  }, [userId]);
 
   const getRecentConversation = async (id: number, token: string) => {
     setLoading(true);
@@ -91,7 +112,7 @@ export const useConversation = () => {
       const response = await getGroupConversationsByUserId(userId, token);
       return response || null;
     } catch (err) {
-      setError("Failed to fetch conversation");
+      setError("Failed to fetch group conversations");
       return null;
     } finally {
       setLoading(false);
@@ -242,7 +263,23 @@ export const useConversation = () => {
     }
   };
 
+  const findGroups = async (userId: number, groupName: string, token: string) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await findGroupsAPI(userId, groupName, token);
+      console.log("findGroups Response:", response);
+      return response || [];
+    } catch (err) {
+      setError("Failed to fetch groups");
+      return [];
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
+    groups,
     getRecentConversation,
     createConversation,
     leaveConversationById,
@@ -258,6 +295,7 @@ export const useConversation = () => {
     updateNickname,
     removeParticipantFromGroup,
     leaveGroupConversation,
+    findGroups,
     loading,
     error
   };

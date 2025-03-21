@@ -42,7 +42,9 @@ const ChatList = ({
   const [isFriendListModalOpen, setIsFriendListModalOpen] = useState(false)
   const [isFriendRequestModalOpen, setIsFriendRequestModalOpen] = useState(false)
   const [modalListGroup, setModalListGroup] = useState(false)
-  const { getRecentConversation } = useConversation()
+  const {
+    getRecentConversation
+  } = useConversation(userId, token)
   const [dataConversation, setDataConversation] = useState<ConversationResponse[]>([])
 
   const fetchDataConversation = async () => {
@@ -277,9 +279,19 @@ const ChatList = ({
           setIsChangePasswordModalOpen={handleOpenChangePassword} friend={undefined}
         />
       )}
-      <ModalFriendList isOpen={isFriendListModalOpen} setIsOpen={setIsFriendListModalOpen} />
-      <ModalFriendRequests isOpen={isFriendRequestModalOpen} setIsOpen={setIsFriendRequestModalOpen} />
-      <ModalListGroup isOpen={modalListGroup} setIsOpen={setModalListGroup} isAdmin={true} />
+      <ModalFriendList
+        isOpen={isFriendListModalOpen}
+        setIsOpen={setIsFriendListModalOpen}
+      />
+      <ModalFriendRequests
+        isOpen={isFriendRequestModalOpen}
+        setIsOpen={setIsFriendRequestModalOpen}
+      />
+      <ModalListGroup
+        isOpen={modalListGroup}
+        setIsOpen={setModalListGroup}
+        isAdmin={true}
+      />
     </div>
   )
 }

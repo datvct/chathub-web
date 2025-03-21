@@ -127,7 +127,9 @@ const ChatScreen = ({
             <div ref={messagesEndRef} />
           </div>
         ) : (
-          <div className="flex items-center justify-center text-white">Không có tin nhắn</div>
+          <div className="flex items-center justify-center text-white">
+            No messages found
+          </div>
         )}
       </div>
 

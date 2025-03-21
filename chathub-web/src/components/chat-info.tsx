@@ -1,37 +1,39 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import Image from "next/image"
-import { Images } from "~/constants/images"
-import { useConversation } from "~/hooks/use-converstation";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
+import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
 import { RootState } from "~/lib/reudx/store";
 import { ChatDetailSectionResponse, ConversationResponse } from "~/codegen/data-contracts";
-import { toast } from "react-toastify";
-import { GoBell, GoBellSlash } from "react-icons/go"
-import { BsPinAngleFill } from "react-icons/bs"
-import { RiUnpinFill } from "react-icons/ri"
-import { FaRegFile } from "react-icons/fa"
-import { FaLink } from "react-icons/fa6"
-import { MdBlock } from "react-icons/md"
-import { CgTrashEmpty } from "react-icons/cg"
-import { AiOutlineUsergroupAdd } from "react-icons/ai"
-import { IoSettingsOutline } from "react-icons/io5"
-import { LuUserRound } from "react-icons/lu"
-import { FaUserFriends } from "react-icons/fa"
-import { HiOutlineArrowRightEndOnRectangle } from "react-icons/hi2"
-import ModalLeaveGroup from "./modal-leave-group"
-import { FaChevronLeft } from "react-icons/fa6"
-import { Button } from "./ui/button"
-import { LuUserRoundPlus } from "react-icons/lu"
-import ModalAddMembers from "./modal-add-members"
-import ModalDissolveGroup from "./modal-dissolve-group"
-import ModalUpdateGroupInfo from "./modal-update-group-info"
-import ModalConfirm from "./modal-confirm"
-import ModalSuccess from "./modal-success"
-import { getRecentConversationByUserID } from "~/lib/get-conversation"
-import ModalDeleteConversation from "~/components/modal-delete-conversation"
+import { getRecentConversationByUserID } from "~/lib/get-conversation";
+import { Images } from "~/constants/images";
+import { useConversation } from "~/hooks/use-converstation";
+
+import ModalLeaveGroup from "./modal-leave-group";
+import ModalAddMembers from "./modal-add-members";
+import ModalDissolveGroup from "./modal-dissolve-group";
+import ModalUpdateGroupInfo from "./modal-update-group-info";
+import ModalConfirm from "./modal-confirm";
+import ModalSuccess from "./modal-success";
+import ModalDeleteConversation from "~/components/modal-delete-conversation";
+import { Button } from "./ui/button";
+
+import { GoBell, GoBellSlash } from "react-icons/go";
+import { BsPinAngleFill } from "react-icons/bs";
+import { RiUnpinFill } from "react-icons/ri";
+import { FaRegFile } from "react-icons/fa";
+import { FaLink } from "react-icons/fa6";
+import { MdBlock } from "react-icons/md";
+import { CgTrashEmpty } from "react-icons/cg";
+import { AiOutlineUsergroupAdd } from "react-icons/ai";
+import { IoSettingsOutline } from "react-icons/io5";
+import { LuUserRound } from "react-icons/lu";
+import { FaUserFriends } from "react-icons/fa";
+import { HiOutlineArrowRightEndOnRectangle } from "react-icons/hi2";
+import { FaChevronLeft } from "react-icons/fa6";
+import { LuUserRoundPlus } from "react-icons/lu";
 
 interface ChatInfoProps {
   isOpen?: boolean;
@@ -59,6 +61,18 @@ const ChatInfo = ({
 }: ChatInfoProps) => {
   const router = useRouter();
 
+  const token = useSelector((state: RootState) => state.auth.token);
+  const userId = useSelector((state: RootState) => state.auth.userId);
+
+  const {
+    getGroupConversations,
+    getChatDetailSection,
+    removeParticipantFromGroup,
+    pinConversation,
+    deleteConversation,
+    leaveGroupConversation
+  } = useConversation(userId, token);
+
   const [isOpenLeaveGroup, setIsOpenLeaveGroup] = useState(false);
   const [isAddingMember, setIsAddingMember] = useState(false);
   const [isOpenAddMembers, setIsOpenAddMembers] = useState(false);
@@ -75,16 +89,6 @@ const ChatInfo = ({
   const [selectedChatId, setSelectedChatId] = useState<number | null>(null);
   const [isOpenDeleteConversation, setIsOpenDeleteConversation] = useState(false);
 
-  const token = useSelector((state: RootState) => state.auth.token);
-  const userId = useSelector((state: RootState) => state.auth.userId);
-
-  const {
-    getChatDetailSection,
-    removeParticipantFromGroup,
-    pinConversation,
-    deleteConversation,
-    leaveGroupConversation
-  } = useConversation();
   const [chatDetail, setChatDetail] = useState<ChatDetailSectionResponse | null>(null);
   const [isPinned, setIsPinned] = useState(false);
   const [isDeletingConversation, setIsDeletingConversation] = useState<boolean>(false);
@@ -99,6 +103,8 @@ const ChatInfo = ({
     };
     fetchChatDetails();
   }, [selectedChat, userId, token]);
+
+
 
   const handleLeaveGroup = async () => {
     if (!selectedChat || !userId || !token) return;
@@ -290,15 +296,17 @@ const ChatInfo = ({
               </div>
             </div>
 
-            <div className="mt-4">
-              <h3 className="text-md font-semibold">Group members</h3>
-              <div className="flex items-center justify-between mt-2 cursor-pointer" onClick={() => setIsAddingMember(true)}>
-                <div className="flex items-center gap-3 rounded-lg p-2 hover:bg-[#484848] w-full">
-                  <FaUserFriends size={20} color="white" className="text-white" />
-                  <span>{chatDetail?.members?.length} members</span>
+            {isGroupChat && (
+              <div className="mt-4">
+                <h3 className="text-md font-semibold">Group members</h3>
+                <div className="flex items-center justify-between mt-2 cursor-pointer" onClick={() => setIsAddingMember(true)}>
+                  <div className="flex items-center gap-3 rounded-lg p-2 hover:bg-[#484848] w-full">
+                    <FaUserFriends size={20} color="white" className="text-white" />
+                    <span>{chatDetail?.members?.length} members</span>
+                  </div>
                 </div>
               </div>
-            </div>
+            )}
 
             <div className="mt-4">
               <h3 className="text-md font-semibold">Photos/ Videos</h3>
@@ -378,19 +386,21 @@ const ChatInfo = ({
                         Leave group
                       </span>
                     </button>
-                    <button
-                      className="flex items-center gap-3"
-                      onClick={() => setIsOpenDissolveGroup(true)}
-                    >
-                      <HiOutlineArrowRightEndOnRectangle
-                        size={25}
-                        color="red"
-                        className="font-semibold"
-                      />
-                      <span className="text-sm text-[#FF0000] font-semibold leading-[25px]">
-                        Dissolve Group
-                      </span>
-                    </button>
+                    {isCurrentUserAdmin && (
+                      <button
+                        className="flex items-center gap-3"
+                        onClick={() => setIsOpenDissolveGroup(true)}
+                      >
+                        <HiOutlineArrowRightEndOnRectangle
+                          size={25}
+                          color="red"
+                          className="font-semibold"
+                        />
+                        <span className="text-sm text-[#FF0000] font-semibold leading-[25px]">
+                          Dissolve Group
+                        </span>
+                      </button>
+                    )}
                   </>
                 ) : (
                   <button className="flex items-center gap-3">
@@ -415,7 +425,7 @@ const ChatInfo = ({
                     className="text-red font-semibold"
                   />
                   <span className="text-sm font-semibold leading-[25px] text-[#FF0000]">
-                    Delete chat history
+                    Delete conversation
                   </span>
                 </button>
               </div>
@@ -529,6 +539,7 @@ const ChatInfo = ({
             isOpen={isOpenDissolveGroup}
             setIsOpen={setIsOpenDissolveGroup}
             chatId={selectedChat}
+            isAdmin={isCurrentUserAdmin}
           />
         )
       }
