@@ -278,9 +278,19 @@ const ChatList = ({
           setIsChangePasswordModalOpen={handleOpenChangePassword} friend={undefined}
         />
       )}
-      <ModalFriendList isOpen={isFriendListModalOpen} setIsOpen={setIsFriendListModalOpen} />
-      <ModalFriendRequests isOpen={isFriendRequestModalOpen} setIsOpen={setIsFriendRequestModalOpen} />
-      <ModalListGroup isOpen={modalListGroup} setIsOpen={setModalListGroup} isAdmin={true} />
+      <ModalFriendList
+        isOpen={isFriendListModalOpen}
+        setIsOpen={setIsFriendListModalOpen}
+      />
+      <ModalFriendRequests
+        isOpen={isFriendRequestModalOpen}
+        setIsOpen={setIsFriendRequestModalOpen}
+      />
+      <ModalListGroup
+        isOpen={modalListGroup}
+        setIsOpen={setModalListGroup}
+        isAdmin={true}
+      />
     </div>
   )
 }

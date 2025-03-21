@@ -20,6 +20,7 @@ import {
   updateNicknameAPI,
   removeParticipantFromGroupConversationAPI,
   leaveGroupConversationAPI,
+  findGroupsAPI,
 } from "~/lib/get-conversation";
 
 export const useConversation = () => {
@@ -91,7 +92,7 @@ export const useConversation = () => {
       const response = await getGroupConversationsByUserId(userId, token);
       return response || null;
     } catch (err) {
-      setError("Failed to fetch conversation");
+      setError("Failed to fetch group conversations");
       return null;
     } finally {
       setLoading(false);
@@ -242,6 +243,21 @@ export const useConversation = () => {
     }
   };
 
+  const findGroups = async (userId: number, groupName: string, token: string) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await findGroupsAPI(userId, groupName, token);
+      console.log("findGroups Response:", response);
+      return response || [];
+    } catch (err) {
+      setError("Failed to fetch groups");
+      return [];
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return {
     getRecentConversation,
     createConversation,
@@ -258,6 +274,7 @@ export const useConversation = () => {
     updateNickname,
     removeParticipantFromGroup,
     leaveGroupConversation,
+    findGroups,
     loading,
     error
   };

@@ -331,3 +331,23 @@ export const leaveGroupConversationAPI = async (
     return null;
   }
 };
+
+export async function findGroupsAPI(userId: number, groupName: string, token: string) {
+  try {
+    if (!userId) return [];
+    console.log("Calling API findGroupsAPI with:", { userId, groupName });
+    const response = await conversationInstance.findGroupConversations(
+      { userId, groupName },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    console.log("API Response:", response);
+    return response.data || [];
+  } catch (error) {
+    console.error("Error fetching groups:", error);
+    return [];
+  }
+};
