@@ -21,9 +21,13 @@ const ModalDeleteConversation = ({
   chatId,
   onHistoryDeleted
 }: ModalDeleteConversationProps) => {
-  const { deleteConversation, loading } = useConversation()
   const userId = useSelector((state: RootState) => state.auth.userId)
   const token = useSelector((state: RootState) => state.auth.token)
+
+  const {
+    deleteConversation,
+    loading
+  } = useConversation(userId, token)
 
   const handleDeleteConversation = async () => {
     if (!chatId || !userId || !token) return;

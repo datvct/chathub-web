@@ -20,11 +20,16 @@ interface ModalListGroupProps {
   isAdmin: boolean
 }
 
-const ModalListGroup: React.FC<ModalListGroupProps> = ({ isOpen, setIsOpen, isAdmin }) => {
+const ModalListGroup: React.FC<ModalListGroupProps> = ({
+  isOpen,
+  setIsOpen,
+  isAdmin
+}) => {
   const router = useRouter();
 
   const userId = useSelector((state: RootState) => state.auth.userId)
   const token = useSelector((state: RootState) => state.auth.token)
+
   const [dataGroup, setDataGroup] = useState<ConversationResponse[]>([])
   const [groupName, setGroupName] = useState<string>("")
   const [activeTab, setActiveTab] = useState<string>("all");
@@ -35,10 +40,11 @@ const ModalListGroup: React.FC<ModalListGroupProps> = ({ isOpen, setIsOpen, isAd
     findGroups,
   } = useConversation(userId, token)
 
+  const groupRefs = useRef<(HTMLLIElement | null)[]>([])
+
   const [selectedGroup, setSelectedGroup] = useState<number | null>(null);
   const [showOptionsForGroup, setShowOptionsForGroup] = useState<number | null>(null);
   const [modalPosition, setModalPosition] = useState<{ top: number; left: number } | null>(null);
-  const groupRefs = useRef<(HTMLLIElement | null)[]>([])
 
   useEffect(() => {
     if (userId) {
