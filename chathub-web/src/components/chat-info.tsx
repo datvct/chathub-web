@@ -31,7 +31,7 @@ import ModalUpdateGroupInfo from "./modal-update-group-info"
 import ModalConfirm from "./modal-confirm"
 import ModalSuccess from "./modal-success"
 import { getRecentConversationByUserID } from "~/lib/get-conversation"
-import ModalDeleteChatHistory from "./modal-delete-conversation"
+import ModalDeleteConversation from "~/components/modal-delete-conversation"
 
 interface ChatInfoProps {
   isOpen?: boolean;
@@ -73,7 +73,7 @@ const ChatInfo = ({
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string>("");
   const [selectedChatId, setSelectedChatId] = useState<number | null>(null);
-  const [isOpenDeleteChatHistory, setIsOpenDeleteChatHistory] = useState(false);
+  const [isOpenDeleteConversation, setIsOpenDeleteConversation] = useState(false);
 
   const token = useSelector((state: RootState) => state.auth.token);
   const userId = useSelector((state: RootState) => state.auth.userId);
@@ -155,8 +155,8 @@ const ChatInfo = ({
     }
   };
 
-  const handleDeleteChatHistory = async () => {
-    setIsOpenDeleteChatHistory(true);
+  const handleDeleteConversation = async () => {
+    setIsOpenDeleteConversation(true);
   };
 
   const handleRemoveMember = async (participantId: number) => {
@@ -407,7 +407,7 @@ const ChatInfo = ({
 
                 <button
                   className="flex items-center gap-3"
-                  onClick={handleDeleteChatHistory}
+                  onClick={handleDeleteConversation}
                 >
                   <CgTrashEmpty
                     size={25}
@@ -557,10 +557,10 @@ const ChatInfo = ({
         setIsOpen={setIsSuccessModalOpen}
         message={successMessage}
       />
-      {isOpenDeleteChatHistory && (
-        <ModalDeleteChatHistory
-          isOpen={isOpenDeleteChatHistory}
-          setIsOpen={setIsOpenDeleteChatHistory}
+      {isOpenDeleteConversation && (
+        <ModalDeleteConversation
+          isOpen={isOpenDeleteConversation}
+          setIsOpen={setIsOpenDeleteConversation}
           chatId={selectedChat}
           onHistoryDeleted={onHistoryDeleted}
         />

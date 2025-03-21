@@ -25,7 +25,7 @@ const ModalDeleteConversation = ({
 	const userId = useSelector((state: RootState) => state.auth.userId)
 	const token = useSelector((state: RootState) => state.auth.token)
 
-	const handleDeleteChatHistory = async () => {
+	const handleDeleteConversation = async () => {
 		if (!chatId || !userId || !token) return;
 		try {
 			const response = await deleteConversation(chatId, userId, token);
@@ -62,7 +62,7 @@ const ModalDeleteConversation = ({
 					<Button
 						className="p-4 h-10 bg-[#FF2F2F] text-white rounded-lg text-center
             hover:bg-[#B22222]"
-						onClick={handleDeleteChatHistory}
+						onClick={handleDeleteConversation}
 						disabled={loading}
 					>
 						{loading ? "Processing..." : "Delete"}
