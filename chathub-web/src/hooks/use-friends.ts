@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { FriendshipRequest, UserDTO } from "~/codegen/data-contracts";
 import { getListFriends, rejectFriendRequest, unsentFriendRequest } from "~/lib/get-friend";
-import {getListFriendRequest, acceptFriendRequest} from "~/lib/get-friend";
+import { getListFriendRequest, acceptFriendRequest } from "~/lib/get-friend";
 
 export function useFriends(userId: number, token: string) {
   const [friends, setFriends] = useState<UserDTO[] | null>(null);
@@ -42,11 +42,11 @@ export function useFriends(userId: number, token: string) {
     }
   };
 
-  const acceptFriendRequestHook = async(values: FriendshipRequest)=>{
+  const acceptFriendRequestHook = async (values: FriendshipRequest) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await acceptFriendRequest(values,token);
+      const response = await acceptFriendRequest(values, token);
       return response || null;
     } catch (err) {
       setError("Failed to fetch conversation");
@@ -56,11 +56,11 @@ export function useFriends(userId: number, token: string) {
     }
   }
 
-  const rejectFriendRequestHook = async(values: FriendshipRequest)=>{
+  const rejectFriendRequestHook = async (values: FriendshipRequest) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await rejectFriendRequest(values,token);
+      const response = await rejectFriendRequest(values, token);
       return response || null;
     } catch (err) {
       setError("Failed to fetch conversation");
@@ -70,11 +70,11 @@ export function useFriends(userId: number, token: string) {
     }
   }
 
-  const unsentFriendRequestHook = async(friendId: number)=>{
+  const unsentFriendRequestHook = async (friendId: number) => {
     setLoading(true);
     setError(null);
     try {
-      const response = await unsentFriendRequest(userId,friendId,token);
+      const response = await unsentFriendRequest(userId, friendId, token);
       return response || null;
     } catch (err) {
       setError("Failed to fetch conversation");
@@ -84,5 +84,5 @@ export function useFriends(userId: number, token: string) {
     }
   }
 
-  return { friends, loading, error, getListFriendRequests, acceptFriendRequestHook, rejectFriendRequestHook, unsentFriendRequestHook};
+  return { friends, loading, error, getListFriendRequests, acceptFriendRequestHook, rejectFriendRequestHook, unsentFriendRequestHook };
 }

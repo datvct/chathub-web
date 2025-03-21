@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   ConversationRequest,
   UpdateNickNameRequest,
   UpdateGroupInfoRequest,
+  ConversationResponse,
 } from "~/codegen/data-contracts";
 import {
   getRecentConversationByUserID,
@@ -23,9 +24,28 @@ import {
   findGroupsAPI,
 } from "~/lib/get-conversation";
 
-export const useConversation = () => {
+export const useConversation = (userId: number, token: string) => {
+  const [groups, setGroups] = useState<ConversationResponse[] | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!userId) return;
+
+    const fetchGroups = async () => {
+      setLoading(true);
+      try {
+        const data = await getGroupConversations(userId, token);
+        setGroups(data);
+      } catch {
+        setError("Failed to fetch groups.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchGroups();
+  }, [userId]);
 
   const getRecentConversation = async (id: number, token: string) => {
     setLoading(true);
@@ -259,6 +279,7 @@ export const useConversation = () => {
   };
 
   return {
+    groups,
     getRecentConversation,
     createConversation,
     leaveConversationById,

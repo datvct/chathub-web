@@ -59,6 +59,18 @@ const ChatInfo = ({
 }: ChatInfoProps) => {
   const router = useRouter();
 
+  const token = useSelector((state: RootState) => state.auth.token);
+  const userId = useSelector((state: RootState) => state.auth.userId);
+
+  const {
+    getGroupConversations,
+    getChatDetailSection,
+    removeParticipantFromGroup,
+    pinConversation,
+    deleteConversation,
+    leaveGroupConversation
+  } = useConversation(userId, token);
+
   const [isOpenLeaveGroup, setIsOpenLeaveGroup] = useState(false);
   const [isAddingMember, setIsAddingMember] = useState(false);
   const [isOpenAddMembers, setIsOpenAddMembers] = useState(false);
@@ -75,16 +87,6 @@ const ChatInfo = ({
   const [selectedChatId, setSelectedChatId] = useState<number | null>(null);
   const [isOpenDeleteConversation, setIsOpenDeleteConversation] = useState(false);
 
-  const token = useSelector((state: RootState) => state.auth.token);
-  const userId = useSelector((state: RootState) => state.auth.userId);
-
-  const {
-    getChatDetailSection,
-    removeParticipantFromGroup,
-    pinConversation,
-    deleteConversation,
-    leaveGroupConversation
-  } = useConversation();
   const [chatDetail, setChatDetail] = useState<ChatDetailSectionResponse | null>(null);
   const [isPinned, setIsPinned] = useState(false);
   const [isDeletingConversation, setIsDeletingConversation] = useState<boolean>(false);

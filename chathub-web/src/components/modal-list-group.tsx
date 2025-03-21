@@ -27,16 +27,17 @@ const ModalListGroup: React.FC<ModalListGroupProps> = ({ isOpen, setIsOpen, isAd
   const token = useSelector((state: RootState) => state.auth.token)
   const [dataGroup, setDataGroup] = useState<ConversationResponse[]>([])
   const [groupName, setGroupName] = useState<string>("")
+  const [activeTab, setActiveTab] = useState<string>("all");
 
   const {
+    groups: fetchedGroups,
     getGroupConversations,
     findGroups,
-  } = useConversation()
+  } = useConversation(userId, token)
 
-  const [selectedGroup, setSelectedGroup] = useState<number | null>(null)
-  const [showOptionsForGroup, setShowOptionsForGroup] = useState<number | null>(null)
-  const [modalPosition, setModalPosition] = useState<{ top: number; left: number } | null>(null)
-
+  const [selectedGroup, setSelectedGroup] = useState<number | null>(null);
+  const [showOptionsForGroup, setShowOptionsForGroup] = useState<number | null>(null);
+  const [modalPosition, setModalPosition] = useState<{ top: number; left: number } | null>(null);
   const groupRefs = useRef<(HTMLLIElement | null)[]>([])
 
   useEffect(() => {
@@ -117,9 +118,11 @@ const ModalListGroup: React.FC<ModalListGroupProps> = ({ isOpen, setIsOpen, isAd
               />
               <Search className="absolute top-1/2 left-4 -translate-y-1/2 text-gray-500 pr-2" />
             </div>
-
-            <Button className="w-20 py-2 px-4 mb-2 bg-[#7746f5] rounded-[12px] text-lg text-white bg-gradient-to-r from-[#501794] to-[#3E70A1] hover:bg-gradient-to-l">
-              All ({dataGroup.length})
+            <Button className={`w-20 py-2 px-4 mb-2 bg-[#7746f5] rounded-[12px] text-lg text-white bg-gradient-to-r from-[#501794] to-[#3E70A1] hover:bg-gradient-to-l
+              ${activeTab === "all" ? "bg-[#501794]" : "bg-[#8C8595] hover:bg-[#7746F5]"}
+            `}
+            >
+              All ({fetchedGroups?.length || 0})
             </Button>
 
             <ul className="max-h-[55vh] overflow-auto custom-scrollbar">
@@ -128,7 +131,7 @@ const ModalListGroup: React.FC<ModalListGroupProps> = ({ isOpen, setIsOpen, isAd
                   <li
                     key={group.id}
                     ref={el => {
-                      groupRefs.current[index] = el
+                      groupRefs.current[index] = el;
                     }}
                     className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer mb-3 ${selectedGroup === index ? "bg-[#7a99b8]/90" : ""
                       } bg-[#fff] hover:bg-[#93C1D2]`}
@@ -197,7 +200,7 @@ const ModalListGroup: React.FC<ModalListGroupProps> = ({ isOpen, setIsOpen, isAd
           </DialogPanel>
         </div>
       </div>
-    </Dialog>
+    </Dialog >
   )
 }
 

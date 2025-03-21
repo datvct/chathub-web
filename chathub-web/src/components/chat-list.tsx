@@ -42,7 +42,9 @@ const ChatList = ({
   const [isFriendListModalOpen, setIsFriendListModalOpen] = useState(false)
   const [isFriendRequestModalOpen, setIsFriendRequestModalOpen] = useState(false)
   const [modalListGroup, setModalListGroup] = useState(false)
-  const { getRecentConversation } = useConversation()
+  const {
+    getRecentConversation
+  } = useConversation(userId, token)
   const [dataConversation, setDataConversation] = useState<ConversationResponse[]>([])
   const [needRefetchConversations, setNeedRefetchConversations] = useState(false)
 
