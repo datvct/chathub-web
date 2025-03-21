@@ -8,19 +8,19 @@ import { useSelector } from "react-redux"
 import { RootState } from "~/lib/reudx/store"
 import { toast } from "react-toastify"
 
-interface ModalDeleteChatHistoryProps {
+interface ModalDeleteConversationProps {
 	isOpen: boolean
 	setIsOpen: (isOpen: boolean) => void
 	chatId: number
 	onHistoryDeleted: () => void
 }
 
-const ModalDeleteChatHistory = ({
+const ModalDeleteConversation = ({
 	isOpen,
 	setIsOpen,
 	chatId,
 	onHistoryDeleted
-}: ModalDeleteChatHistoryProps) => {
+}: ModalDeleteConversationProps) => {
 	const { deleteConversation, loading } = useConversation()
 	const userId = useSelector((state: RootState) => state.auth.userId)
 	const token = useSelector((state: RootState) => state.auth.token)
@@ -73,4 +73,4 @@ const ModalDeleteChatHistory = ({
 	)
 }
 
-export default ModalDeleteChatHistory
+export default ModalDeleteConversation

@@ -31,7 +31,7 @@ import ModalUpdateGroupInfo from "./modal-update-group-info"
 import ModalConfirm from "./modal-confirm"
 import ModalSuccess from "./modal-success"
 import { getRecentConversationByUserID } from "~/lib/get-conversation"
-import ModalDeleteChatHistory from "./modal-delete-chat-history"
+import ModalDeleteChatHistory from "./modal-delete-conversation"
 
 interface ChatInfoProps {
   isOpen?: boolean;
