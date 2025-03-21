@@ -15,9 +15,14 @@ interface ModalLeaveGroupProps {
 }
 
 const ModalDissolveGroup = ({ isOpen, setIsOpen, chatId }: ModalLeaveGroupProps) => {
-  const { dissolveGroup, loading, error } = useConversation()
   const userId = useSelector((state: RootState) => state.auth.userId)
   const token = useSelector((state: RootState) => state.auth.token)
+
+  const {
+    dissolveGroup,
+    loading,
+    error
+  } = useConversation(userId, token)
 
   const handleDissolveGroup = async () => {
     const response = await dissolveGroup(chatId, userId, token)
