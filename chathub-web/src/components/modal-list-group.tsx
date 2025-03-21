@@ -45,7 +45,8 @@ const ModalListGroup: React.FC<ModalListGroupProps> = ({ isOpen, setIsOpen, isAd
       const init = async () => {
         const response = await getGroupConversations(userId, token)
         if (response) {
-          setDataGroup(response)
+          const groupConversations = response.filter(group => group.chatType === "GROUP")
+          setDataGroup(groupConversations)
         }
       }
       init()
@@ -122,7 +123,7 @@ const ModalListGroup: React.FC<ModalListGroupProps> = ({ isOpen, setIsOpen, isAd
               ${activeTab === "all" ? "bg-[#501794]" : "bg-[#8C8595] hover:bg-[#7746F5]"}
             `}
             >
-              All ({fetchedGroups?.length || 0})
+              All ({dataGroup?.length || 0})
             </Button>
 
             <ul className="max-h-[55vh] overflow-auto custom-scrollbar">
