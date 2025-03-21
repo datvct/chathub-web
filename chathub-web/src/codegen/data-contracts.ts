@@ -80,7 +80,8 @@ export interface FriendshipRequest {
 export interface ConversationRequest {
   chatType?: "SINGLE" | "GROUP"
   groupName?: string
-  groupAvatar?: string
+  /** @format binary */
+  groupAvatar?: File
   /** @format int64 */
   creatorId?: number
   participantIds?: number[]
@@ -106,8 +107,8 @@ export interface ConversationResponse {
   /** @format date-time */
   createAt?: string
   participants?: ParticipantDTO[]
-  dissolved?: boolean
   pinned?: boolean
+  dissolved?: boolean
 }
 
 export interface ParticipantDTO {
