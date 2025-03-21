@@ -8,24 +8,24 @@ import { useSelector } from "react-redux"
 import { RootState } from "~/lib/reudx/store"
 import { toast } from "react-toastify"
 
-interface ModalDeleteChatHistoryProps {
+interface ModalDeleteConversationProps {
 	isOpen: boolean
 	setIsOpen: (isOpen: boolean) => void
 	chatId: number
 	onHistoryDeleted: () => void
 }
 
-const ModalDeleteChatHistory = ({
+const ModalDeleteConversation = ({
 	isOpen,
 	setIsOpen,
 	chatId,
 	onHistoryDeleted
-}: ModalDeleteChatHistoryProps) => {
+}: ModalDeleteConversationProps) => {
 	const { deleteConversation, loading } = useConversation()
 	const userId = useSelector((state: RootState) => state.auth.userId)
 	const token = useSelector((state: RootState) => state.auth.token)
 
-	const handleDeleteChatHistory = async () => {
+	const handleDeleteConversation = async () => {
 		if (!chatId || !userId || !token) return;
 		try {
 			const response = await deleteConversation(chatId, userId, token);
@@ -62,7 +62,7 @@ const ModalDeleteChatHistory = ({
 					<Button
 						className="p-4 h-10 bg-[#FF2F2F] text-white rounded-lg text-center
             hover:bg-[#B22222]"
-						onClick={handleDeleteChatHistory}
+						onClick={handleDeleteConversation}
 						disabled={loading}
 					>
 						{loading ? "Processing..." : "Delete"}
@@ -73,4 +73,4 @@ const ModalDeleteChatHistory = ({
 	)
 }
 
-export default ModalDeleteChatHistory
+export default ModalDeleteConversation
