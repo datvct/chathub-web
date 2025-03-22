@@ -9,12 +9,18 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs"
 import { useSelector } from "react-redux"
 import { RootState } from "~/lib/reudx/store"
 import dayjs from "dayjs"
-import { Friend, ProfileData } from "~/types/types"
+import { UserDTO } from "~/codegen/data-contracts"
+
+interface ProfileData {
+	displayName: string
+	dateOfBirth?: string | Date
+	gender: string
+}
 
 interface ProfileViewModalProps {
 	isOpen: boolean
 	setIsOpen: (open: boolean) => void
-	friend: Friend | null
+	friend: UserDTO | null
 }
 
 const ProfileViewModal: React.FC<ProfileViewModalProps> = ({
@@ -91,7 +97,7 @@ const ProfileViewModal: React.FC<ProfileViewModalProps> = ({
 									<div className="relative">
 										<label htmlFor="profile-upload" className="relative cursor-pointer">
 											<Image
-												src={friend?.image ?? Images.ProfileImage}
+												src={friend?.avatar ?? Images.ProfileImage}
 												alt="profile default"
 												width={100}
 												height={100}
