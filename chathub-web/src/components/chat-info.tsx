@@ -374,7 +374,7 @@ const ChatInfo = ({
                 {isGroupChat ? (
                   <>
                     <button
-                      className="flex items-center gap-3"
+                      className="flex items-center gap-3 hover:bg-[#484848] rounded-lg p-2"
                       onClick={() => { setIsOpenLeaveGroup(true); handleLeaveGroup(); }}
                     >
                       <HiOutlineArrowRightEndOnRectangle
@@ -388,7 +388,7 @@ const ChatInfo = ({
                     </button>
                     {isCurrentUserAdmin && (
                       <button
-                        className="flex items-center gap-3"
+                        className="flex items-center gap-3 hover:bg-[#484848] rounded-lg p-2"
                         onClick={() => setIsOpenDissolveGroup(true)}
                       >
                         <HiOutlineArrowRightEndOnRectangle
@@ -397,13 +397,13 @@ const ChatInfo = ({
                           className="font-semibold"
                         />
                         <span className="text-sm text-[#FF0000] font-semibold leading-[25px]">
-                          Dissolve Group
+                          Dissolve group
                         </span>
                       </button>
                     )}
                   </>
                 ) : (
-                  <button className="flex items-center gap-3">
+                  <button className="flex items-center gap-3 hover:bg-[#484848] rounded-lg p-2">
                     <MdBlock
                       size={25}
                       color="white"
@@ -416,7 +416,7 @@ const ChatInfo = ({
                 )}
 
                 <button
-                  className="flex items-center gap-3"
+                  className="flex items-center gap-3 hover:bg-[#484848] rounded-lg p-2"
                   onClick={handleDeleteConversation}
                 >
                   <CgTrashEmpty
