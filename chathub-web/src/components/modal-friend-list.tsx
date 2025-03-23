@@ -1,10 +1,10 @@
 "use client"
 
-import { Dialog, DialogPanel, DialogTitle, Transition, TransitionChild } from "@headlessui/react"
 import React, { Fragment, useState } from "react"
+import Image from "next/image"
+import { Dialog, DialogPanel, DialogTitle, Transition, TransitionChild } from "@headlessui/react"
 import { useSelector } from "react-redux"
 import { RootState } from "~/lib/reudx/store"
-import Image from "next/image"
 import { Images } from "../constants/images"
 import { Search } from "lucide-react"
 import { Button } from "./ui/button"
@@ -35,7 +35,6 @@ const ModalFriendList: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) =>
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
   const [friendIdToUnfriend, setFriendIdToUnfriend] = useState<number | null>(null);
   const [successMessage, setSuccessMessage] = useState<string>("");
-  const [refetchFriends, setRefetchFriends] = useState(false);
 
   const handleOpenProfile = (friend: UserDTO) => {
     setSelectedFriend({ ...friend, gender: friend.gender as "Male" | "Female" })
@@ -108,7 +107,7 @@ const ModalFriendList: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) =>
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <DialogPanel className="bg-[#385068] rounded-[5%] w-[80%] h-[95%] max-w-md max-h-screen transform overflow-hidden p-6 text-left align-middle shadow-xl transition-all">
+                <DialogPanel className="bg-[#385068] rounded-[5%] w-[80%] h-[95%] max-w-md max-h-screen transform overflow-hidden p-6 text-left align-middle shadow-xl transition-all pr-4">
                   <DialogTitle className="text-xl font-bold mb-4 flex items-center justify-between text-white leading-6">
                     <div className="flex items-center gap-x-2">
                       <Image src={Images.IconChatList} alt="Chat Icon" width={40} height={40} />
@@ -169,10 +168,6 @@ const ModalFriendList: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) =>
                           <div
                             key={index}
                             className="flex items-center odd:bg-[#E4DEED] even:bg-[#AF9CC9] rounded-lg p-3 mb-3 space-x-3"
-                            onClick={() => {
-                              setSelectedFriend(friend)
-                              setIsDropDownOpen(true)
-                            }}
                           >
                             <Image src={friend.avatar} alt={friend.name} width={45} height={45} className="rounded-full" />
 
@@ -183,19 +178,21 @@ const ModalFriendList: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) =>
                               <p className="text-gray-600 text-sm">{friend.phoneNumber}</p>
                             </div>
 
-                            <Button
-                              className="w-20 px-4 py-2 bg-[#7746f5] rounded-[12px] text-lg text-white
-                                bg-gradient-to-r from-[#501794] to-[#3E70A1] hover:bg-gradient-to-l"
-                              onClick={() => handleConfirmUnfriend(parseInt(friend.id?.toString() || "0"))}
-                              disabled={isUnfriending && parseInt(friend.id?.toString() || "0") === unfriendUserId}
-                            >
-                              {
-                                isUnfriending &&
-                                  parseInt(friend.id?.toString() || "0") === unfriendUserId
-                                  ? "Unfriending..." : "Unfriend"
-                              }
-                            </Button>
-                            <DropdownFriendList friend={friend as any} key={index} onOpenProfile={handleOpenProfile} />
+                            <div className="relative flex items-center space-x-2">
+                              <Button
+                                className="w-20 px-4 py-2 bg-[#7746f5] rounded-[12px] text-lg text-white
+                                  bg-gradient-to-r from-[#501794] to-[#3E70A1] hover:bg-gradient-to-l z-10 relative"
+                                onClick={() => handleConfirmUnfriend(parseInt(friend.id?.toString() || "0"))}
+                                disabled={isUnfriending && parseInt(friend.id?.toString() || "0") === unfriendUserId}
+                              >
+                                {
+                                  isUnfriending &&
+                                    parseInt(friend.id?.toString() || "0") === unfriendUserId
+                                    ? "Unfriending..." : "Unfriend"
+                                }
+                              </Button>
+                              <DropdownFriendList friend={friend as any} key={index} onOpenProfile={handleOpenProfile} />
+                            </div>
                           </div>
                         )
                       })

@@ -61,6 +61,8 @@ export interface BlockRequest {
 
 export interface ReactionRequest {
   /** @format int64 */
+  conversationId?: number
+  /** @format int64 */
   messageId?: number
   /** @format int64 */
   userId?: number
@@ -91,8 +93,13 @@ export interface ConversationResponse {
   groupName?: string
   groupAvatar?: string
   senderAvatar?: string
+  /** @format int64 */
+  senderId?: number
+  /** @format int64 */
+  adminId?: number
   senderName?: string
   lastMessage?: string
+  lastMessageType?: "TEXT" | "IMAGE" | "VIDEO" | "DOCUMENT" | "EMOJI"
   /** @format date-time */
   lastMessageAt?: string
   isSeen?: boolean
@@ -164,6 +171,7 @@ export interface MessageResponse {
   senderId?: number
   senderName?: string
   content?: string
+  avatar?: string
   messageType?: "TEXT" | "IMAGE" | "VIDEO" | "DOCUMENT" | "EMOJI"
   /** @format date-time */
   sentAt?: string

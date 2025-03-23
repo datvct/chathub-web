@@ -258,6 +258,51 @@ export class Conversation<SecurityDataType = unknown> extends HttpClient<Securit
    * No description
    *
    * @tags conversation-controller
+   * @name GetConversationsId
+   * @request GET:/conversation/getConversationsByUserId
+   * @secure
+   */
+  getConversationsId = (
+    query: {
+      /** @format int64 */
+      userId: number
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<number[], ErrorResponse>({
+      path: `/conversation/getConversationsByUserId`,
+      method: "GET",
+      query: query,
+      secure: true,
+      ...params,
+    })
+  /**
+   * No description
+   *
+   * @tags conversation-controller
+   * @name FindGroupConversations
+   * @request GET:/conversation/find-groups
+   * @secure
+   */
+  findGroupConversations = (
+    query: {
+      /** @format int64 */
+      userId: number
+      groupName: string
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<ConversationResponse[], ErrorResponse>({
+      path: `/conversation/find-groups`,
+      method: "GET",
+      query: query,
+      secure: true,
+      ...params,
+    })
+  /**
+   * No description
+   *
+   * @tags conversation-controller
    * @name RemoveParticipantFromGroupConversation
    * @request DELETE:/conversation/{conversationId}/removeParticipant
    * @secure

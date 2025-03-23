@@ -1,26 +1,25 @@
 "use client"
 
-import React, { Fragment, useState, useRef } from "react";
-import { Dialog, DialogPanel, DialogTitle, Transition, TransitionChild } from "@headlessui/react";
-import Image from "next/image";
-import { Images } from "~/constants/images";
-import { Input } from "./ui/input";
-import { Button } from "./ui/button";
-import { Camera } from "lucide-react";
-import { useConversation } from "~/hooks/use-converstation";
-import { useSelector } from "react-redux";
-import { RootState } from "~/lib/reudx/store";
-import { UpdateGroupInfoRequest } from "~/codegen/data-contracts";
-import { toast } from "react-toastify";
-
+import React, { Fragment, useState, useRef } from "react"
+import { Dialog, DialogPanel, DialogTitle, Transition, TransitionChild } from "@headlessui/react"
+import Image from "next/image"
+import { Images } from "~/constants/images"
+import { Input } from "./ui/input"
+import { Button } from "./ui/button"
+import { Camera } from "lucide-react"
+import { useConversation } from "~/hooks/use-converstation"
+import { useSelector } from "react-redux"
+import { RootState } from "~/lib/reudx/store"
+import { UpdateGroupInfoRequest } from "~/codegen/data-contracts"
+import { toast } from "react-toastify"
 
 interface ModalUpdateGroupInfoProps {
-	isOpen: boolean;
-	setIsOpen: (open: boolean) => void;
-	conversationId: number;
-	currentGroupName?: string;
-	currentGroupAvatar?: string;
-	onGroupInfoUpdated: () => void;
+	isOpen: boolean
+	setIsOpen: (open: boolean) => void
+	conversationId: number
+	currentGroupName?: string
+	currentGroupAvatar?: string
+	onGroupInfoUpdated: () => void
 }
 
 const ModalUpdateGroupInfo: React.FC<ModalUpdateGroupInfoProps> = ({
@@ -29,52 +28,65 @@ const ModalUpdateGroupInfo: React.FC<ModalUpdateGroupInfoProps> = ({
 	conversationId,
 	currentGroupName,
 	currentGroupAvatar,
-	onGroupInfoUpdated
+	onGroupInfoUpdated,
 }) => {
-	const [groupName, setGroupName] = useState<string>(currentGroupName || "");
-	const [groupAvatar, setGroupAvatar] = useState<string | null>(currentGroupAvatar || null);
-	const [selectedAvatarFile, setSelectedAvatarFile] = useState<File | null>(null);
-	const [loading, setLoading] = useState(false);
-	const { updateGroupInfo } = useConversation();
+	const [groupName, setGroupName] = useState<string>(currentGroupName || "")
+	const [groupAvatar, setGroupAvatar] = useState<string | null>(currentGroupAvatar || null)
+	const [selectedAvatarFile, setSelectedAvatarFile] = useState<File | null>(null)
+	const [loading, setLoading] = useState(false)
+	const { updateGroupInfo } = useConversation()
 
-	const token = useSelector((state: RootState) => state.auth.token);
-	const userId = useSelector((state: RootState) => state.auth.userId);
+	const token = useSelector((state: RootState) => state.auth.token)
+	const userId = useSelector((state: RootState) => state.auth.userId)
 
 	const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-		const file = event.target.files?.[0];
+		const file = event.target.files?.[0]
 		if (file) {
-			setSelectedAvatarFile(file);
-			setGroupAvatar(URL.createObjectURL(file));
+			setSelectedAvatarFile(file)
+			setGroupAvatar(URL.createObjectURL(file))
 		}
-	};
+	}
 
 	const handleSubmit = async () => {
-		if (!conversationId || !userId || !token) return;
+		if (!conversationId || !userId || !token) return
 
-		setLoading(true);
+		setLoading(true)
+
 		try {
+			let avatarFileToUpload: File | undefined = selectedAvatarFile || undefined
+
+			if (avatarFileToUpload && avatarFileToUpload.size > 1024 * 1024) {
+				toast.error("Avatar file size must be less than 1MB.")
+				setLoading(false)
+				return
+			}
+
 			const updateRequest: UpdateGroupInfoRequest = {
-				userId: userId,
+				userId: userId!,
 				groupName: groupName,
-				avatar: selectedAvatarFile ? selectedAvatarFile : undefined
-			};
+				avatar: avatarFileToUpload,
+			}
 
-			const updateSuccess = await updateGroupInfo(conversationId, updateRequest, token);
+			console.log("Calling updateGroupInfo API with:", updateRequest)
 
-			if (updateSuccess) {
-				toast.success("Group info updated successfully!");
-				setIsOpen(false);
-				onGroupInfoUpdated();
+			const updateSuccess = await updateGroupInfo(conversationId, updateRequest, token)
+
+			console.log("updateGroupInfo API response:", updateSuccess)
+
+			if (updateSuccess?.statusCode === 200) {
+				toast.success("Group info updated successfully!")
+				setIsOpen(false)
+				onGroupInfoUpdated()
 			} else {
-				toast.error("Failed to update group info.");
+				toast.error("Failed to update group info.")
 			}
 		} catch (error) {
-			console.error("Error updating group info:", error);
-			toast.error("Failed to update group info.");
+			console.error("Error updating group info:", error)
+			toast.error("Failed to update group info.")
 		} finally {
-			setLoading(false);
+			setLoading(false)
 		}
-	};
+	}
 
 	return (
 		<Transition appear show={isOpen} as={Fragment}>
@@ -117,7 +129,7 @@ const ModalUpdateGroupInfo: React.FC<ModalUpdateGroupInfoProps> = ({
 									<div className="relative flex justify-center mb-6">
 										<label htmlFor="group-avatar-upload" className="relative cursor-pointer">
 											<Image
-												src={groupAvatar || currentGroupAvatar || Images.ProfileImage} // Display current or default avatar
+												src={groupAvatar || currentGroupAvatar || Images.ProfileImage}
 												alt="group avatar"
 												width={100}
 												height={100}
@@ -147,11 +159,10 @@ const ModalUpdateGroupInfo: React.FC<ModalUpdateGroupInfoProps> = ({
 												placeholder="Enter new group name"
 												className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500"
 												value={groupName}
-												onChange={(e) => setGroupName(e.target.value)}
+												onChange={e => setGroupName(e.target.value)}
 											/>
 										</div>
 									</div>
-
 
 									<div className="mt-6 flex justify-end gap-4 w-full">
 										<Button
@@ -175,7 +186,7 @@ const ModalUpdateGroupInfo: React.FC<ModalUpdateGroupInfoProps> = ({
 				</div>
 			</Dialog>
 		</Transition>
-	);
-};
+	)
+}
 
-export default ModalUpdateGroupInfo;
+export default ModalUpdateGroupInfo

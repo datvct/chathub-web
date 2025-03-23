@@ -25,8 +25,9 @@ export default function Home() {
   const token = useSelector((state: RootState) => state.auth.token);
   const userId = useSelector((state: RootState) => state.auth.userId);
 
-  const handlePinChangeSuccess = useCallback(() => { // Callback function
-    setNeedRefetchConversations(prevState => !prevState); // Toggle state to trigger useEffect in ChatList
+  const handlePinChangeSuccess = useCallback(() => {
+    setNeedRefetchConversations(prevState => !prevState);
+    return true;
   }, []);
 
   useEffect(() => {
