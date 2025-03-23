@@ -51,7 +51,7 @@ const ModalCreateNewGroupChat: React.FC<ModalCreateNewGroupChatProps> = ({ isOpe
   }
 
   const isCreateButtonEnabled = selectedUsers.length >= 1
-  if (loading) return <p>Loading...</p>
+  if (loading) return <div className="loader"></div>
   return (
     <Transition appear show={isOpen} as={React.Fragment}>
       <Dialog as="div" className="relative z-50" onClose={() => setIsOpen(false)}>

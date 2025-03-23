@@ -95,7 +95,7 @@ const ChatInput = ({ onSendMessage }: { onSendMessage: (msg: string, messageType
           : file.type.startsWith("video/")
           ? MessageType.VIDEO
           : MessageType.DOCUMENT
-
+        console.log(messageType, "messageType", uploadResponse.url.split("?")[0])
         onSendMessage(uploadResponse.url.split("?")[0], messageType)
         setFile(null)
         setPreviewFile(null)
