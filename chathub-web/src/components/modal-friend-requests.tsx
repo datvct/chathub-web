@@ -149,14 +149,14 @@ const ModalFriendRequests: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean
                     <div className="flex space-x-4">
                       <button
                         onClick={() => setActiveTab("received")}
-                        className={`px-4 py-2 rounded-lg text-white font-semibold 
+                        className={`px-4 py-2 rounded-lg text-white font-semibold
                         ${activeTab === "received" ? "bg-[#501794]" : "bg-[#8C8595] hover:bg-[#7746F5]"}`}
                       >
                         Received ({receivedRequests.length})
                       </button>
                       <button
                         onClick={() => setActiveTab("sent")}
-                        className={`px-4 py-2 rounded-lg text-white font-semibold 
+                        className={`px-4 py-2 rounded-lg text-white font-semibold
                         ${activeTab === "sent" ? "bg-[#501794]" : "bg-[#8C8595] hover:bg-[#7746F5]"}`}
                       >
                         Sent ({sentRequests.length})

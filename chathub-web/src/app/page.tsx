@@ -20,8 +20,8 @@ export default function Home() {
   const [needRefetchConversations, setNeedRefetchConversations] = useState(false)
 
   const handlePinChangeSuccess = useCallback(() => {
-    // Callback function
     setNeedRefetchConversations(prevState => !prevState)
+    return true
   }, [])
 
   useEffect(() => {

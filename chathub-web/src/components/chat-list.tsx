@@ -18,6 +18,8 @@ import { useConversation } from "~/hooks/use-converstation"
 import { ConversationResponse } from "~/codegen/data-contracts"
 import formatLastMessageTime from "~/lib/utils"
 import { MessageType } from "~/types/types"
+import { BsPinAngleFill } from "react-icons/bs"
+import { RiUnpinFill } from "react-icons/ri"
 
 interface ChatListProps {
   setSelectedChat: (id: number) => void
@@ -39,6 +41,7 @@ const ChatList = ({ setSelectedChat, setIsGroupChat, setConversationData, onPinC
   const [modalListGroup, setModalListGroup] = useState(false)
   const { getRecentConversation } = useConversation()
   const [dataConversation, setDataConversation] = useState<ConversationResponse[]>([])
+  const [needRefetchConversations, setNeedRefetchConversations] = useState(false)
 
   const fetchDataConversation = async () => {
     if (userId) {
@@ -56,7 +59,7 @@ const ChatList = ({ setSelectedChat, setIsGroupChat, setConversationData, onPinC
 
   useEffect(() => {
     fetchDataConversation()
-  }, [userId, modalCreateChatOpen, modalCreateGroupChatOpen])
+  }, [userId, modalCreateChatOpen, modalCreateGroupChatOpen, needRefetchConversations])
 
   useEffect(() => {
     if (userId) {
@@ -156,9 +159,9 @@ const ChatList = ({ setSelectedChat, setIsGroupChat, setConversationData, onPinC
               if (!a.pinned && b.pinned) return 1
               return 0
             })
-            .map(chat => (
+            .map((chat, index) => (
               <li
-                key={chat.id}
+                key={`${chat.id}-${index}`}
                 className={`flex items-center gap-3 p-2 rounded-lg hover:cursor-pointer`}
                 onClick={() => handleSelectChat(chat.id, chat, chat.chatType === "GROUP")}
               >
@@ -180,7 +183,7 @@ const ChatList = ({ setSelectedChat, setIsGroupChat, setConversationData, onPinC
                       <span className="text-[14px] text-[#838383] mr-2">
                         {formatLastMessageTime(chat.lastMessageAt)}
                       </span>
-                      {chat.pinned && <Image src={Images.IconPin} alt="Pin Icon" width={20} height={20} />}
+                      {chat.pinned && <BsPinAngleFill size={20} color="white" className="text-white" />}
                     </div>
                   </div>
                   <div className="flex justify-between items-center w-[120px]">
