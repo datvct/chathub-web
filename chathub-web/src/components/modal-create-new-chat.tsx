@@ -44,7 +44,7 @@ const ModalCreateNewChat: React.FC<ModalCreateNewChatProps> = ({ isOpen, setIsOp
     }
   }
 
-  if (loading) return <p>Loading...</p>
+  if (loading) return <div className="loader"></div>
   return (
     <Dialog open={isOpen} onClose={() => setIsOpen(false)} className="relative z-50">
       <div className="fixed inset-0 bg-opacity-[.40]" aria-hidden="true" />

@@ -13,6 +13,7 @@ interface ChatHeaderProps {
   avatar?: string
   setIsChatSearchOpen?: (isOpen: boolean) => void
   isChatSearchOpen?: boolean
+  isUserOnline?: string
 }
 
 const ChatHeader = ({
@@ -22,6 +23,7 @@ const ChatHeader = ({
   avatar,
   setIsChatSearchOpen,
   isChatSearchOpen,
+  isUserOnline,
 }: ChatHeaderProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
@@ -42,14 +44,14 @@ const ChatHeader = ({
         <div className="flex items-center gap-3">
           <Image
             src={avatar ? avatar : Images.AvatarDefault}
-            alt={name}
+            alt={name ?? "Avatar"}
             className="w-[3.125rem] h-[3.125rem] rounded-[30px]"
             width={50}
             height={50}
           />
           <div>
             <h2 className="text-lg font-bold">{name}</h2>
-            <p className="text-sm text-gray-400">Active 3m ago</p>
+            <p className="text-sm text-gray-400">{isUserOnline}</p>
           </div>
         </div>
         {/* Các nút chức năng */}
