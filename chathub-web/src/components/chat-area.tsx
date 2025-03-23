@@ -1,7 +1,5 @@
 "use client"
 
-import Image from "next/image"
-import { Images } from "~/constants/images"
 import ChatHeader from "./chat-header"
 import ChatInput from "./chat-input"
 import { useSelector } from "react-redux"
@@ -34,14 +32,11 @@ const ChatScreen = ({
   isChatSearchOpen,
   setIsChatSearchOpen,
   highlightMessageId,
-  onRefetchConversations,
 }: ChatScreenProps) => {
   const token = useSelector((state: RootState) => state.auth.token)
   const userId = useSelector((state: RootState) => state.auth.userId)
-  // const { messages, loading, addMessage } = useMessages(selectedChatId, userId, token)
-  const { messages, sendMessage, loading } = useWebSocket(selectedChatId, userId, token)
+  const { messages, sendMessage, loading, isUserOnline } = useWebSocket(selectedChatId, userId, token)
   const messagesEndRef = useRef<HTMLDivElement | null>(null)
-
   useEffect(() => {
     if (messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" })
@@ -69,12 +64,13 @@ const ChatScreen = ({
   return (
     <div className="flex-1 h-full w-full p-4 bg-[#3A3A3A] text-white flex flex-col relative transition-all">
       <ChatHeader
-        name={conversationData?.groupName ?? messages?.[0]?.senderName}
+        name={conversationData?.groupName ?? conversationData.senderName}
         setIsChatInfoOpen={setIsChatInfoOpen}
         isChatInfoOpen={isChatInfoOpen}
         avatar={conversationData?.groupAvatar}
         isChatSearchOpen={isChatSearchOpen}
         setIsChatSearchOpen={setIsChatSearchOpen}
+        isUserOnline={isUserOnline}
       />
 
       <div className="flex flex-col-reverse overflow-y-auto h-[75vh] custom-scrollbar">

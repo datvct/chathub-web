@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useState, useCallback } from "react"
+import React, { useEffect, useState } from "react"
 import Image from "next/image"
 import { Images } from "../constants/images"
 import "../styles/custom-scroll.css"
@@ -16,6 +16,8 @@ import { useSelector } from "react-redux"
 import { RootState } from "~/lib/reudx/store"
 import { useConversation } from "~/hooks/use-converstation"
 import { ConversationResponse } from "~/codegen/data-contracts"
+import formatLastMessageTime from "~/lib/utils"
+import { MessageType } from "~/types/types"
 
 interface ChatListProps {
   setSelectedChat: (id: number) => void
@@ -45,6 +47,7 @@ const ChatList = ({ setSelectedChat, setIsGroupChat, setConversationData, onPinC
         const response = await getRecentConversation(userId, token)
         if (response) {
           setDataConversation(response)
+          console.log(response)
         }
       }
       init()
@@ -82,11 +85,6 @@ const ChatList = ({ setSelectedChat, setIsGroupChat, setConversationData, onPinC
     setSelectedChat(id)
     setConversationData(converstation)
     setIsGroupChat(isGroup || false)
-  }
-
-  const formatTime = (timestamp: string) => {
-    const date = new Date(timestamp)
-    return `${date.getHours()}:${date.getMinutes()}`
   }
 
   return (
@@ -179,13 +177,27 @@ const ChatList = ({ setSelectedChat, setIsGroupChat, setConversationData, onPinC
                       {chat.chatType === "GROUP" ? chat.groupName : chat.senderName}
                     </span>
                     <div className="flex items-center">
-                      <span className="text-[14px] text-[#838383] mr-2">{formatTime(chat.lastMessageAt)}</span>
+                      <span className="text-[14px] text-[#838383] mr-2">
+                        {formatLastMessageTime(chat.lastMessageAt)}
+                      </span>
                       {chat.pinned && <Image src={Images.IconPin} alt="Pin Icon" width={20} height={20} />}
                     </div>
                   </div>
                   <div className="flex justify-between items-center">
-                    <p className="text-sm text-[#838383] truncate">{chat.lastMessage}</p>
-                    {chat.isSeen === false && (
+                    <p className="text-sm text-[#838383] truncate">
+                      {chat.lastMessage
+                        ? chat.lastMessageType === MessageType.IMAGE
+                          ? "Sent an image"
+                          : chat.lastMessageType === MessageType.VIDEO
+                          ? "Sent a video"
+                          : chat.lastMessageType === MessageType.DOCUMENT
+                          ? "Sent a document"
+                          : chat.lastMessageType === MessageType.EMOJI
+                          ? "Sent a reaction"
+                          : chat.lastMessage
+                        : "No messages"}
+                    </p>
+                    {chat.isSeen && (
                       <span className="bg-[#0078D4] text-xs font-bold text-white rounded-[20px] px-1 flex items-center justify-center">
                         NEW
                       </span>
@@ -193,7 +205,6 @@ const ChatList = ({ setSelectedChat, setIsGroupChat, setConversationData, onPinC
                   </div>
                   <div className="flex items-center">
                     {chat.pinned && <Image src={Images.IconPin} alt="Pin Icon" width={20} height={20} />}
-                    <span className="text-[14px] text-[#838383] ml-2">{formatTime(chat.lastMessageAt)}</span>
                   </div>
                 </div>
               </li>

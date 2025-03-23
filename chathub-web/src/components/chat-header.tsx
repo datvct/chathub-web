@@ -13,6 +13,7 @@ interface ChatHeaderProps {
   avatar?: string
   setIsChatSearchOpen?: (isOpen: boolean) => void
   isChatSearchOpen?: boolean
+  isUserOnline?: string
 }
 
 const ChatHeader = ({
@@ -22,6 +23,7 @@ const ChatHeader = ({
   avatar,
   setIsChatSearchOpen,
   isChatSearchOpen,
+  isUserOnline,
 }: ChatHeaderProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
@@ -49,7 +51,7 @@ const ChatHeader = ({
           />
           <div>
             <h2 className="text-lg font-bold">{name}</h2>
-            <p className="text-sm text-gray-400">Active 3m ago</p>
+            <p className="text-sm text-gray-400">{isUserOnline}</p>
           </div>
         </div>
         {/* Các nút chức năng */}
