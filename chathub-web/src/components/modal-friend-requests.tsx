@@ -7,8 +7,8 @@ import { FriendRequestResponse, FriendshipRequest } from "~/codegen/data-contrac
 import { useFriends } from "../hooks/use-friends"
 import { useSelector } from "react-redux"
 import { RootState } from "../lib/reudx/store"
-import ModalConfirm from "./modal-confirm";
-import ModalSuccess from "./modal-success";
+import ModalConfirm from "./modal-confirm"
+import ModalSuccess from "./modal-success"
 
 const ModalFriendRequests: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) => void }> = ({
   isOpen,
@@ -21,17 +21,12 @@ const ModalFriendRequests: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean
   const [sentRequests, setSentRequests] = useState<FriendRequestResponse[]>([])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const {
-    getListFriendRequests,
-    acceptFriendRequestHook,
-    rejectFriendRequestHook,
-    unsentFriendRequestHook
-  } = useFriends(userId, token);
-  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
-  const [isSuccessOpen, setIsSuccessOpen] = useState(false);
-  const [confirmAction, setConfirmAction] = useState<(() => void) | null>(null);
-  const [successMessage, setSuccessMessage] = useState("");
-
+  const { getListFriendRequests, acceptFriendRequestHook, rejectFriendRequestHook, unsentFriendRequestHook } =
+    useFriends(userId, token)
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false)
+  const [isSuccessOpen, setIsSuccessOpen] = useState(false)
+  const [confirmAction, setConfirmAction] = useState<(() => void) | null>(null)
+  const [successMessage, setSuccessMessage] = useState("")
 
   // Fetch danh sách lời mời kết bạn từ API
   useEffect(() => {
@@ -40,12 +35,12 @@ const ModalFriendRequests: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean
       setError(null)
 
       try {
-        const response = await getListFriendRequests();
+        const response = await getListFriendRequests()
         console.log(response)
 
         // Phân loại lời mời theo type
-        const received = response.filter((req) => req.type === "RECEIVED")
-        const sent = response.filter((req) => req.type === "SENT")
+        const received = response.filter(req => req.type === "RECEIVED")
+        const sent = response.filter(req => req.type === "SENT")
 
         setReceivedRequests(received)
         setSentRequests(sent)
@@ -64,40 +59,40 @@ const ModalFriendRequests: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean
   const requestsToDisplay = activeTab === "received" ? receivedRequests : sentRequests
 
   const handleConfirmAction = () => {
-    if (confirmAction) confirmAction();
-    setIsConfirmOpen(false);
-  };
+    if (confirmAction) confirmAction()
+    setIsConfirmOpen(false)
+  }
 
   const handleAccept = async (senderId: number) => {
-    const requestData: FriendshipRequest = { senderId, receiverId: userId };
-    const response = await acceptFriendRequestHook(requestData);
+    const requestData: FriendshipRequest = { senderId, receiverId: userId }
+    const response = await acceptFriendRequestHook(requestData)
     if (response) {
-      setReceivedRequests(receivedRequests.filter(req => req.userId !== senderId));
-      setSuccessMessage("Friend request accepted successfully!");
-      setIsSuccessOpen(true);
+      setReceivedRequests(receivedRequests.filter(req => req.userId !== senderId))
+      setSuccessMessage("Friend request accepted successfully!")
+      setIsSuccessOpen(true)
     }
-  };
+  }
 
   const handleReject = async (senderId: number) => {
     setConfirmAction(() => async () => {
-      const requestData: FriendshipRequest = { senderId, receiverId: userId };
-      const response = await rejectFriendRequestHook(requestData);
+      const requestData: FriendshipRequest = { senderId, receiverId: userId }
+      const response = await rejectFriendRequestHook(requestData)
       if (response) {
-        setReceivedRequests(receivedRequests.filter(req => req.userId !== senderId));
+        setReceivedRequests(receivedRequests.filter(req => req.userId !== senderId))
       }
-    });
-    setIsConfirmOpen(true);
-  };
+    })
+    setIsConfirmOpen(true)
+  }
 
   const handleUnsent = async (friendId: number) => {
     setConfirmAction(() => async () => {
-      const response = await unsentFriendRequestHook(friendId);
+      const response = await unsentFriendRequestHook(friendId)
       if (response) {
-        setSentRequests(sentRequests.filter(req => req.userId !== friendId));
+        setSentRequests(sentRequests.filter(req => req.userId !== friendId))
       }
-    });
-    setIsConfirmOpen(true);
-  };
+    })
+    setIsConfirmOpen(true)
+  }
 
   return (
     <>
@@ -111,11 +106,7 @@ const ModalFriendRequests: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean
       />
 
       {/* Modal thành công */}
-      <ModalSuccess
-        isOpen={isSuccessOpen}
-        setIsOpen={setIsSuccessOpen}
-        message={successMessage}
-      />
+      <ModalSuccess isOpen={isSuccessOpen} setIsOpen={setIsSuccessOpen} message={successMessage} />
       <Transition appear show={isOpen} as={Fragment}>
         <Dialog as="div" className="relative z-50" onClose={() => setIsOpen(false)}>
           <TransitionChild
@@ -174,14 +165,23 @@ const ModalFriendRequests: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean
                   </div>
 
                   {/* Loading & Error Handling */}
-                  {loading && <p className="text-white text-center">Loading...</p>}
+                  {loading && <div className="loader"></div>}
                   {error && <p className="text-red-500 text-center">{error}</p>}
 
                   {/* Danh sách lời mời */}
                   <div className="max-h-[55vh] overflow-y-auto custom-scrollbar pr-2">
                     {requestsToDisplay.map((request, index) => (
-                      <div key={index} className="flex items-center odd:bg-[#E4DEED] even:bg-[#AF9CC9] rounded-lg p-3 mb-3 space-x-3">
-                        <Image src={request.avatar} alt={request.name} width={45} height={45} className="rounded-full" />
+                      <div
+                        key={index}
+                        className="flex items-center odd:bg-[#E4DEED] even:bg-[#AF9CC9] rounded-lg p-3 mb-3 space-x-3"
+                      >
+                        <Image
+                          src={request.avatar}
+                          alt={request.name}
+                          width={45}
+                          height={45}
+                          className="rounded-full"
+                        />
                         <div className="flex-1">
                           <p className="text-black font-medium">{request.name}</p>
                           <p className="text-gray-600 text-sm italic">{request.message}</p>
@@ -189,16 +189,25 @@ const ModalFriendRequests: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean
                         <div className="space-x-2">
                           {activeTab === "received" && (
                             <>
-                              <Button onClick={() => handleReject(request.userId!)} className="px-4 py-2 border border-white rounded-[12px] text-sm text-white bg-gray-500 hover:bg-gray-700">
+                              <Button
+                                onClick={() => handleReject(request.userId!)}
+                                className="px-4 py-2 border border-white rounded-[12px] text-sm text-white bg-gray-500 hover:bg-gray-700"
+                              >
                                 Decline
                               </Button>
-                              <Button onClick={() => handleAccept(request.userId!)} className="w-20 px-4 py-2 bg-[#7746f5] rounded-[12px] text-lg text-white">
+                              <Button
+                                onClick={() => handleAccept(request.userId!)}
+                                className="w-20 px-4 py-2 bg-[#7746f5] rounded-[12px] text-lg text-white"
+                              >
                                 Accept
                               </Button>
                             </>
                           )}
                           {activeTab === "sent" && (
-                            <Button onClick={() => handleUnsent(request.userId!)} className="w-20 px-4 py-2 bg-[#7746f5] rounded-[12px] text-lg text-white">
+                            <Button
+                              onClick={() => handleUnsent(request.userId!)}
+                              className="w-20 px-4 py-2 bg-[#7746f5] rounded-[12px] text-lg text-white"
+                            >
                               Unsent
                             </Button>
                           )}

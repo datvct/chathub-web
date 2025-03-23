@@ -61,7 +61,7 @@ const ModalAddMembers: React.FC<ModalAddMembersProps> = ({ isOpen, setIsOpen, co
     }
 
     try {
-      setLoading(true);
+      setLoading(true)
       const memberIdsToAdd = selectedMembers.map(member => member.id || 0).filter(id => id !== 0)
       if (memberIdsToAdd.length === 0) {
         toast.warning("Please select valid members to add.")
@@ -72,10 +72,10 @@ const ModalAddMembers: React.FC<ModalAddMembersProps> = ({ isOpen, setIsOpen, co
         conversationId,
         memberIdsToAdd,
         token,
-      });
+      })
 
       const success = await addMembersToConversation(conversationId, memberIdsToAdd, token)
-      console.log("addMembersToConversation API Response:", success);
+      console.log("addMembersToConversation API Response:", success)
 
       if (success) {
         toast.success("Members added to group successfully!")
@@ -89,13 +89,10 @@ const ModalAddMembers: React.FC<ModalAddMembersProps> = ({ isOpen, setIsOpen, co
       toast.error("Failed to add members to group.")
     } finally {
       setLoading(false);
-      setTimeout(() => {
-        window.location.reload();
-      }, 6000);
     }
   }
 
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false)
 
   return (
     <Transition appear show={isOpen} as={Fragment}>
