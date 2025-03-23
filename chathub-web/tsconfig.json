@@ -15,7 +15,7 @@
     "allowSyntheticDefaultImports": true,
     "allowImportingTsExtensions": true,
     "forceConsistentCasingInFileNames": true,
-    "noImplicitAny": false,
+    "noImplicitAny": true,
     "strictFunctionTypes": false,
     "composite": true,
     "incremental": true,
