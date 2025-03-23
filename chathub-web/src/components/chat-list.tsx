@@ -183,7 +183,7 @@ const ChatList = ({ setSelectedChat, setIsGroupChat, setConversationData, onPinC
                       {chat.pinned && <Image src={Images.IconPin} alt="Pin Icon" width={20} height={20} />}
                     </div>
                   </div>
-                  <div className="flex justify-between items-center">
+                  <div className="flex justify-between items-center w-[120px]">
                     <p className="text-sm text-[#838383] truncate">
                       {chat.lastMessage
                         ? chat.lastMessageType === MessageType.IMAGE

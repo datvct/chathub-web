@@ -101,6 +101,7 @@ export interface ConversationResponse {
   participants?: ParticipantDTO[]
   pinned?: boolean
   dissolved?: boolean
+  lastMessageType?: strig | null
 }
 
 export interface ParticipantDTO {
