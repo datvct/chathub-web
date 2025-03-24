@@ -41,6 +41,7 @@ import { HiOutlineArrowRightEndOnRectangle } from "react-icons/hi2";
 import { FaChevronLeft } from "react-icons/fa6";
 import { LuUserRoundPlus } from "react-icons/lu";
 import { MdOutlineMoreHoriz } from "react-icons/md";
+import { FaInfoCircle } from "react-icons/fa";
 
 interface ChatInfoProps {
   isOpen?: boolean;
@@ -203,7 +204,6 @@ const ChatInfo = ({
         setSuccessMessage("Member removed successfully!");
         setIsSuccessModalOpen(true);
 
-        // Cập nhật lại chi tiết nhóm sau khi xóa thành viên
         const updatedDetails = await getChatDetailSection(selectedChat, userId, token);
         setChatDetail(updatedDetails || null);
 
@@ -513,6 +513,20 @@ const ChatInfo = ({
                     ) : null
                   ) : null
                 )}
+
+                <button
+                  className="flex items-center gap-3 hover:bg-[#484848] rounded-lg p-2 w-full"
+                  onClick={() => setIsNicknameModalOpen(true)}
+                >
+                  <FaInfoCircle
+                    size={25}
+                    color="blue"
+                    className="text-blue-500 font-semibold"
+                  />
+                  <span className="text-sm font-semibold leading-[25px] text-[#51a2ff]">
+                    Update Nickname
+                  </span>
+                </button>
 
                 <button
                   className="flex items-center gap-3 hover:bg-[#484848] rounded-lg p-2 w-full"
