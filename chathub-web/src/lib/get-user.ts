@@ -1,6 +1,10 @@
-import { UserDTO } from "~/codegen/data-contracts";
 import { User } from "~/codegen/User";
-import { ChangeProfileRequest, SuccessResponse } from "../codegen/data-contracts";
+import { 
+  UserDTO, 
+  BlockRequest,
+  ChangeProfileRequest, 
+  SuccessResponse 
+} from "../codegen/data-contracts";
 
 const userInstance = new User({ baseUrl: process.env.API_URL });
 
@@ -34,5 +38,39 @@ export async function getUserInfo(phoneNumber: string, token?: string) {
   } catch (error) {
     console.error("Error fetching user info:", error);
     return null;
+  }
+}
+
+export async function blockUser(blockerId: number, blockedId: number, token: string) {
+  try {
+    const response = await userInstance.blockUser(
+      { blockerId, blockedId } as BlockRequest,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+    return response; 
+  } catch (error) {
+    console.error("Error blocking user:", error);
+    throw error;
+  }
+}
+
+export async function unblockUser(blockerId: number, blockedId: number, token: string) {
+  try {
+    const response = await userInstance.unblockUser(
+      { blockerId, blockedId } as BlockRequest,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    );
+    return response; 
+  } catch (error) {
+    console.error("Error unblocking user:", error);
+    throw error;
   }
 }
