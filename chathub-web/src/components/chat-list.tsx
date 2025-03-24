@@ -61,7 +61,6 @@ const ChatList = ({
   } = useBlockUnblockUser();
 
   const [dataConversation, setDataConversation] = useState<ConversationResponse[]>([])
-  const [needRefetchConversations, setNeedRefetchConversations] = useState(false)
 
   const fetchDataConversation = async () => {
     if (userId) {
@@ -79,7 +78,7 @@ const ChatList = ({
 
   useEffect(() => {
     fetchDataConversation()
-  }, [userId, modalCreateChatOpen, modalCreateGroupChatOpen, needRefetchConversations])
+  }, [userId, modalCreateChatOpen, modalCreateGroupChatOpen])
 
   useEffect(() => {
     if (userId) {
