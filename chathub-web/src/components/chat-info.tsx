@@ -10,6 +10,7 @@ import { ChatDetailSectionResponse, ConversationResponse } from "~/codegen/data-
 import { getRecentConversationByUserID } from "~/lib/get-conversation";
 import { Images } from "~/constants/images";
 import { useConversation } from "~/hooks/use-converstation";
+import { useBlockUnblockUser } from "~/hooks/use-user";
 
 import ModalLeaveGroup from "./modal-leave-group";
 import ModalAddMembers from "./modal-add-members";
@@ -73,15 +74,18 @@ const ChatInfo = ({
     leaveGroupConversation
   } = useConversation(userId, token);
 
+  const {
+    blockUser,
+    unblockUser,
+    loading
+  } = useBlockUnblockUser();
+
   const [isOpenLeaveGroup, setIsOpenLeaveGroup] = useState(false);
   const [isAddingMember, setIsAddingMember] = useState(false);
   const [isOpenAddMembers, setIsOpenAddMembers] = useState(false);
   const [isOpenDissolveGroup, setIsOpenDissolveGroup] = useState(false);
   const [isMuted, setIsMuted] = useState<boolean>(false);
   const [isOpenUpdateGroupInfo, setIsOpenUpdateGroupInfo] = useState(false);
-  const [isOpenConfirmRemove, setIsOpenConfirmRemove] = useState(false);
-  const [isOpenSuccessRemove, setIsOpenSuccessRemove] = useState(false);
-  const [removeSuccessMessage, setRemoveSuccessMessage] = useState("");
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [memberToRemove, setMemberToRemove] = useState<number | null>(null);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
@@ -200,7 +204,6 @@ const ChatInfo = ({
     setIsConfirmModalOpen(true);
   };
 
-
   const handleOpenUpdateGroupInfoModal = () => {
     setIsOpenUpdateGroupInfo(true);
   };
@@ -217,6 +220,23 @@ const ChatInfo = ({
     }
   };
 
+  const handleBlockUser = async (targetUserId: number) => {
+    const response = await blockUser(userId, targetUserId, token);
+    if (response) {
+      toast.success("User blocked successfully!");
+    } else {
+      toast.error("Failed to block user.");
+    }
+  };
+
+  const handleUnblockUser = async (targetUserId: number) => {
+    const response = await unblockUser(userId, targetUserId, token);
+    if (response) {
+      toast.success("User unblocked successfully!");
+    } else {
+      toast.error("Failed to unblock user.");
+    }
+  };
 
   return (
     <div className="bg-[#292929] text-white h-screen overflow-hidden overflow-y-auto w-1/4 p-4">
@@ -374,7 +394,7 @@ const ChatInfo = ({
                 {isGroupChat ? (
                   <>
                     <button
-                      className="flex items-center gap-3"
+                      className="flex items-center gap-3 hover:bg-[#484848] rounded-lg p-2"
                       onClick={() => { setIsOpenLeaveGroup(true); handleLeaveGroup(); }}
                     >
                       <HiOutlineArrowRightEndOnRectangle
@@ -388,7 +408,7 @@ const ChatInfo = ({
                     </button>
                     {isCurrentUserAdmin && (
                       <button
-                        className="flex items-center gap-3"
+                        className="flex items-center gap-3 hover:bg-[#484848] rounded-lg p-2"
                         onClick={() => setIsOpenDissolveGroup(true)}
                       >
                         <HiOutlineArrowRightEndOnRectangle
@@ -397,13 +417,16 @@ const ChatInfo = ({
                           className="font-semibold"
                         />
                         <span className="text-sm text-[#FF0000] font-semibold leading-[25px]">
-                          Dissolve Group
+                          Dissolve group
                         </span>
                       </button>
                     )}
                   </>
                 ) : (
-                  <button className="flex items-center gap-3">
+                  <button
+                    className="flex items-center gap-3 hover:bg-[#484848] rounded-lg p-2"
+                    onClick={() => handleBlockUser(chatDetail?.members?.find((m) => m.id !== userId)?.id || 0)}
+                  >
                     <MdBlock
                       size={25}
                       color="white"
@@ -416,7 +439,7 @@ const ChatInfo = ({
                 )}
 
                 <button
-                  className="flex items-center gap-3"
+                  className="flex items-center gap-3 hover:bg-[#484848] rounded-lg p-2"
                   onClick={handleDeleteConversation}
                 >
                   <CgTrashEmpty

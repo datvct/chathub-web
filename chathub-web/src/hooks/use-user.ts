@@ -1,8 +1,14 @@
 import { useState, useCallback } from "react";
-import { UserDTO, ChangeProfileRequest } from "~/codegen/data-contracts";
-import { getUserInfo } from "~/lib/get-user";
-import { updateProfile as updateProfileAPI } from "~/lib/get-user";
-import { toast } from "react-toastify";
+import { 
+  UserDTO, 
+  ChangeProfileRequest 
+} from "~/codegen/data-contracts";
+import { 
+  getUserInfo,
+  updateProfile as updateProfileAPI,
+  blockUser as blockUserAPI, 
+  unblockUser as unblockUserAPI,
+} from "~/lib/get-user";
 
 export function useFindUserByPhoneNumber() {
   const [user, setUser] = useState<UserDTO | null>(null);
@@ -53,4 +59,41 @@ export const useUpdateProfile = () => {
   }, []);
 
   return { updateProfile, loading, errorMessage };
+};
+
+export const useBlockUnblockUser = () => {
+  const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+
+  const blockUser = async (blockerId: number, blockedId: number, token: string) => {
+    setLoading(true);
+    setErrorMessage("");
+    try {
+      const response = await blockUserAPI(blockerId, blockedId, token);
+      return response;
+    } catch (error) {
+      console.error("Error blocking user:", error);
+      setErrorMessage("Failed to block user.");
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const unblockUser = async (blockerId: number, blockedId: number, token: string) => {
+    setLoading(true);
+    setErrorMessage("");
+    try {
+      const response = await unblockUserAPI(blockerId, blockedId, token);
+      return response;
+    } catch (error) {
+      console.error("Error unblocking user:", error);
+      setErrorMessage("Failed to unblock user.");
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return { blockUser, unblockUser, loading, errorMessage };
 };

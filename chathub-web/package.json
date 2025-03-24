@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "codegen": "npx swagger-typescript-api -p http://localhost:8080/v3/api-docs -o ./src/codegen -n swagger-generated.ts --modular"
+    "codegen": "npx swagger-typescript-api generate -p http://localhost:8080/v3/api-docs -o ./src/codegen -n swagger-generated.ts --modular"
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
@@ -37,6 +37,7 @@
     "react-redux": "^9.2.0",
     "react-toastify": "^11.0.3",
     "sockjs-client": "^1.6.1",
+    "swagger-typescript-api": "^13.0.25",
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7",
     "zod": "^3.24.1"
