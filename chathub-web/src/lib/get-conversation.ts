@@ -30,10 +30,12 @@ export async function getRecentConversationByUserID(userId: number, token: strin
 
 export async function createConversationAPI(data: ConversationRequest, token: string) {
   try {
-    if (!data) return null;
+    if (!data || !data.chatType) {
+      throw new Error("Chat type is required.");
+    }
 
     const response = await conversationInstance.createConversation(
-      { request: data },
+      { request: { ...data } },
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -43,7 +45,7 @@ export async function createConversationAPI(data: ConversationRequest, token: st
     return response; 
   } catch (error) {
     console.error("Error creating conversation:", error);
-    return null;
+    throw error;
   }
 }
 

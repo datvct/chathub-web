@@ -68,7 +68,7 @@ export const useConversation = (userId: number, token: string) => {
       if (!data.chatType) {
         throw new Error("Chat type is required.");
       }
-      
+
       const response = await createConversationAPI(data, token);
       if (response) {
         return response;
@@ -77,6 +77,28 @@ export const useConversation = (userId: number, token: string) => {
       }
     } catch (err: any) {
       setError(err.message || "Failed to create conversation");
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const createGroupConversation = async (data: ConversationRequest) => {
+    setLoading(true);
+    setError(null);
+    try {
+      if (!data.chatType || data.chatType !== "GROUP") {
+        throw new Error("Chat type must be 'GROUP'.");
+      }
+
+      const response = await createConversationAPI(data, token);
+      if (response) {
+        return response;
+      } else {
+        throw new Error("Failed to create group chat");
+      }
+    } catch (err: any) {
+      setError(err.message || "Failed to create group chat");
       return null;
     } finally {
       setLoading(false);
@@ -286,6 +308,7 @@ export const useConversation = (userId: number, token: string) => {
     groups,
     getRecentConversation,
     createConversation,
+    createGroupConversation,
     leaveConversationById,
     dissolveGroup,
     getGroupConversations,
