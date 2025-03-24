@@ -30,14 +30,14 @@ const ModalUpdateGroupInfo: React.FC<ModalUpdateGroupInfoProps> = ({
 	currentGroupAvatar,
 	onGroupInfoUpdated,
 }) => {
+	const token = useSelector((state: RootState) => state.auth.token)
+	const userId = useSelector((state: RootState) => state.auth.userId)
+
 	const [groupName, setGroupName] = useState<string>(currentGroupName || "")
 	const [groupAvatar, setGroupAvatar] = useState<string | null>(currentGroupAvatar || null)
 	const [selectedAvatarFile, setSelectedAvatarFile] = useState<File | null>(null)
 	const [loading, setLoading] = useState(false)
-	const { updateGroupInfo } = useConversation()
-
-	const token = useSelector((state: RootState) => state.auth.token)
-	const userId = useSelector((state: RootState) => state.auth.userId)
+	const { updateGroupInfo } = useConversation(userId!, token!)
 
 	const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
 		const file = event.target.files?.[0]
@@ -47,46 +47,83 @@ const ModalUpdateGroupInfo: React.FC<ModalUpdateGroupInfoProps> = ({
 		}
 	}
 
-	const handleSubmit = async () => {
-		if (!conversationId || !userId || !token) return
+	// const handleSubmit = async () => {
+	// 	if (!conversationId || !userId || !token) return
 
-		setLoading(true)
+	// 	setLoading(true)
+
+	// 	try {
+	// 		let avatarFileToUpload: File | undefined = selectedAvatarFile || undefined
+
+	// 		if (avatarFileToUpload && avatarFileToUpload.size > 1024 * 1024) {
+	// 			toast.error("Avatar file size must be less than 1MB.")
+	// 			setLoading(false)
+	// 			return
+	// 		}
+
+	// 		const updateRequest: UpdateGroupInfoRequest = {
+	// 			userId: userId!,
+	// 			groupName: groupName,
+	// 			avatar: avatarFileToUpload,
+	// 		}
+
+	// 		console.log("Calling updateGroupInfo API with:", updateRequest)
+
+	// 		const updateSuccess = await updateGroupInfo(conversationId, updateRequest, token)
+
+	// 		console.log("updateGroupInfo API response:", updateSuccess)
+
+	// 		if (updateSuccess?.statusCode === 200) {
+	// 			toast.success("Group info updated successfully!")
+	// 			setIsOpen(false)
+	// 			onGroupInfoUpdated()
+	// 		} else {
+	// 			toast.error("Failed to update group info.")
+	// 		}
+	// 	} catch (error) {
+	// 		console.error("Error updating group info:", error)
+	// 		toast.error("Failed to update group info.")
+	// 	} finally {
+	// 		setLoading(false)
+	// 	}
+	// }
+
+	const handleSubmit = async () => {
+		if (!conversationId || !userId || !token) return;
+
+		setLoading(true);
 
 		try {
-			let avatarFileToUpload: File | undefined = selectedAvatarFile || undefined
+			let avatarFileToUpload: File | undefined = selectedAvatarFile || undefined;
 
 			if (avatarFileToUpload && avatarFileToUpload.size > 1024 * 1024) {
-				toast.error("Avatar file size must be less than 1MB.")
-				setLoading(false)
-				return
+				toast.error("Avatar file size must be less than 1MB.");
+				setLoading(false);
+				return;
 			}
 
 			const updateRequest: UpdateGroupInfoRequest = {
 				userId: userId!,
 				groupName: groupName,
 				avatar: avatarFileToUpload,
-			}
+			};
 
-			console.log("Calling updateGroupInfo API with:", updateRequest)
-
-			const updateSuccess = await updateGroupInfo(conversationId, updateRequest, token)
-
-			console.log("updateGroupInfo API response:", updateSuccess)
+			const updateSuccess = await updateGroupInfo(conversationId, updateRequest, token);
 
 			if (updateSuccess?.statusCode === 200) {
-				toast.success("Group info updated successfully!")
-				setIsOpen(false)
-				onGroupInfoUpdated()
+				toast.success("Group info updated successfully!");
+				setIsOpen(false);
+				onGroupInfoUpdated();
 			} else {
-				toast.error("Failed to update group info.")
+				toast.error("Failed to update group info.");
 			}
 		} catch (error) {
-			console.error("Error updating group info:", error)
-			toast.error("Failed to update group info.")
+			console.error("Error updating group info:", error);
+			toast.error("Failed to update group info.");
 		} finally {
-			setLoading(false)
+			setLoading(false);
 		}
-	}
+	};
 
 	return (
 		<Transition appear show={isOpen} as={Fragment}>
