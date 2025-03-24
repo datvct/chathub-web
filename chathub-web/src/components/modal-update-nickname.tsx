@@ -109,10 +109,18 @@ const ModalUpdateNickname: React.FC<ModalUpdateNicknameProps> = ({
                   </div>
 
                   <div className="mt-4 flex justify-end gap-4">
-                    <Button variant="ghost" onClick={() => setIsOpen(false)} disabled={loading}>
+                    <Button
+                      variant="secondary"
+                      onClick={() => setIsOpen(false)} disabled={loading}
+                      className="bg-gray-500 hover:bg-gray-600 text-white"
+                    >
                       Cancel
                     </Button>
-                    <Button onClick={handleUpdateNickname} disabled={loading}>
+                    <Button
+                      onClick={handleUpdateNickname}
+                      disabled={loading}
+                      className="bg-green-500 hover:bg-green-600 text-white"
+                    >
                       {loading ? "Updating..." : "Update"}
                     </Button>
                   </div>
