@@ -6,7 +6,11 @@ import Image from "next/image";
 import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
 import { RootState } from "~/lib/reudx/store";
-import { ChatDetailSectionResponse, ConversationResponse } from "~/codegen/data-contracts";
+import {
+  ChatDetailSectionResponse,
+  ConversationResponse,
+  UpdateNickNameRequest
+} from "~/codegen/data-contracts";
 import { getRecentConversationByUserID } from "~/lib/get-conversation";
 import { Images } from "~/constants/images";
 import { useConversation } from "~/hooks/use-converstation";
@@ -19,6 +23,7 @@ import ModalUpdateGroupInfo from "./modal-update-group-info";
 import ModalConfirm from "./modal-confirm";
 import ModalSuccess from "./modal-success";
 import ModalDeleteConversation from "~/components/modal-delete-conversation";
+import ModalUpdateNickname from "./modal-update-nickname";
 import { Button } from "./ui/button";
 
 import { GoBell, GoBellSlash } from "react-icons/go";
@@ -93,16 +98,18 @@ const ChatInfo = ({
   const [successMessage, setSuccessMessage] = useState<string>("");
   const [selectedChatId, setSelectedChatId] = useState<number | null>(null);
   const [isOpenDeleteConversation, setIsOpenDeleteConversation] = useState(false);
+  const [isNicknameModalOpen, setIsNicknameModalOpen] = useState(false); // State để mở modal
+  const [selectedParticipantId, setSelectedParticipantId] = useState<number | null>(null); // ID của thành viên được chọn
+  const [currentNickname, setCurrentNickname] = useState<string>(""); // Nickname hiện tại của thành viên được chọn
 
   const [chatDetail, setChatDetail] = useState<ChatDetailSectionResponse | null>(null);
   const [isPinned, setIsPinned] = useState(false);
   const [isDeletingConversation, setIsDeletingConversation] = useState<boolean>(false);
-  // Lấy danh sách các admin trong nhóm
+  const [isBlocked, setIsBlocked] = useState(false);
+
   const admins = chatDetail?.members?.filter((member) => member.is_admin) || [];
 
-  // Kiểm tra xem người dùng hiện tại có phải là admin hay không
   const isCurrentUserAdmin = admins.some((admin) => admin.id === userId);
-  const [isBlocked, setIsBlocked] = useState(false);
 
   useEffect(() => {
     const fetchChatDetails = async () => {
@@ -113,6 +120,23 @@ const ChatInfo = ({
     };
     fetchChatDetails();
   }, [selectedChat, userId, token]);
+
+  const openUpdateNicknameModal = (participantId: number, nickname: string) => {
+    setSelectedParticipantId(participantId);
+    setCurrentNickname(nickname);
+    setIsNicknameModalOpen(true);
+  };
+
+  const handleNicknameUpdated = () => {
+    toast.success("Nickname updated successfully!");
+    setIsNicknameModalOpen(false);
+
+    const fetchUpdatedDetails = async () => {
+      const updatedDetails = await getChatDetailSection(selectedChat, userId, token);
+      setChatDetail(updatedDetails || null);
+    };
+    fetchUpdatedDetails();
+  };
 
   const handleLeaveGroup = async () => {
     if (!selectedChat || !userId || !token) return;
@@ -585,6 +609,14 @@ const ChatInfo = ({
                           Remove
                         </Button>
                         {/* )} */}
+
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                        // onClick={() => openUpdateNicknameModal(member.id, member.nickname || "")}
+                        >
+                          Update Nickname
+                        </Button>
                       </div>
                     );
                   })}
