@@ -35,6 +35,7 @@ import { FaUserFriends } from "react-icons/fa";
 import { HiOutlineArrowRightEndOnRectangle } from "react-icons/hi2";
 import { FaChevronLeft } from "react-icons/fa6";
 import { LuUserRoundPlus } from "react-icons/lu";
+import { MdOutlineMoreHoriz } from "react-icons/md";
 
 interface ChatInfoProps {
   isOpen?: boolean;
@@ -96,7 +97,11 @@ const ChatInfo = ({
   const [chatDetail, setChatDetail] = useState<ChatDetailSectionResponse | null>(null);
   const [isPinned, setIsPinned] = useState(false);
   const [isDeletingConversation, setIsDeletingConversation] = useState<boolean>(false);
-  const isCurrentUserAdmin = chatDetail?.members?.find((m) => m.id === userId)?.is_admin || false;
+  // Lấy danh sách các admin trong nhóm
+  const admins = chatDetail?.members?.filter((member) => member.is_admin) || [];
+
+  // Kiểm tra xem người dùng hiện tại có phải là admin hay không
+  const isCurrentUserAdmin = admins.some((admin) => admin.id === userId);
   const [isBlocked, setIsBlocked] = useState(false);
 
   useEffect(() => {
@@ -108,8 +113,6 @@ const ChatInfo = ({
     };
     fetchChatDetails();
   }, [selectedChat, userId, token]);
-
-
 
   const handleLeaveGroup = async () => {
     if (!selectedChat || !userId || !token) return;
@@ -171,19 +174,31 @@ const ChatInfo = ({
   };
 
   const handleRemoveMember = async (participantId: number) => {
-    if (!selectedChat || !userId || !token) return;
+    if (!selectedChat || !userId || !token) {
+      toast.error("Invalid chat or user information.");
+      return;
+    }
+
     try {
       const response = await removeParticipantFromGroup(selectedChat, userId, participantId, token);
       if (response?.statusCode === 200) {
+        toast.success("Member removed successfully!");
         setSuccessMessage("Member removed successfully!");
         setIsSuccessModalOpen(true);
-        getChatDetailSection(selectedChat, userId, token);
+
+        // Cập nhật lại chi tiết nhóm sau khi xóa thành viên
+        const updatedDetails = await getChatDetailSection(selectedChat, userId, token);
+        setChatDetail(updatedDetails || null);
+
+        setTimeout(() => {
+          router.push("/");
+        }, 6000);
       } else {
-        toast.error("Failed to remove member.");
+        toast.error(response?.message || "Failed to remove member.");
       }
     } catch (error) {
       console.error("Error removing member:", error);
-      toast.error("Failed to remove member.");
+      toast.error("Failed to remove member. Please try again.");
     }
   };
 
@@ -201,6 +216,7 @@ const ChatInfo = ({
   };
 
   const handleRemoveMemberAction = (participantId: number) => {
+    handleRemoveMember(participantId);
     setMemberToRemove(participantId);
     setIsConfirmModalOpen(true);
   };
@@ -463,7 +479,7 @@ const ChatInfo = ({
                         </button>
                       ) : (
                         <button
-                          className="flex items-center gap-3 hover:bg-[#484848] rounded-lg p-2"
+                          className="flex items-center gap-3 hover:bg-[#484848] rounded-lg p-2 w-full"
                           onClick={handleBlockUserClick}
                           disabled={blockUnblockLoading}
                         >
@@ -482,7 +498,7 @@ const ChatInfo = ({
                 )}
 
                 <button
-                  className="flex items-center gap-3 hover:bg-[#484848] rounded-lg p-2"
+                  className="flex items-center gap-3 hover:bg-[#484848] rounded-lg p-2 w-full"
                   onClick={handleDeleteConversation}
                 >
                   <CgTrashEmpty
@@ -519,13 +535,14 @@ const ChatInfo = ({
                   <LuUserRoundPlus size={20} color="black" />
                   <span className="text-black text-sm">Add member</span>
                 </Button>
+
                 <div className="mt-3 px-2">
                   {chatDetail?.members?.map((member, i) => {
                     const isAdmin = chatDetail?.members?.find((m) => m.id === userId)?.is_admin;
 
                     if (member.id === userId) {
                       return (
-                        <div key={i} className="flex items-center gap-3 p-2 justify-between">
+                        <div key={i} className="flex items-center gap-3 p-2 justify-between w-full hover:bg-[#484848] rounded-lg cursor-pointer">
                           <div className="flex items-center gap-3">
                             <Image
                               src={member.avatar || Images.AvatarDefault}
@@ -545,9 +562,9 @@ const ChatInfo = ({
                     return (
                       <div
                         key={i}
-                        className="flex items-center gap-3 p-2 justify-between"
+                        className="flex items-center gap-3 p-2 justify-between w-full hover:bg-[#484848] rounded-lg cursor-pointer"
                       >
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-3 w-full">
                           <Image
                             src={member.avatar || Images.AvatarDefault}
                             alt={"avatar"}
@@ -559,15 +576,15 @@ const ChatInfo = ({
                             {member.name} {member.is_admin ? "(Admin)" : ""}
                           </span>
                         </div>
-                        {isAdmin && !member.is_admin && (
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            onClick={() => handleRemoveMemberAction(Number(member.id))}
-                          >
-                            Remove
-                          </Button>
-                        )}
+                        {/* {isCurrentUserAdmin && ( */}
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => handleRemoveMemberAction(Number(member.id))}
+                        >
+                          Remove
+                        </Button>
+                        {/* )} */}
                       </div>
                     );
                   })}
