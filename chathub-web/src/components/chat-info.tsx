@@ -108,7 +108,6 @@ const ChatInfo = ({
   const [isBlocked, setIsBlocked] = useState(false);
 
   const admins = chatDetail?.members?.filter((member) => member.is_admin) || [];
-
   const isCurrentUserAdmin = admins.some((admin) => admin.id === userId);
 
   useEffect(() => {
@@ -120,12 +119,6 @@ const ChatInfo = ({
     };
     fetchChatDetails();
   }, [selectedChat, userId, token]);
-
-  const openUpdateNicknameModal = (participantId: number, nickname: string) => {
-    setSelectedParticipantId(participantId);
-    setCurrentNickname(nickname);
-    setIsNicknameModalOpen(true);
-  };
 
   const handleNicknameUpdated = () => {
     toast.success("Nickname updated successfully!");
@@ -613,7 +606,7 @@ const ChatInfo = ({
                         <Button
                           variant="secondary"
                           size="sm"
-                        // onClick={() => openUpdateNicknameModal(member.id, member.nickname || "")}
+                          onClick={() => setIsNicknameModalOpen(true)}
                         >
                           Update Nickname
                         </Button>
@@ -683,24 +676,28 @@ const ChatInfo = ({
         setIsOpen={setIsSuccessModalOpen}
         message={successMessage}
       />
-      {isOpenDeleteConversation && (
-        <ModalDeleteConversation
-          isOpen={isOpenDeleteConversation}
-          setIsOpen={setIsOpenDeleteConversation}
-          chatId={selectedChat}
-          onHistoryDeleted={onHistoryDeleted}
-        />
-      )}
-      {isNicknameModalOpen && (
-        <ModalUpdateNickname
-          isOpen={isNicknameModalOpen}
-          setIsOpen={setIsNicknameModalOpen}
-          conversationId={selectedChat!}
-          participantId={selectedParticipantId!}
-          currentNickname={currentNickname}
-          onNicknameUpdated={handleNicknameUpdated}
-        />
-      )}
+      {
+        isOpenDeleteConversation && (
+          <ModalDeleteConversation
+            isOpen={isOpenDeleteConversation}
+            setIsOpen={setIsOpenDeleteConversation}
+            chatId={selectedChat}
+            onHistoryDeleted={onHistoryDeleted}
+          />
+        )
+      }
+      {
+        isNicknameModalOpen && (
+          <ModalUpdateNickname
+            isOpen={isNicknameModalOpen}
+            setIsOpen={setIsNicknameModalOpen}
+            conversationId={selectedChat!}
+            participantId={selectedParticipantId!}
+            currentNickname={currentNickname}
+            onNicknameUpdated={handleNicknameUpdated}
+          />
+        )
+      }
     </div >
   );
 };

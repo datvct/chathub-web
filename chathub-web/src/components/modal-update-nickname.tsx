@@ -54,7 +54,7 @@ const ModalUpdateNickname: React.FC<ModalUpdateNicknameProps> = ({
       if (response) {
         toast.success("Nickname updated successfully!");
         setIsOpen(false);
-        onNicknameUpdated(); // Gọi callback để thông báo component cha
+        onNicknameUpdated();
       } else {
         setErrorMessage("Failed to update nickname.");
       }
@@ -65,9 +65,9 @@ const ModalUpdateNickname: React.FC<ModalUpdateNicknameProps> = ({
   };
 
   return (
-    <Transition.Root show={isOpen} as={Fragment}>
+    <Transition show={isOpen} as={Fragment}>
       <Dialog as="div" className="relative z-50" onClose={setIsOpen}>
-        <Transition.Child
+        <TransitionChild
           as={Fragment}
           enter="ease-out duration-300"
           enterFrom="opacity-0"
@@ -77,12 +77,12 @@ const ModalUpdateNickname: React.FC<ModalUpdateNicknameProps> = ({
           leaveTo="opacity-0"
         >
           <div className="fixed inset-0 bg-black bg-opacity-25 transition-opacity" />
-        </Transition.Child>
+        </TransitionChild>
 
         <div className="fixed inset-0 overflow-hidden">
           <div className="absolute inset-0 overflow-y-auto">
             <div className="flex min-h-full items-center justify-center p-4 text-center">
-              <Transition.Child
+              <TransitionChild
                 as={Fragment}
                 enter="ease-out duration-300"
                 enterFrom="opacity-0 translate-y-4 sm:translate-y-0 sm:scale-95"
@@ -117,12 +117,12 @@ const ModalUpdateNickname: React.FC<ModalUpdateNicknameProps> = ({
                     </Button>
                   </div>
                 </DialogPanel>
-              </Transition.Child>
+              </TransitionChild>
             </div>
           </div>
         </div>
       </Dialog>
-    </Transition.Root>
+    </Transition>
   );
 };
 

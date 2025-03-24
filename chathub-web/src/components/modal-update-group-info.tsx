@@ -47,47 +47,6 @@ const ModalUpdateGroupInfo: React.FC<ModalUpdateGroupInfoProps> = ({
 		}
 	}
 
-	// const handleSubmit = async () => {
-	// 	if (!conversationId || !userId || !token) return
-
-	// 	setLoading(true)
-
-	// 	try {
-	// 		let avatarFileToUpload: File | undefined = selectedAvatarFile || undefined
-
-	// 		if (avatarFileToUpload && avatarFileToUpload.size > 1024 * 1024) {
-	// 			toast.error("Avatar file size must be less than 1MB.")
-	// 			setLoading(false)
-	// 			return
-	// 		}
-
-	// 		const updateRequest: UpdateGroupInfoRequest = {
-	// 			userId: userId!,
-	// 			groupName: groupName,
-	// 			avatar: avatarFileToUpload,
-	// 		}
-
-	// 		console.log("Calling updateGroupInfo API with:", updateRequest)
-
-	// 		const updateSuccess = await updateGroupInfo(conversationId, updateRequest, token)
-
-	// 		console.log("updateGroupInfo API response:", updateSuccess)
-
-	// 		if (updateSuccess?.statusCode === 200) {
-	// 			toast.success("Group info updated successfully!")
-	// 			setIsOpen(false)
-	// 			onGroupInfoUpdated()
-	// 		} else {
-	// 			toast.error("Failed to update group info.")
-	// 		}
-	// 	} catch (error) {
-	// 		console.error("Error updating group info:", error)
-	// 		toast.error("Failed to update group info.")
-	// 	} finally {
-	// 		setLoading(false)
-	// 	}
-	// }
-
 	const handleSubmit = async () => {
 		if (!conversationId || !userId || !token) return;
 
