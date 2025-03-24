@@ -55,11 +55,6 @@ const ChatList = ({
     getRecentConversation
   } = useConversation(userId, token)
 
-  const {
-    blockUser,
-    unblockUser
-  } = useBlockUnblockUser();
-
   const [dataConversation, setDataConversation] = useState<ConversationResponse[]>([])
 
   const fetchDataConversation = async () => {
@@ -108,24 +103,6 @@ const ChatList = ({
     setConversationData(converstation)
     setIsGroupChat(isGroup || false)
   }
-
-  const handleBlockUser = async (targetUserId: number) => {
-    const response = await blockUser(userId, targetUserId, token);
-    if (response) {
-      toast.success("User blocked successfully!");
-    } else {
-      toast.error("Failed to block user.");
-    }
-  };
-
-  const handleUnblockUser = async (targetUserId: number) => {
-    const response = await unblockUser(userId, targetUserId, token);
-    if (response) {
-      toast.success("User unblocked successfully!");
-    } else {
-      toast.error("Failed to unblock user.");
-    }
-  };
 
   return (
     <div className="bg-[#202020] text-white w-1/4 h-screen p-4 relative z-50">

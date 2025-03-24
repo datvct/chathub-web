@@ -61,7 +61,10 @@ export const useUpdateProfile = () => {
   return { updateProfile, loading, errorMessage };
 };
 
-export const useBlockUnblockUser = () => {
+export const useBlockUnblockUser = (
+  userId: number, 
+  token: string
+) => {
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 

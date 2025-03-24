@@ -77,8 +77,8 @@ const ChatInfo = ({
   const {
     blockUser,
     unblockUser,
-    loading
-  } = useBlockUnblockUser();
+    loading: blockUnblockLoading,
+  } = useBlockUnblockUser(userId, token);
 
   const [isOpenLeaveGroup, setIsOpenLeaveGroup] = useState(false);
   const [isAddingMember, setIsAddingMember] = useState(false);
@@ -97,6 +97,7 @@ const ChatInfo = ({
   const [isPinned, setIsPinned] = useState(false);
   const [isDeletingConversation, setIsDeletingConversation] = useState<boolean>(false);
   const isCurrentUserAdmin = chatDetail?.members?.find((m) => m.id === userId)?.is_admin || false;
+  const [isBlocked, setIsBlocked] = useState(false);
 
   useEffect(() => {
     const fetchChatDetails = async () => {
@@ -220,21 +221,41 @@ const ChatInfo = ({
     }
   };
 
-  const handleBlockUser = async (targetUserId: number) => {
-    const response = await blockUser(userId, targetUserId, token);
-    if (response) {
-      toast.success("User blocked successfully!");
+  const handleBlockUserClick = async () => {
+    if (!selectedChat || !userId || !token || !chatDetail) return;
+
+    const targetUserId = chatDetail.members?.find(m => m.id !== userId)?.id;
+    if (!targetUserId) {
+      console.error("Cannot find user ID to block");
+      return;
+    }
+
+    const success = await blockUser(userId, targetUserId, token);
+    if (success) {
+      toast.success("Blocked this user successfully!");
+      setIsBlocked(true);
     } else {
-      toast.error("Failed to block user.");
+      toast.error("Cannot block this user. Please try again later.");
+      setIsBlocked(false);
     }
   };
 
-  const handleUnblockUser = async (targetUserId: number) => {
-    const response = await unblockUser(userId, targetUserId, token);
-    if (response) {
-      toast.success("User unblocked successfully!");
+  const handleUnblockUserClick = async () => {
+    if (!selectedChat || !userId || !token || !chatDetail) return;
+
+    const targetUserId = chatDetail.members?.find(m => m.id !== userId)?.id;
+    if (!targetUserId) {
+      console.error("Cannot find user ID to unblock");
+      return;
+    }
+
+    const success = await unblockUser(userId, targetUserId, token);
+    if (success) {
+      toast.success("Unblocked this user successfully!");
+      setIsBlocked(false);
     } else {
-      toast.error("Failed to unblock user.");
+      toast.error("Cannot unblock this user. Please try again later.");
+      setIsBlocked(true);
     }
   };
 
@@ -423,19 +444,41 @@ const ChatInfo = ({
                     )}
                   </>
                 ) : (
-                  <button
-                    className="flex items-center gap-3 hover:bg-[#484848] rounded-lg p-2"
-                    onClick={() => handleBlockUser(chatDetail?.members?.find((m) => m.id !== userId)?.id || 0)}
-                  >
-                    <MdBlock
-                      size={25}
-                      color="white"
-                      className="text-white font-semibold"
-                    />
-                    <span className="text-sm font-semibold leading-[25px]">
-                      Block
-                    </span>
-                  </button>
+                  chatDetail?.members?.length === 2 && chatDetail.members.some(m => m.id !== userId) ? (
+                    chatDetail?.members?.find((m) => m.id !== userId) ? (
+                      isBlocked ? (
+                        <button
+                          className="flex items-center gap-3 hover:bg-[#484848] rounded-lg p-2"
+                          onClick={handleUnblockUserClick}
+                          disabled={blockUnblockLoading}
+                        >
+                          <MdBlock
+                            size={25}
+                            color="white"
+                            className="text-white font-semibold"
+                          />
+                          <span className="text-sm font-semibold leading-[25px]">
+                            {blockUnblockLoading ? "Unblocking..." : "Unblock"}
+                          </span>
+                        </button>
+                      ) : (
+                        <button
+                          className="flex items-center gap-3 hover:bg-[#484848] rounded-lg p-2"
+                          onClick={handleBlockUserClick}
+                          disabled={blockUnblockLoading}
+                        >
+                          <MdBlock
+                            size={25}
+                            color="white"
+                            className="text-white font-semibold"
+                          />
+                          <span className="text-sm font-semibold leading-[25px]">
+                            {blockUnblockLoading ? "Blocking..." : "Block"}
+                          </span>
+                        </button>
+                      )
+                    ) : null
+                  ) : null
                 )}
 
                 <button
