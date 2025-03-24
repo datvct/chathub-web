@@ -10,6 +10,7 @@ import { ChatDetailSectionResponse, ConversationResponse } from "~/codegen/data-
 import { getRecentConversationByUserID } from "~/lib/get-conversation";
 import { Images } from "~/constants/images";
 import { useConversation } from "~/hooks/use-converstation";
+import { useBlockUnblockUser } from "~/hooks/use-user";
 
 import ModalLeaveGroup from "./modal-leave-group";
 import ModalAddMembers from "./modal-add-members";
@@ -72,6 +73,12 @@ const ChatInfo = ({
     deleteConversation,
     leaveGroupConversation
   } = useConversation(userId, token);
+
+  const {
+    blockUser,
+    unblockUser,
+    loading
+  } = useBlockUnblockUser();
 
   const [isOpenLeaveGroup, setIsOpenLeaveGroup] = useState(false);
   const [isAddingMember, setIsAddingMember] = useState(false);
@@ -197,7 +204,6 @@ const ChatInfo = ({
     setIsConfirmModalOpen(true);
   };
 
-
   const handleOpenUpdateGroupInfoModal = () => {
     setIsOpenUpdateGroupInfo(true);
   };
@@ -214,6 +220,23 @@ const ChatInfo = ({
     }
   };
 
+  const handleBlockUser = async (targetUserId: number) => {
+    const response = await blockUser(userId, targetUserId, token);
+    if (response) {
+      toast.success("User blocked successfully!");
+    } else {
+      toast.error("Failed to block user.");
+    }
+  };
+
+  const handleUnblockUser = async (targetUserId: number) => {
+    const response = await unblockUser(userId, targetUserId, token);
+    if (response) {
+      toast.success("User unblocked successfully!");
+    } else {
+      toast.error("Failed to unblock user.");
+    }
+  };
 
   return (
     <div className="bg-[#292929] text-white h-screen overflow-hidden overflow-y-auto w-1/4 p-4">
@@ -400,7 +423,10 @@ const ChatInfo = ({
                     )}
                   </>
                 ) : (
-                  <button className="flex items-center gap-3 hover:bg-[#484848] rounded-lg p-2">
+                  <button
+                    className="flex items-center gap-3 hover:bg-[#484848] rounded-lg p-2"
+                    onClick={() => handleBlockUser(chatDetail?.members?.find((m) => m.id !== userId)?.id || 0)}
+                  >
                     <MdBlock
                       size={25}
                       color="white"
