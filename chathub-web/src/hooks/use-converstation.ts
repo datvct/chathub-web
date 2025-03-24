@@ -247,20 +247,6 @@ export const useConversation = (userId: number, token: string) => {
     }
   };
 
-  const updateNickname = async (data: UpdateNickNameRequest, token: string) => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await updateNicknameAPI(data, token);
-      return response;
-    } catch (err: any) {
-      setError(err.message || "Failed to update nickname");
-      return null;
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const removeParticipantFromGroup = async (conversationId: number, userId: number, participantId: number, token: string) => {
     setLoading(true);
     setError(null);
@@ -299,6 +285,20 @@ export const useConversation = (userId: number, token: string) => {
     } catch (err) {
       setError("Failed to fetch groups");
       return [];
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const updateNickname = async (data: UpdateNickNameRequest, token: string) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await updateNicknameAPI(data, token);
+      return response;
+    } catch (err: any) {
+      setError(err.message || "Failed to update nickname");
+      return null;
     } finally {
       setLoading(false);
     }
