@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
+import { useSelector } from "react-redux";
+import { RootState } from "~/lib/reudx/store";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { useConversation } from "~/hooks/use-converstation";
@@ -13,7 +15,7 @@ interface ModalUpdateNicknameProps {
 	conversationId: number;
 	participantId: number;
 	currentNickname: string;
-	token: string;
+	onNicknameUpdated: () => void;
 }
 
 const ModalUpdateNickname: React.FC<ModalUpdateNicknameProps> = ({
@@ -22,10 +24,13 @@ const ModalUpdateNickname: React.FC<ModalUpdateNicknameProps> = ({
 	conversationId,
 	participantId,
 	currentNickname,
-	token,
+	onNicknameUpdated,
 }) => {
+	const token = useSelector((state: RootState) => state.auth.token);
+	const userId = useSelector((state: RootState) => state.auth.userId);
+
 	const [nickname, setNickname] = useState<string>(currentNickname);
-	const { updateNickname, loading } = useConversation(0, token);
+	const { updateNickname, loading } = useConversation(userId, token);
 
 	const handleUpdateNickname = async () => {
 		if (!nickname) {

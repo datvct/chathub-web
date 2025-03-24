@@ -98,9 +98,9 @@ const ChatInfo = ({
   const [successMessage, setSuccessMessage] = useState<string>("");
   const [selectedChatId, setSelectedChatId] = useState<number | null>(null);
   const [isOpenDeleteConversation, setIsOpenDeleteConversation] = useState(false);
-  const [isNicknameModalOpen, setIsNicknameModalOpen] = useState(false); // State để mở modal
-  const [selectedParticipantId, setSelectedParticipantId] = useState<number | null>(null); // ID của thành viên được chọn
-  const [currentNickname, setCurrentNickname] = useState<string>(""); // Nickname hiện tại của thành viên được chọn
+  const [isNicknameModalOpen, setIsNicknameModalOpen] = useState(false);
+  const [selectedParticipantId, setSelectedParticipantId] = useState<number | null>(null);
+  const [currentNickname, setCurrentNickname] = useState<string>("");
 
   const [chatDetail, setChatDetail] = useState<ChatDetailSectionResponse | null>(null);
   const [isPinned, setIsPinned] = useState(false);
@@ -689,6 +689,16 @@ const ChatInfo = ({
           setIsOpen={setIsOpenDeleteConversation}
           chatId={selectedChat}
           onHistoryDeleted={onHistoryDeleted}
+        />
+      )}
+      {isNicknameModalOpen && (
+        <ModalUpdateNickname
+          isOpen={isNicknameModalOpen}
+          setIsOpen={setIsNicknameModalOpen}
+          conversationId={selectedChat!}
+          participantId={selectedParticipantId!}
+          currentNickname={currentNickname}
+          onNicknameUpdated={handleNicknameUpdated}
         />
       )}
     </div >
