@@ -1,5 +1,6 @@
 /* eslint-disable */
 /* tslint:disable */
+// @ts-nocheck
 /*
  * ---------------------------------------------------------------
  * ## THIS FILE WAS GENERATED VIA SWAGGER-TYPESCRIPT-API        ##
@@ -109,7 +110,6 @@ export interface ConversationResponse {
   participants?: ParticipantDTO[]
   pinned?: boolean
   dissolved?: boolean
-  lastMessageType?: strig | null
 }
 
 export interface ParticipantDTO {
