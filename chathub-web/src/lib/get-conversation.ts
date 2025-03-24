@@ -30,20 +30,22 @@ export async function getRecentConversationByUserID(userId: number, token: strin
 
 export async function createConversationAPI(data: ConversationRequest, token: string) {
   try {
-    if (!data) return null
+    if (!data) return null;
 
-    const response = (await conversationInstance.createConversation(data, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }).then(res => res.json())) as ConversationResponse[]
-    return response
+    const response = await conversationInstance.createConversation(
+      { request: data },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response; 
   } catch (error) {
-    console.error("Error checking admin token:", error)
-    return null
+    console.error("Error creating conversation:", error);
+    return null;
   }
 }
-
 
 export async function leaveConversation(conversationId: number, userId: number, token?: string) {
   try {

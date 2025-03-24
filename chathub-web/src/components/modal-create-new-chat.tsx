@@ -13,6 +13,7 @@ import { RootState } from "~/lib/reudx/store"
 import { useFriends } from "~/hooks/use-friends"
 import { ConversationRequest } from "~/codegen/data-contracts"
 import { useConversation } from "~/hooks/use-converstation"
+import { toast } from "react-toastify"
 
 interface ModalCreateNewChatProps {
   isOpen: boolean
@@ -22,29 +23,49 @@ interface ModalCreateNewChatProps {
 const ModalCreateNewChat: React.FC<ModalCreateNewChatProps> = ({ isOpen, setIsOpen }) => {
   const userId = useSelector((state: RootState) => state.auth.userId)
   const token = useSelector((state: RootState) => state.auth.token)
+
   const [selectedUser, setSelectedUser] = useState<number | null>(null)
-  const { friends, loading, error } = useFriends(userId, token)
-  const { createConversation } = useConversation()
+  const {
+    friends,
+    loading: friendsLoading,
+    error
+  } = useFriends(userId, token)
+  const {
+    createConversation,
+    loading: conversationLoading,
+  } = useConversation(userId, token)
+
   const handleSelectUser = (userId: number) => {
     setSelectedUser(userId)
   }
 
   const handleCreateChat = async () => {
-    if (!selectedUser) return
+    if (!selectedUser) {
+      console.error("No user selected.");
+      return;
+    }
+
     const data: ConversationRequest = {
       chatType: "SINGLE",
       creatorId: userId,
       participantIds: [selectedUser, userId],
-    }
+    };
 
-    const response = await createConversation(data, token)
-    if (response) {
-      setIsOpen(false)
-    } else {
+    try {
+      const response = await createConversation(data);
+      if (response) {
+        toast.success("Chat created successfully!");
+        setIsOpen(false);
+      } else {
+        toast.error("Failed to create chat.");
+      }
+    } catch (error) {
+      console.error("Error creating chat:", error);
+      toast.error(error.message || "Failed to create chat.");
     }
-  }
+  };
 
-  if (loading) return <div className="loader"></div>
+  if (friendsLoading) return <div className="loader"></div>
   return (
     <Dialog open={isOpen} onClose={() => setIsOpen(false)} className="relative z-50">
       <div className="fixed inset-0 bg-opacity-[.40]" aria-hidden="true" />
@@ -83,7 +104,7 @@ const ModalCreateNewChat: React.FC<ModalCreateNewChatProps> = ({ isOpen, setIsOp
                 <li
                   key={user.id}
                   className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer mb-3 
-                   hover:bg-[#93C1D2]
+                    hover:bg-[#93C1D2]
                   ${selectedUser === user.id ? "bg-[#7a99b8]/90" : "bg-[#fff]"}`}
                   onClick={() => handleSelectUser(user.id)}
                 >
