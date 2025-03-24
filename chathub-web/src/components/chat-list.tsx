@@ -77,8 +77,8 @@ const ChatList = ({
   }
 
   useEffect(() => {
-    fetchDataConversation();
-  }, [userId, modalCreateChatOpen, modalCreateGroupChatOpen, needRefetchConversations]);
+    fetchDataConversation()
+  }, [userId, modalCreateChatOpen, modalCreateGroupChatOpen, needRefetchConversations])
 
   useEffect(() => {
     if (userId) {
