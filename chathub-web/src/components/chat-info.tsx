@@ -520,7 +520,7 @@ const ChatInfo = ({
                 >
                   <FaInfoCircle
                     size={25}
-                    color="blue"
+                    color="black"
                     className="text-blue-500 font-semibold"
                   />
                   <span className="text-sm font-semibold leading-[25px] text-[#51a2ff]">
