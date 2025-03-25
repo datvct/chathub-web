@@ -1,9 +1,9 @@
 import { User } from "~/codegen/User";
-import { 
-  UserDTO, 
+import {
+  UserDTO,
   BlockRequest,
-  ChangeProfileRequest, 
-  SuccessResponse 
+  ChangeProfileRequest,
+  SuccessResponse
 } from "../codegen/data-contracts";
 
 const userInstance = new User({ baseUrl: process.env.API_URL });
@@ -51,7 +51,7 @@ export async function blockUser(blockerId: number, blockedId: number, token: str
         },
       },
     );
-    return response; 
+    return response;
   } catch (error) {
     console.error("Error blocking user:", error);
     throw error;
@@ -68,7 +68,7 @@ export async function unblockUser(blockerId: number, blockedId: number, token: s
         },
       },
     );
-    return response; 
+    return response;
   } catch (error) {
     console.error("Error unblocking user:", error);
     throw error;
