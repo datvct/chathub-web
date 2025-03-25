@@ -74,3 +74,61 @@ export async function unblockUser(blockerId: number, blockedId: number, token: s
     throw error;
   }
 }
+
+export async function searchUserByNameOrPhone(
+  userId: number,
+  query: string,
+  token: string
+): Promise<UserDTO[]> {
+  try {
+    const response = await userInstance.search(
+      { userId, query },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response?.data || [];
+  } catch (error) {
+    console.error("Error searching user by name or phone:", error);
+    throw error;
+  }
+}
+
+export async function findUserByPhoneNumber(
+  phoneNumber: string,
+  token: string
+): Promise<UserDTO | null> {
+  try {
+    const response = await userInstance.findUserByPhoneNumber(
+      { phoneNumber },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data || null;
+  } catch (error) {
+    console.error("Error finding user by phone number:", error);
+    throw error;
+  }
+}
+
+export async function findUserById(
+  userId: number,
+  token: string
+): Promise<UserDTO | null> {
+  try {
+    const response = await userInstance.findUserByUserId(userId, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data || null;
+  } catch (error) {
+    console.error("Error finding user by ID:", error);
+    throw error;
+  }
+}
