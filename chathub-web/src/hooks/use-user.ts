@@ -129,3 +129,29 @@ export function useSearchUserByNameOrPhone() {
 
   return { users, loading, error, search };
 }
+
+export function useFindUserById() {
+  const [user, setUser] = useState<UserDTO | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const findById = useCallback(
+    async (userId: number, token: string) => {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const response = await findUserById(userId, token);
+        setUser(response);
+      } catch (err) {
+        console.error("Error finding user by ID:", err);
+        setError("Failed to find user by ID");
+      } finally {
+        setLoading(false);
+      }
+    },
+    []
+  );
+
+  return { user, loading, error, findById };
+}
