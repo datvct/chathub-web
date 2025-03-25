@@ -45,7 +45,9 @@ const ModalListGroup: React.FC<ModalListGroupProps> = ({
   const [selectedGroup, setSelectedGroup] = useState<number | null>(null);
   const [showOptionsForGroup, setShowOptionsForGroup] = useState<number | null>(null);
   const [modalPosition, setModalPosition] = useState<{ top: number; left: number } | null>(null);
+  const [groups, setGroups] = useState<ConversationResponse[]>([]);
   const [searchTerm, setSearchTerm] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
 
   useEffect(() => {
     if (userId) {
@@ -59,6 +61,24 @@ const ModalListGroup: React.FC<ModalListGroupProps> = ({
       init()
     }
   }, [userId])
+
+  useEffect(() => {
+    if (userId && token) {
+      const fetchGroups = async () => {
+        setLoading(true);
+        try {
+          const response = await findGroups(userId, searchTerm, token);
+          setGroups(response);
+        } catch (error) {
+          console.error("Error fetching groups:", error);
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      fetchGroups();
+    }
+  }, [userId, token, searchTerm, findGroups]);
 
   const handleEllipsisClick = (index: number) => {
     if (showOptionsForGroup === index) {
@@ -116,16 +136,18 @@ const ModalListGroup: React.FC<ModalListGroupProps> = ({
 
             <hr className="w-full my-4 border-1 border-gray-500 mb-6" />
 
-            <div className="relative mb-2">
+            {/* Search Bar */}
+            <div className="relative mb-4">
               <Input
                 type="text"
-                placeholder="Search by group name"
-                value={groupName}
-                onChange={(e) => setGroupName(e.target.value)}
-                className="w-full py-[22px] pl-12 pr-4 bg-[#fff] border border-[#545454] rounded-lg text-gray-900 focus:outline-none placeholder-[#828282]"
+                placeholder="Search groups"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full py-2 pl-10 pr-4 bg-[#1F1F1F] text-white placeholder-gray-400 rounded-lg"
               />
-              <Search className="absolute top-1/2 left-4 -translate-y-1/2 text-gray-500 pr-2" />
+              <Search className="absolute top-1/2 left-3 -translate-y-1/2 text-gray-400" />
             </div>
+
             <Button className={`w-20 py-2 px-4 mb-2 bg-[#7746f5] rounded-[12px] text-lg text-white bg-gradient-to-r from-[#501794] to-[#3E70A1] hover:bg-gradient-to-l
               ${activeTab === "all" ? "bg-[#501794]" : "bg-[#8C8595] hover:bg-[#7746F5]"}
             `}
@@ -133,6 +155,7 @@ const ModalListGroup: React.FC<ModalListGroupProps> = ({
               All ({dataGroup?.length || 0})
             </Button>
 
+            {/* Group List */}
             <ul className="max-h-[55vh] overflow-auto custom-scrollbar">
               {dataGroup.length > 0 ? (
                 dataGroup.map((group, index) => (
