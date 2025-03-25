@@ -17,16 +17,26 @@ import { useFriends } from "~/hooks/use-friends"
 import { useUnfriend } from "~/hooks/use-unfriend"
 import { toast } from "react-toastify"
 import { UserDTO } from "~/codegen/data-contracts"
+import { useSearchUserByNameOrPhone } from "~/hooks/use-user"
 
 const ModalFriendList: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) => void }> = ({ isOpen, setIsOpen }) => {
   const userId = useSelector((state: RootState) => state.auth.userId)
   const token = useSelector((state: RootState) => state.auth.token)
 
-  const { friends: fetchedFriends, loading, error } = useFriends(userId, token)
-  const { unfriend, isUnfriending, unfriendUserId, unfriendError } = useUnfriend()
+  const {
+    friends: fetchedFriends,
+    loading,
+    error
+  } = useFriends(userId, token)
+
+  const {
+    unfriend,
+    isUnfriending,
+    unfriendUserId,
+    unfriendError
+  } = useUnfriend()
 
   const [activeTab, setActiveTab] = useState("all")
-  const [searchTerm, setSearchTerm] = useState("")
   const [selectedFriend, setSelectedFriend] = useState<UserDTO | null>(null)
   const [isDropDownOpen, setIsDropDownOpen] = useState(false)
   const [isProfileViewModalOpen, setIsProfileViewModalOpen] = useState(false)
@@ -35,11 +45,23 @@ const ModalFriendList: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) =>
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
   const [friendIdToUnfriend, setFriendIdToUnfriend] = useState<number | null>(null);
   const [successMessage, setSuccessMessage] = useState<string>("");
+  const [searchTerm, setSearchTerm] = useState<string>("");
+
+  const {
+    users,
+    loading: searchLoading,
+    search
+  } = useSearchUserByNameOrPhone();
 
   const handleOpenProfile = (friend: UserDTO) => {
     setSelectedFriend({ ...friend, gender: friend.gender as "Male" | "Female" })
     setIsProfileViewModalOpen(true)
   }
+
+  const handleSearch = () => {
+    if (searchTerm.trim() === "") return;
+    search(userId, searchTerm, token);
+  };
 
   const filteredFriends = fetchedFriends?.filter(friend => friend.name.toLowerCase().includes(searchTerm.toLowerCase()))
 
@@ -123,12 +145,15 @@ const ModalFriendList: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) =>
                   <div className="relative mb-4 rounded-lg">
                     <Input
                       type="text"
-                      placeholder="Search by phoneNumber number or name"
+                      placeholder="Search by phone number or name"
                       value={searchTerm}
-                      onChange={e => setSearchTerm(e.target.value)}
+                      onChange={(e) => setSearchTerm(e.target.value)}
                       className="w-full py-[22px] pl-12 pr-4 bg-[#fff] border border-[#545454] rounded-lg text-gray-900 focus:outline-none placeholder-[#828282] focus:border-indigo-500 focus:ring-indigo-500"
                     />
                     <Search className="h-8 w-8 absolute top-1/2 left-4 -translate-y-1/2 text-gray-400 pr-2" />
+                    <Button onClick={handleSearch} disabled={searchLoading}>
+                      {searchLoading ? "Searching..." : "Search"}
+                    </Button>
                   </div>
 
                   <div className="flex space-x-4 mb-5">

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, KeyboardEvent } from "react";
 import Image from "next/image";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -14,6 +14,7 @@ import { RootState } from "~/lib/reudx/store";
 import { useFriends } from "~/hooks/use-friends";
 import { ConversationRequest } from "~/codegen/data-contracts";
 import { useConversation } from "~/hooks/use-converstation";
+import { useSearchUserByNameOrPhone } from "~/hooks/use-user";
 
 interface ModalCreateGroupChatProps {
   isOpen: boolean;
@@ -23,15 +24,36 @@ interface ModalCreateGroupChatProps {
 const ModalCreateGroupChat: React.FC<ModalCreateGroupChatProps> = ({ isOpen, setIsOpen }) => {
   const userId = useSelector((state: RootState) => state.auth.userId);
   const token = useSelector((state: RootState) => state.auth.token);
+
   const [groupName, setGroupName] = useState<string>("");
   const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
-  const { friends, loading: friendsLoading } = useFriends(userId, token);
-  const { createGroupConversation, loading: groupLoading } = useConversation(userId, token);
+  const [searchTerm, setSearchTerm] = useState<string>("");
+
+  const {
+    friends,
+    loading: friendsLoading
+  } = useFriends(userId, token);
+
+  const {
+    createGroupConversation,
+    loading: groupLoading
+  } = useConversation(userId, token);
+
+  const {
+    users,
+    loading: searchLoading,
+    search
+  } = useSearchUserByNameOrPhone();
 
   const handleSelectUser = (userId: number) => {
     setSelectedUsers((prev) =>
       prev.includes(userId) ? prev.filter((id) => id !== userId) : [...prev, userId]
     );
+  };
+
+  const handleSearch = () => {
+    if (searchTerm.trim() === "") return;
+    search(userId, searchTerm, token);
   };
 
   const handleCreateGroupChat = async () => {
@@ -86,6 +108,20 @@ const ModalCreateGroupChat: React.FC<ModalCreateGroupChatProps> = ({ isOpen, set
             </DialogTitle>
 
             <hr className="w-full my-4 border-1 border-gray-500 mb-6" />
+
+            <div className="relative mb-6">
+              <Input
+                type="text"
+                placeholder="Search by name or phone number"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full py-[22px] pl-12 pr-4 bg-[#fff] border border-[#545454] rounded-lg text-gray-900 focus:outline-none placeholder-[#828282]"
+              />
+              <Search className="absolute top-1/2 left-4 -translate-y-1/2 text-gray-500 pr-2" />
+              <Button onClick={handleSearch} disabled={searchLoading}>
+                {searchLoading ? "Searching..." : "Search"}
+              </Button>
+            </div>
 
             <div className="relative mb-6">
               <Input

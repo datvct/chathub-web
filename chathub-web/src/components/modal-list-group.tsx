@@ -45,6 +45,7 @@ const ModalListGroup: React.FC<ModalListGroupProps> = ({
   const [selectedGroup, setSelectedGroup] = useState<number | null>(null);
   const [showOptionsForGroup, setShowOptionsForGroup] = useState<number | null>(null);
   const [modalPosition, setModalPosition] = useState<{ top: number; left: number } | null>(null);
+  const [searchTerm, setSearchTerm] = useState<string>("");
 
   useEffect(() => {
     if (userId) {

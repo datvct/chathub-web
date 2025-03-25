@@ -13,6 +13,7 @@ import { RootState } from "~/lib/reudx/store"
 import { useFriends } from "~/hooks/use-friends"
 import { ConversationRequest } from "~/codegen/data-contracts"
 import { useConversation } from "~/hooks/use-converstation"
+import { useSearchUserByNameOrPhone } from "~/hooks/use-user"
 import { toast } from "react-toastify"
 
 interface ModalCreateNewChatProps {
@@ -65,6 +66,14 @@ const ModalCreateNewChat: React.FC<ModalCreateNewChatProps> = ({ isOpen, setIsOp
     }
   };
 
+  const [searchTerm, setSearchTerm] = useState<string>("");
+  const { users, loading: searchLoading, search } = useSearchUserByNameOrPhone();
+
+  const handleSearch = () => {
+    if (searchTerm.trim() === "") return;
+    search(userId, searchTerm, token);
+  };
+
   if (friendsLoading) return <div className="loader"></div>
   return (
     <Dialog open={isOpen} onClose={() => setIsOpen(false)} className="relative z-50">
@@ -97,13 +106,16 @@ const ModalCreateNewChat: React.FC<ModalCreateNewChatProps> = ({ isOpen, setIsOp
                 className="w-full py-[22px] pl-12 pr-4 bg-[#fff] border border-[#545454] rounded-lg text-gray-900 focus:outline-none placeholder-[#828282]"
               />
               <Search className="absolute top-1/2 left-4 -translate-y-1/2 text-gray-500 pr-2" />
+              <Button onClick={handleSearch} disabled={searchLoading}>
+                {searchLoading ? "Searching..." : "Search"}
+              </Button>
             </div>
 
             <ul className="max-h-[55vh] overflow-auto custom-scrollbar">
-              {friends.map(user => (
+              {friends.map((user) => (
                 <li
                   key={user.id}
-                  className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer mb-3 
+                  className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer mb-3
                     hover:bg-[#93C1D2]
                   ${selectedUser === user.id ? "bg-[#7a99b8]/90" : "bg-[#fff]"}`}
                   onClick={() => handleSelectUser(user.id)}
