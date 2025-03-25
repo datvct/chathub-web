@@ -318,8 +318,6 @@ export const leaveGroupConversationAPI = async (
 
 export async function findGroupsAPI(userId: number, groupName: string, token: string) {
   try {
-    if (!userId) return [];
-    console.log("Calling API findGroupsAPI with:", { userId, groupName });
     const response = await conversationInstance.findGroupConversations(
       { userId, groupName },
       {
@@ -328,13 +326,12 @@ export async function findGroupsAPI(userId: number, groupName: string, token: st
         },
       }
     );
-    console.log("API Response:", response);
     return response.data || [];
   } catch (error) {
-    console.error("Error fetching groups:", error);
+    console.error("Error finding groups:", error);
     return [];
   }
-};
+}
 
 export const updateNicknameAPI = async (data: UpdateNickNameRequest, token: string) => {
   try {

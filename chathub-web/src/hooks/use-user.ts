@@ -8,6 +8,9 @@ import {
   updateProfile as updateProfileAPI,
   blockUser as blockUserAPI, 
   unblockUser as unblockUserAPI,
+  findUserByIdAPI,
+  findUserByPhoneNumberAPI,
+  searchUserByNameOrPhoneAPI
 } from "~/lib/get-user";
 
 export function useFindUserByPhoneNumber() {
@@ -99,4 +102,54 @@ export const useBlockUnblockUser = (
   };
 
   return { blockUser, unblockUser, loading, errorMessage };
+};
+
+export const useFindUserById = () => {
+  const [user, setUser] = useState<UserDTO | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const findUserById = useCallback(async (userId: number, token: string) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await findUserByIdAPI(userId, token);
+      if (!response) {
+        setError("Không tìm thấy người dùng");
+        return null;
+      }
+      setUser(response);
+      return response;
+    } catch (err) {
+      setError("Error finding user info");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  return { user, loading, error, findUserById };
+};
+
+export const useSearchUserByNameOrPhone = () => {
+  const [users, setUsers] = useState<UserDTO[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const searchUser = useCallback(async (query: string, userId: number, token: string) => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const results = await searchUserByNameOrPhoneAPI(query, userId, token);
+      setUsers(results);
+      return results;
+    } catch (err) {
+      setError("Error searching users");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  return { users, loading, error, searchUser };
 };

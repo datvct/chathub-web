@@ -74,3 +74,51 @@ export async function unblockUser(blockerId: number, blockedId: number, token: s
     throw error;
   }
 }
+
+export async function searchUserByNameOrPhoneAPI(query: string, userId: number, token: string) {
+  try {
+    const response = await userInstance.search(
+      { userId, query },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data || [];
+  } catch (error) {
+    console.error("Error searching user by name or phone:", error);
+    return [];
+  }
+}
+
+export async function findUserByPhoneNumberAPI(phoneNumber: string, token: string) {
+  try {
+    const response = await userInstance.findUserByPhoneNumber(
+      { phoneNumber },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data || null;
+  } catch (error) {
+    console.error("Error finding user by phone number:", error);
+    return null;
+  }
+}
+
+export async function findUserByIdAPI(userId: number, token: string) {
+  try {
+    const response = await userInstance.findUserByUserId(userId, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data || null;
+  } catch (error) {
+    console.error("Error finding user by ID:", error);
+    return null;
+  }
+}
