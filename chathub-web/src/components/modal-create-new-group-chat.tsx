@@ -1,13 +1,15 @@
 "use client";
 
-import React, { useState, KeyboardEvent } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Images } from "../constants/images";
 import { Dialog, DialogPanel, DialogTitle, TransitionChild } from "@headlessui/react";
 import { toast } from "react-toastify";
-import { Search, EllipsisVertical } from "lucide-react";
+import { Search, EllipsisVertical, X } from "lucide-react";
+import { FaRegCircle } from "react-icons/fa";
+import { useUserSearch } from "~/hooks/use-user";
 import "../styles/custom-scroll.css";
 import { useSelector } from "react-redux";
 import { RootState } from "~/lib/reudx/store";
@@ -27,33 +29,32 @@ const ModalCreateGroupChat: React.FC<ModalCreateGroupChatProps> = ({ isOpen, set
 
   const [groupName, setGroupName] = useState<string>("");
   const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
-  const [searchTerm, setSearchTerm] = useState<string>("");
+  const [searchTerm, setSearchTerm] = useState("");
 
-  const {
-    friends,
-    loading: friendsLoading
-  } = useFriends(userId, token);
+  const { friends, loading: friendsLoading, error: friendsError } = useFriends(userId, token);
+  const { searchUsers, searchResults, isSearching, searchError } = useUserSearch(userId!, token!);
+  const { createGroupConversation, loading: groupLoading } = useConversation(userId, token);
 
-  const {
-    createGroupConversation,
-    loading: groupLoading
-  } = useConversation(userId, token);
+  const [isDisplayingSearchResults, setIsDisplayingSearchResults] = useState(false);
 
-  const {
-    users,
-    loading: searchLoading,
-    search
-  } = useSearchUserByNameOrPhone();
+  useEffect(() => {
+    if (!searchTerm.trim()) {
+      setIsDisplayingSearchResults(false);
+      return;
+    }
+    const delayDebounceFn = setTimeout(() => {
+      searchUsers(searchTerm);
+      setIsDisplayingSearchResults(true);
+    }, 500);
+    return () => clearTimeout(delayDebounceFn);
+  }, [searchTerm, searchUsers]);
 
-  const handleSelectUser = (userId: number) => {
+  const handleSelectUser = (userIdToToggle: number) => {
     setSelectedUsers((prev) =>
-      prev.includes(userId) ? prev.filter((id) => id !== userId) : [...prev, userId]
+      prev.includes(userIdToToggle)
+        ? prev.filter((id) => id !== userIdToToggle)
+        : [...prev, userIdToToggle]
     );
-  };
-
-  const handleSearch = () => {
-    if (searchTerm.trim() === "") return;
-    search(userId, searchTerm, token);
   };
 
   const handleCreateGroupChat = async () => {
@@ -82,6 +83,10 @@ const ModalCreateGroupChat: React.FC<ModalCreateGroupChatProps> = ({ isOpen, set
       toast.error(error.message || "Failed to create group chat.");
     }
   };
+
+  const usersToDisplay = isDisplayingSearchResults ? searchResults : friends;
+  const currentLoadingState = isDisplayingSearchResults ? isSearching : friendsLoading;
+  const currentErrorState = isDisplayingSearchResults ? searchError : friendsError;
 
   if (friendsLoading) return <div className="loader"></div>;
 
@@ -112,20 +117,6 @@ const ModalCreateGroupChat: React.FC<ModalCreateGroupChatProps> = ({ isOpen, set
             <div className="relative mb-6">
               <Input
                 type="text"
-                placeholder="Search by name or phone number"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="w-full py-[22px] pl-12 pr-4 bg-[#fff] border border-[#545454] rounded-lg text-gray-900 focus:outline-none placeholder-[#828282]"
-              />
-              <Search className="absolute top-1/2 left-4 -translate-y-1/2 text-gray-500 pr-2" />
-              <Button onClick={handleSearch} disabled={searchLoading}>
-                {searchLoading ? "Searching..." : "Search"}
-              </Button>
-            </div>
-
-            <div className="relative mb-6">
-              <Input
-                type="text"
                 placeholder="Group Name"
                 value={groupName}
                 onChange={(e) => setGroupName(e.target.value)}
@@ -133,22 +124,70 @@ const ModalCreateGroupChat: React.FC<ModalCreateGroupChatProps> = ({ isOpen, set
               />
             </div>
 
-            <ul className="max-h-[55vh] overflow-auto custom-scrollbar">
-              {friends.map((user) => (
-                <li
-                  key={user.id}
-                  className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer mb-3 hover:bg-[#93C1D2]
-                  ${selectedUsers.includes(user.id) ? "bg-[#7a99b8]/90" : "bg-[#fff]"}`}
-                  onClick={() => handleSelectUser(user.id)}
+            <div className="relative mb-6">
+              <Input
+                type="text"
+                placeholder="Search user to add"
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full py-[22px] pl-12 pr-10 bg-[#fff] border border-[#545454] rounded-lg text-gray-900 focus:outline-none placeholder-[#828282]"
+              />
+              <Search className="absolute top-1/2 left-4 -translate-y-1/2 text-gray-500" />
+              {searchTerm && (
+                <button
+                  onClick={() => setSearchTerm('')}
+                  className="absolute top-1/2 right-4 -translate-y-1/2 text-gray-500 hover:text-gray-700"
                 >
-                  <Image src={user.avatar} alt="avatar" width={40} height={40} className="rounded-full" />
-                  <div>
-                    <p className="font-semibold text-black">{user.name}</p>
-                    <p className="text-sm text-gray-700">{user.phoneNumber}</p>
-                  </div>
-                  <EllipsisVertical className="ml-auto text-gray-500" />
-                </li>
-              ))}
+                  <X size={18} />
+                </button>
+              )}
+            </div>
+
+            <ul className="max-h-[45vh] overflow-auto custom-scrollbar">
+              {currentLoadingState ? (
+                <div className="flex justify-center items-center h-32">
+                  <div className="loader"></div>
+                </div>
+              ) : currentErrorState ? (
+                <p className="text-center text-red-400">{currentErrorState}</p>
+              ) : usersToDisplay && usersToDisplay.length > 0 ? (
+                usersToDisplay.map((user) => (
+                  <li
+                    key={user.id}
+                    className={`
+                      flex items-center justify-between gap-3 p-2 rounded-lg cursor-pointer mb-3 hover:bg-[#93C1D2]
+                      ${selectedUsers.includes(user.id!) ? "bg-[#7a99b8]/90" : "bg-[#fff]"}
+                    `}
+                    onClick={() => handleSelectUser(user.id!)}
+                  >
+                    <div className="flex items-center gap-3">
+                      <Image
+                        src={user.avatar || Images.AvatarDefault}
+                        alt={user.name || "avatar"}
+                        width={40}
+                        height={40}
+                        className="rounded-full"
+                      />
+                      <div>
+                        <p className="font-semibold text-black">{user.name}</p>
+                        <p className="text-sm text-gray-700">{user.phoneNumber}</p>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-center w-6 h-6">
+                      {selectedUsers.includes(user.id!) ? (
+                        <Image src={Images.IconCheckSmall} alt="check icon" width={20} height={20} />
+                      ) : (
+                        <FaRegCircle size={18} color="gray" />
+                      )}
+                    </div>
+                  </li>
+                ))
+              ) : (
+                <p className="text-center text-gray-400">
+                  {isDisplayingSearchResults ? "No users found." : "No friends available."}
+                </p>
+              )}
             </ul>
 
             <div className="mt-6 flex justify-end gap-5">
