@@ -132,3 +132,20 @@ export async function findUserById(
     throw error;
   }
 }
+
+export async function searchUsersAPI(query: string, userId: number, token: string): Promise<UserDTO[] | null> {
+  try {
+    const response = await userInstance.search(
+      { userId, query },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return (response as any)?.data || response || null;
+  } catch (error) {
+    console.error("Error searching users:", error);
+    return null;
+  }
+}

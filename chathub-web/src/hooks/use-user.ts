@@ -11,6 +11,7 @@ import {
   searchUserByNameOrPhone,
   findUserByPhoneNumber,
   findUserById,
+  searchUsersAPI,
 } from "~/lib/get-user";
 
 export function useFindUserByPhoneNumber() {
@@ -154,4 +155,34 @@ export function useFindUserById() {
   );
 
   return { user, loading, error, findById };
+}
+
+export function useUserSearch(userId: number, token: string) {
+  const [searchResults, setSearchResults] = useState<UserDTO[]>([]);
+  const [searchLoading, setSearchLoading] = useState<boolean>(false);
+  const [searchError, setSearchError] = useState<string | null>(null);
+
+  const searchUsers = useCallback(async (query: string) => {
+    if (!query.trim()) {
+      setSearchResults([]);
+      setSearchLoading(false);
+      setSearchError(null);
+      return;
+    }
+
+    setSearchLoading(true);
+    setSearchError(null);
+    try {
+      const results = await searchUsersAPI(query, userId, token);
+      setSearchResults(results || []);
+    } catch (err) {
+      setSearchError("Failed to search users.");
+      console.error(err);
+      setSearchResults([]);
+    } finally {
+      setSearchLoading(false);
+    }
+  }, [userId, token]);
+
+  return { searchResults, searchLoading, searchError, searchUsers };
 }
