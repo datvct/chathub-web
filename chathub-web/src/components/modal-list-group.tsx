@@ -36,6 +36,7 @@ const ModalListGroup: React.FC<ModalListGroupProps> = ({
     loading: conversationHookLoading
   } = useConversation(userId!, token!);
 
+  const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [displayedGroups, setDisplayedGroups] = useState<ConversationResponse[]>([]);
   const [allGroups, setAllGroups] = useState<ConversationResponse[]>([]);
@@ -77,12 +78,17 @@ const ModalListGroup: React.FC<ModalListGroupProps> = ({
   }, [isOpen, userId, token, getGroupConversations]);
 
   useEffect(() => {
+    if (debounceTimeoutRef.current) {
+      clearTimeout(debounceTimeoutRef.current);
+    }
+
     if (!searchTerm.trim()) {
       setDisplayedGroups(allGroups);
+      setError(null);
       return;
     }
 
-    const delayDebounceFn = setTimeout(async () => {
+    debounceTimeoutRef.current = setTimeout(async () => {
       if (!userId || !token) return;
       setIsLoading(true);
       setError(null);
@@ -97,8 +103,36 @@ const ModalListGroup: React.FC<ModalListGroupProps> = ({
       }
     }, 500);
 
-    return () => clearTimeout(delayDebounceFn);
+    return () => {
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current);
+      }
+    };
   }, [searchTerm, userId, token, findGroups, allGroups]);
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter' && searchTerm.trim() && userId && token) {
+      event.preventDefault();
+
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current);
+      }
+
+      setIsLoading(true);
+      setError(null);
+      findGroups(userId, searchTerm, token)
+        .then(results => {
+          setDisplayedGroups(results);
+        })
+        .catch(() => {
+          setError("Failed to search groups.");
+          setDisplayedGroups([]);
+        })
+        .finally(() => {
+          setIsLoading(false);
+        });
+    }
+  };
 
   const handleEllipsisClick = (index: number) => {
     if (showOptionsForGroup === index) {
@@ -163,6 +197,7 @@ const ModalListGroup: React.FC<ModalListGroupProps> = ({
                 placeholder="Search by group name"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
+                onKeyDown={handleKeyDown}
                 className="w-full py-[22px] pl-12 pr-10 bg-[#fff] border border-[#545454] rounded-lg text-gray-900 focus:outline-none placeholder-[#828282]"
               />
               <Search className="absolute top-1/2 left-4 -translate-y-1/2 text-gray-500 pr-2" />

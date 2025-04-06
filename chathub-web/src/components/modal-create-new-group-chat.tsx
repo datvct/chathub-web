@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
@@ -30,6 +30,7 @@ const ModalCreateGroupChat: React.FC<ModalCreateGroupChatProps> = ({ isOpen, set
   const [groupName, setGroupName] = useState<string>("");
   const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const { friends, loading: friendsLoading, error: friendsError } = useFriends(userId, token);
   const { searchUsers, searchResults, isSearching, searchError } = useUserSearch(userId!, token!);
@@ -38,16 +39,39 @@ const ModalCreateGroupChat: React.FC<ModalCreateGroupChatProps> = ({ isOpen, set
   const [isDisplayingSearchResults, setIsDisplayingSearchResults] = useState(false);
 
   useEffect(() => {
+    if (debounceTimeoutRef.current) {
+      clearTimeout(debounceTimeoutRef.current);
+    }
+
     if (!searchTerm.trim()) {
       setIsDisplayingSearchResults(false);
       return;
     }
-    const delayDebounceFn = setTimeout(() => {
+
+    debounceTimeoutRef.current = setTimeout(() => {
       searchUsers(searchTerm);
       setIsDisplayingSearchResults(true);
     }, 500);
-    return () => clearTimeout(delayDebounceFn);
+
+    return () => {
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current);
+      }
+    };
   }, [searchTerm, searchUsers]);
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter' && searchTerm.trim()) {
+      event.preventDefault();
+
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current);
+      }
+
+      searchUsers(searchTerm);
+      setIsDisplayingSearchResults(true);
+    }
+  };
 
   const handleSelectUser = (userIdToToggle: number) => {
     setSelectedUsers((prev) =>
@@ -130,6 +154,7 @@ const ModalCreateGroupChat: React.FC<ModalCreateGroupChatProps> = ({ isOpen, set
                 placeholder="Search user to add"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
+                onKeyDown={handleKeyDown}
                 className="w-full py-[22px] pl-12 pr-10 bg-[#fff] border border-[#545454] rounded-lg text-gray-900 focus:outline-none placeholder-[#828282]"
               />
               <Search className="absolute top-1/2 left-4 -translate-y-1/2 text-gray-500" />
