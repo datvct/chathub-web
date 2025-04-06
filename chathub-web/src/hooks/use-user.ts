@@ -157,32 +157,29 @@ export function useFindUserById() {
   return { user, loading, error, findById };
 }
 
-export function useUserSearch(userId: number, token: string) {
+export const useUserSearch = (userId: number, token: string) => {
   const [searchResults, setSearchResults] = useState<UserDTO[]>([]);
-  const [searchLoading, setSearchLoading] = useState<boolean>(false);
+  const [isSearching, setIsSearching] = useState(false);
   const [searchError, setSearchError] = useState<string | null>(null);
 
   const searchUsers = useCallback(async (query: string) => {
     if (!query.trim()) {
       setSearchResults([]);
-      setSearchLoading(false);
-      setSearchError(null);
       return;
     }
-
-    setSearchLoading(true);
+    setIsSearching(true);
     setSearchError(null);
     try {
-      const results = await searchUsersAPI(query, userId, token);
-      setSearchResults(results || []);
-    } catch (err) {
+      const results = await searchUsersAPI(userId, query, token);
+      setSearchResults(results);
+    } catch (err: any) {
+      console.error("Search user error:", err);
       setSearchError("Failed to search users.");
-      console.error(err);
       setSearchResults([]);
     } finally {
-      setSearchLoading(false);
+      setIsSearching(false);
     }
   }, [userId, token]);
 
-  return { searchResults, searchLoading, searchError, searchUsers };
-}
+  return { searchUsers, searchResults, isSearching, searchError };
+};
