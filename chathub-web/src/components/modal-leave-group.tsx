@@ -22,10 +22,16 @@ const ModalLeaveGroup = ({
   chatId,
   setSelectedChatId,
 }: ModalLeaveGroupProps) => {
-  const { leaveConversationById, loading, error } = useConversation()
+  const router = useRouter()
+
   const userId = useSelector((state: RootState) => state.auth.userId)
   const token = useSelector((state: RootState) => state.auth.token)
-  const router = useRouter()
+
+  const {
+    leaveConversationById,
+    loading,
+    error
+  } = useConversation(userId, token)
 
   const handleLeaveGroup = async () => {
     if (!chatId || !userId || !token) return;
