@@ -6,7 +6,7 @@ import { Button } from "./ui/button"
 import { Input } from "./ui/input"
 import { Images } from "../constants/images"
 import { Dialog, DialogPanel, DialogTitle, TransitionChild } from "@headlessui/react"
-import { Search, EllipsisVertical, X } from "lucide-react"
+import { Search, EllipsisVertical, X, Check } from "lucide-react"
 import "../styles/custom-scroll.css"
 import { useSelector } from "react-redux"
 import { RootState } from "~/lib/reudx/store"
@@ -29,6 +29,11 @@ const ModalCreateNewChat: React.FC<ModalCreateNewChatProps> = ({ isOpen, setIsOp
   const [selectedUser, setSelectedUser] = useState<number | null>(null)
   const [searchTerm, setSearchTerm] = useState("")
   const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null)
+
+  const [displayedUsers, setDisplayedUsers] = useState<UserDTO[]>([]);
+  const [currentDataSource, setCurrentDataSource] = useState<'initial_friends' | 'search_results'>('initial_friends');
+  const [isLoadingDisplay, setIsLoadingDisplay] = useState(false);
+  const [displayError, setDisplayError] = useState<string | null>(null);
 
   const {
     friends,
@@ -54,47 +59,60 @@ const ModalCreateNewChat: React.FC<ModalCreateNewChatProps> = ({ isOpen, setIsOp
   ] = useState(false)
 
   useEffect(() => {
-    if (debounceTimeoutRef.current) {
-      clearTimeout(debounceTimeoutRef.current);
+    if (isOpen && !searchTerm && friends && currentDataSource === 'initial_friends') {
+      setIsLoadingDisplay(friendsLoading);
+      setDisplayError(friendsError);
+      setDisplayedUsers(friends);
     }
+  }, [isOpen, searchTerm, friends, friendsLoading, friendsError, currentDataSource]);
+
+  useEffect(() => {
+    if (debounceTimeoutRef.current) clearTimeout(debounceTimeoutRef.current);
 
     if (!searchTerm.trim()) {
-      setIsDisplayingSearchResults(false);
+      setCurrentDataSource('initial_friends');
+      if (friends) setDisplayedUsers(friends);
+      setIsLoadingDisplay(friendsLoading);
+      setDisplayError(friendsError);
       return;
     }
 
+    setCurrentDataSource('search_results');
+    setIsLoadingDisplay(true);
+    setDisplayError(null);
+
     debounceTimeoutRef.current = setTimeout(() => {
       searchUsers(searchTerm);
-      setIsDisplayingSearchResults(true);
     }, 500);
 
-    return () => {
-      if (debounceTimeoutRef.current) {
-        clearTimeout(debounceTimeoutRef.current);
-      }
-    };
-  }, [searchTerm, searchUsers]);
+    return () => { if (debounceTimeoutRef.current) clearTimeout(debounceTimeoutRef.current); };
+  }, [searchTerm, searchUsers, friends, friendsLoading, friendsError]);
+
+  useEffect(() => {
+    if (currentDataSource === 'search_results') {
+      setIsLoadingDisplay(isSearching);
+      setDisplayError(searchError);
+      setDisplayedUsers(searchResults);
+    }
+  }, [searchResults, isSearching, searchError, currentDataSource]);
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === 'Enter' && searchTerm.trim()) {
       event.preventDefault();
-
       if (debounceTimeoutRef.current) {
         clearTimeout(debounceTimeoutRef.current);
       }
-
+      setCurrentDataSource('search_results');
+      setIsLoadingDisplay(true);
+      setDisplayError(null);
       searchUsers(searchTerm);
-      setIsDisplayingSearchResults(true);
     }
   };
 
-  const handleSelectUser = (userId: number) => {
-    setSelectedUser(userId);
-  }
 
-  const usersToDisplay = isDisplayingSearchResults ? searchResults : friends;
-  const currentLoadingState = isDisplayingSearchResults ? isSearching : friendsLoading;
-  const currentErrorState = isDisplayingSearchResults ? searchError : friendsError;
+  const handleSelectUser = (userIdToSelect: number) => {
+    setSelectedUser(prev => prev === userIdToSelect ? null : userIdToSelect);
+  };
 
   const handleCreateChat = async () => {
     if (!selectedUser) {
@@ -123,7 +141,7 @@ const ModalCreateNewChat: React.FC<ModalCreateNewChatProps> = ({ isOpen, setIsOp
     }
   };
 
-  if (friendsLoading) return <div className="loader"></div>
+  // if (friendsLoading) return <div className="loader"></div>
   return (
     <Dialog open={isOpen} onClose={() => setIsOpen(false)} className="relative z-50">
       <div className="fixed inset-0 bg-opacity-[.40]" aria-hidden="true" />
@@ -148,71 +166,73 @@ const ModalCreateNewChat: React.FC<ModalCreateNewChatProps> = ({ isOpen, setIsOp
 
             <hr className="w-full my-4 border-1 border-gray-500 mb-6" />
 
-            <div className="relative mb-6">
+            <div className="relative mb-4">
               <Input
                 type="text"
                 placeholder="Search by name or phone"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 onKeyDown={handleKeyDown}
-                className="w-full py-[22px] pl-12 pr-10 bg-[#fff] border border-[#545454] rounded-lg text-gray-900 focus:outline-none placeholder-[#828282]"
+                className="w-full py-3 pl-10 pr-10 bg-gray-100 text-gray-900 border border-gray-300 rounded-lg
+                  focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-500"
               />
-              <Search className="absolute top-1/2 left-4 -translate-y-1/2 text-gray-500" />
+              <Search className="absolute top-1/2 left-3 transform -translate-y-1/2 text-gray-400" size={20} />
               {searchTerm && (
                 <button
                   onClick={() => setSearchTerm('')}
-                  className="absolute top-1/2 right-4 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                  className="absolute top-1/2 right-3 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
                 >
                   <X size={18} />
                 </button>
               )}
             </div>
 
-            <ul className="max-h-[55vh] overflow-auto custom-scrollbar">
-              {currentLoadingState ? (
-                <div className="flex justify-center items-center h-32">
-                  <div className="loader"></div>
-                </div>
-              ) : currentErrorState ? (
-                <p className="text-center text-red-400">{currentErrorState}</p>
-              ) : usersToDisplay && usersToDisplay.length > 0 ? (
-                usersToDisplay.map(user => (
-                  <li
-                    key={user.id}
-                    className={`flex items-center justify-between gap-3 p-2 rounded-lg cursor-pointer mb-3
-                      hover:bg-[#93C1D2]
-                      ${selectedUser === user.id ? "bg-[#7a99b8]/90" : "bg-[#fff]"}`}
-                    onClick={() => handleSelectUser(user.id!)}
-                  >
-                    <div className="flex items-center gap-3">
-                      <Image
-                        src={user.avatar || Images.AvatarDefault}
-                        alt={user.name || "avatar"}
-                        width={40}
-                        height={40}
-                        className="rounded-full"
-                      />
-                      <div>
-                        <p className="font-semibold text-black">{user.name}</p>
-                        <p className="text-sm text-gray-700">{user.phoneNumber}</p>
+            <div className="flex-grow overflow-y-auto custom-scrollbar pr-1">
+              {isLoadingDisplay ? (
+                <div className="flex justify-center items-center h-full"><div className="loader"></div></div>
+              ) : displayError ? (
+                <p className="text-center text-red-400 mt-10">{displayError}</p>
+              ) : displayedUsers && displayedUsers.length > 0 ? (
+                <ul>
+                  {displayedUsers.map(user => (
+                    <li
+                      key={user.id}
+                      onClick={() => handleSelectUser(user.id!)}
+                      className={`
+                        flex items-center justify-between gap-3 p-3 rounded-lg cursor-pointer mb-2 transition-colors duration-150
+                        ${selectedUser === user.id ? "bg-blue-200" : "bg-white hover:bg-gray-50"}
+                      `}
+                    >
+                      <div className="flex items-center gap-3 overflow-hidden">
+                        <Image
+                          src={user.avatar || Images.AvatarDefault}
+                          alt={user.name || "avatar"}
+                          width={40}
+                          height={40}
+                          className="rounded-full flex-shrink-0"
+                        />
+                        <div className="overflow-hidden">
+                          <p className="font-semibold text-black truncate">{user.name}</p>
+                          <p className="text-sm text-gray-600 truncate">{user.phoneNumber}</p>
+                        </div>
                       </div>
-                    </div>
-                    <EllipsisVertical className="ml-auto text-gray-500" />
-                    {selectedUser === user.id && (
-                      <Image src={Images.IconCheckSmall} alt="check icon" width={20} height={20} />
-                    )}
-                  </li>
-                ))
+                      {selectedUser === user.id && (
+                        <Check size={20} className="text-blue-600 flex-shrink-0" />
+                      )}
+                    </li>
+                  ))}
+                </ul>
               ) : (
-                <p className="text-center text-gray-400">
-                  {isDisplayingSearchResults ? "No users found." : "No friends available."}
+                <p className="text-center text-gray-400 mt-10">
+                  {currentDataSource === 'search_results' ? "No users found." : "No friends to display."}
                 </p>
               )}
-            </ul>
+            </div>
 
-            <div className="mt-6 flex justify-end gap-5">
+            <div className="mt-4 pt-4 border-t border-gray-600 flex justify-end gap-3">
               <Button
                 onClick={() => setIsOpen(false)}
+                variant="outline"
                 className="px-4 py-2 bg-[#71808E] rounded-lg text-white text-lg hover:bg-[#535353]"
               >
                 Cancel
@@ -223,7 +243,7 @@ const ModalCreateNewChat: React.FC<ModalCreateNewChatProps> = ({ isOpen, setIsOp
                   from-[#501794] to-[#3E70A1] hover:bg-gradient-to-l"
                 disabled={selectedUser === null || conversationLoading}
               >
-                {conversationLoading ? '...' : 'Chat'}
+                {conversationLoading ? 'Creating...' : 'Chat'}
               </Button>
             </div>
           </DialogPanel>
