@@ -176,7 +176,7 @@ const ModalFriendList: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) =>
                         }`
                       }
                     >
-                      All ({filteredFriends?.length || 0})
+                      All ({filteredFriends.length})
                     </button>
                     <button
                       onClick={() => setActiveTab("recent")}
@@ -218,9 +218,7 @@ const ModalFriendList: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) =>
                             />
 
                             <div className="flex-1">
-                              <div className="flex items-start justify-between">
-                                <p className="text-black font-medium">{friend.name}</p>
-                              </div>
+                              <p className="text-black font-medium">{friend.name}</p>
                               <p className="text-gray-600 text-sm">{friend.phoneNumber}</p>
                             </div>
 
