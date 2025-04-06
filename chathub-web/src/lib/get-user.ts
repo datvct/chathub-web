@@ -133,8 +133,9 @@ export async function findUserById(
   }
 }
 
-export async function searchUsersAPI(query: string, userId: number, token: string): Promise<UserDTO[] | null> {
+export async function searchUsersAPI(userId: number, query: string, token: string) {
   try {
+    if (!userId || !query) return [];
     const response = await userInstance.search(
       { userId, query },
       {
@@ -143,9 +144,9 @@ export async function searchUsersAPI(query: string, userId: number, token: strin
         },
       }
     );
-    return (response as any)?.data || response || null;
+    return response.data || [];
   } catch (error) {
     console.error("Error searching users:", error);
-    return null;
+    return [];
   }
 }
