@@ -101,7 +101,7 @@ export interface ConversationResponse {
   adminId?: number
   senderName?: string
   lastMessage?: string
-  lastMessageType?: "TEXT" | "IMAGE" | "VIDEO" | "DOCUMENT" | "EMOJI"
+  lastMessageType?: "TEXT" | "IMAGE" | "VIDEO" | "DOCUMENT" | "LINK"
   /** @format date-time */
   lastMessageAt?: string
   isSeen?: boolean
@@ -174,7 +174,7 @@ export interface MessageResponse {
   senderName?: string
   content?: string
   avatar?: string
-  messageType?: "TEXT" | "IMAGE" | "VIDEO" | "DOCUMENT" | "EMOJI"
+  messageType?: "TEXT" | "IMAGE" | "VIDEO" | "DOCUMENT" | "LINK"
   /** @format date-time */
   sentAt?: string
   reactions?: ReactionDTO[]
@@ -198,6 +198,7 @@ export interface FriendRequestResponse {
 export interface ChatDetailSectionResponse {
   avatar?: string
   name?: string
+  type?: "SINGLE" | "GROUP"
   list_media?: MediaDTO[]
   members?: MemberDTO[]
 }
@@ -227,5 +228,5 @@ export interface MessageFindedResponse {
   content?: string
   /** @format date-time */
   sendAt?: string
-  messageType?: "TEXT" | "IMAGE" | "VIDEO" | "DOCUMENT" | "EMOJI"
+  messageType?: "TEXT" | "IMAGE" | "VIDEO" | "DOCUMENT" | "LINK"
 }
