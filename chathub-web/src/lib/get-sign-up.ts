@@ -9,6 +9,6 @@ export async function signUp(data: RegistrationRequest) {
     return response;
   } catch (error) {
     console.error("Registration error:", error);
-    throw error; 
+    throw error;
   }
 }

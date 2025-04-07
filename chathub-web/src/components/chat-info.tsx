@@ -1,35 +1,47 @@
 "use client"
 
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import Image from "next/image"
-import { Images } from "~/constants/images"
-import { useConversation } from "~/hooks/use-converstation";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import Image from "next/image";
+import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
 import { RootState } from "~/lib/reudx/store";
-import { ChatDetailSectionResponse, ConversationResponse } from "~/codegen/data-contracts";
-import { toast } from "react-toastify";
-import { GoBell, GoBellSlash } from "react-icons/go"
-import { BsPinAngleFill } from "react-icons/bs"
-import { RiUnpinFill } from "react-icons/ri"
-import { FaRegFile } from "react-icons/fa"
-import { FaLink } from "react-icons/fa6"
-import { MdBlock } from "react-icons/md"
-import { CgTrashEmpty } from "react-icons/cg"
-import { AiOutlineUsergroupAdd } from "react-icons/ai"
-import { IoSettingsOutline } from "react-icons/io5"
-import { LuUserRound } from "react-icons/lu"
-import { HiOutlineArrowRightEndOnRectangle } from "react-icons/hi2"
-import ModalLeaveGroup from "./modal-leave-group"
-import { FaChevronLeft } from "react-icons/fa6"
-import { Button } from "./ui/button"
-import { LuUserRoundPlus } from "react-icons/lu"
-import ModalAddMembers from "./modal-add-members"
-import ModalDissolveGroup from "./modal-dissolve-group"
-import ModalUpdateGroupInfo from "./modal-update-group-info"
-import ModalConfirm from "./modal-confirm"
-import ModalSuccess from "./modal-success"
-import { getRecentConversationByUserID } from "~/lib/get-conversation"
+import {
+  ChatDetailSectionResponse,
+  ConversationResponse,
+  UpdateNickNameRequest
+} from "~/codegen/data-contracts";
+import { getRecentConversationByUserID } from "~/lib/get-conversation";
+import { Images } from "~/constants/images";
+import { useConversation } from "~/hooks/use-converstation";
+import { useBlockUnblockUser } from "~/hooks/use-user";
+
+import ModalLeaveGroup from "./modal-leave-group";
+import ModalAddMembers from "./modal-add-members";
+import ModalDissolveGroup from "./modal-dissolve-group";
+import ModalUpdateGroupInfo from "./modal-update-group-info";
+import ModalConfirm from "./modal-confirm";
+import ModalSuccess from "./modal-success";
+import ModalDeleteConversation from "~/components/modal-delete-conversation";
+import ModalUpdateNickname from "./modal-update-nickname";
+import { Button } from "./ui/button";
+
+import { GoBell, GoBellSlash } from "react-icons/go";
+import { BsPinAngleFill } from "react-icons/bs";
+import { RiUnpinFill } from "react-icons/ri";
+import { FaRegFile } from "react-icons/fa";
+import { FaLink } from "react-icons/fa6";
+import { MdBlock } from "react-icons/md";
+import { CgTrashEmpty } from "react-icons/cg";
+import { AiOutlineUsergroupAdd } from "react-icons/ai";
+import { IoSettingsOutline } from "react-icons/io5";
+import { LuUserRound } from "react-icons/lu";
+import { FaUserFriends } from "react-icons/fa";
+import { HiOutlineArrowRightEndOnRectangle } from "react-icons/hi2";
+import { FaChevronLeft } from "react-icons/fa6";
+import { LuUserRoundPlus } from "react-icons/lu";
+import { MdOutlineMoreHoriz } from "react-icons/md";
+import { FaInfoCircle } from "react-icons/fa";
 
 interface ChatInfoProps {
   isOpen?: boolean;
@@ -37,6 +49,7 @@ interface ChatInfoProps {
   selectedChat: number;
   setIsChatInfoOpen: (isOpen: boolean) => void;
   onPinChange: (isPinned: boolean) => void;
+  onHistoryDeleted: () => void;
 }
 
 interface Member {
@@ -52,8 +65,27 @@ const ChatInfo = ({
   selectedChat,
   setIsChatInfoOpen,
   onPinChange,
+  onHistoryDeleted,
 }: ChatInfoProps) => {
   const router = useRouter();
+
+  const token = useSelector((state: RootState) => state.auth.token);
+  const userId = useSelector((state: RootState) => state.auth.userId);
+
+  const {
+    getGroupConversations,
+    getChatDetailSection,
+    removeParticipantFromGroup,
+    pinConversation,
+    deleteConversation,
+    leaveGroupConversation
+  } = useConversation(userId, token);
+
+  const {
+    blockUser,
+    unblockUser,
+    loading: blockUnblockLoading,
+  } = useBlockUnblockUser(userId, token);
 
   const [isOpenLeaveGroup, setIsOpenLeaveGroup] = useState(false);
   const [isAddingMember, setIsAddingMember] = useState(false);
@@ -61,27 +93,23 @@ const ChatInfo = ({
   const [isOpenDissolveGroup, setIsOpenDissolveGroup] = useState(false);
   const [isMuted, setIsMuted] = useState<boolean>(false);
   const [isOpenUpdateGroupInfo, setIsOpenUpdateGroupInfo] = useState(false);
-  const [isOpenConfirmRemove, setIsOpenConfirmRemove] = useState(false);
-  const [isOpenSuccessRemove, setIsOpenSuccessRemove] = useState(false);
-  const [removeSuccessMessage, setRemoveSuccessMessage] = useState("");
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
   const [memberToRemove, setMemberToRemove] = useState<number | null>(null);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string>("");
+  const [selectedChatId, setSelectedChatId] = useState<number | null>(null);
+  const [isOpenDeleteConversation, setIsOpenDeleteConversation] = useState(false);
+  const [isNicknameModalOpen, setIsNicknameModalOpen] = useState(false);
+  const [selectedParticipantId, setSelectedParticipantId] = useState<number | null>(null);
+  const [currentNickname, setCurrentNickname] = useState<string>("");
 
-  const token = useSelector((state: RootState) => state.auth.token);
-  const userId = useSelector((state: RootState) => state.auth.userId);
-
-  const {
-    getChatDetailSection,
-    removeParticipantFromGroup,
-    pinConversation,
-    deleteConversation,
-  } = useConversation();
   const [chatDetail, setChatDetail] = useState<ChatDetailSectionResponse | null>(null);
   const [isPinned, setIsPinned] = useState(false);
   const [isDeletingConversation, setIsDeletingConversation] = useState<boolean>(false);
-  const isCurrentUserAdmin = chatDetail?.members?.find((m) => m.id === userId)?.is_admin || false;
+  const [isBlocked, setIsBlocked] = useState(false);
+
+  const admins = chatDetail?.members?.filter((member) => member.is_admin) || [];
+  const isCurrentUserAdmin = admins.some((admin) => admin.id === userId);
 
   useEffect(() => {
     const fetchChatDetails = async () => {
@@ -93,16 +121,46 @@ const ChatInfo = ({
     fetchChatDetails();
   }, [selectedChat, userId, token]);
 
+  const handleNicknameUpdated = () => {
+    toast.success("Nickname updated successfully!");
+    setIsNicknameModalOpen(false);
+
+    const fetchUpdatedDetails = async () => {
+      const updatedDetails = await getChatDetailSection(selectedChat, userId, token);
+      setChatDetail(updatedDetails || null);
+    };
+    fetchUpdatedDetails();
+  };
+
+  const handleLeaveGroup = async () => {
+    if (!selectedChat || !userId || !token) return;
+    try {
+      const response = await leaveGroupConversation(selectedChat, userId, token);
+      if (response?.statusCode === 200) {
+        toast.success("Left group successfully!");
+        setIsChatInfoOpen(false);
+        setTimeout(() => {
+          router.push("/");
+        }, 6000);
+      }
+    } catch (error: any) {
+      console.error("Error leaving group:", error);
+      toast.error("Failed to leave group.");
+    }
+  };
+
   useEffect(() => {
     const fetchRecentConversations = async () => {
       if (userId && token) {
         const recentConversations = await getRecentConversationByUserID(userId, token);
         const pinnedConversations = recentConversations.filter(conversation => conversation.pinned);
         console.log("Pinned Conversations:", pinnedConversations);
+        setIsPinned(pinnedConversations.some(conversation => conversation.id === selectedChat));
       }
     };
     fetchRecentConversations();
   }, [userId, token, selectedChat]);
+
 
   const handleMuteConversation = () => {
     setIsMuted(!isMuted);
@@ -129,40 +187,35 @@ const ChatInfo = ({
     }
   };
 
-  const handleDeleteChatHistory = async () => {
-    if (!selectedChat || !userId || !token) return;
-    setIsDeletingConversation(true);
-    try {
-      const deleteSuccess = await deleteConversation(selectedChat, userId, token);
-      if (deleteSuccess) {
-        setIsChatInfoOpen(false);
-        router.push("/");
-        toast.success("Chat history deleted successfully!");
-      } else {
-        toast.error("Failed to delete chat history.");
-      }
-    } catch (error) {
-      console.error("Error deleting chat history:", error);
-      toast.error("Failed to delete chat history.");
-    } finally {
-      setIsDeletingConversation(false);
-    }
+  const handleDeleteConversation = async () => {
+    setIsOpenDeleteConversation(true);
   };
 
   const handleRemoveMember = async (participantId: number) => {
-    if (!selectedChat || !userId || !token) return;
+    if (!selectedChat || !userId || !token) {
+      toast.error("Invalid chat or user information.");
+      return;
+    }
+
     try {
       const response = await removeParticipantFromGroup(selectedChat, userId, participantId, token);
       if (response?.statusCode === 200) {
+        toast.success("Member removed successfully!");
         setSuccessMessage("Member removed successfully!");
         setIsSuccessModalOpen(true);
-        getChatDetailSection(selectedChat, userId, token);
+
+        const updatedDetails = await getChatDetailSection(selectedChat, userId, token);
+        setChatDetail(updatedDetails || null);
+
+        setTimeout(() => {
+          router.push("/");
+        }, 6000);
       } else {
-        toast.error("Failed to remove member.");
+        toast.error(response?.message || "Failed to remove member.");
       }
     } catch (error) {
       console.error("Error removing member:", error);
-      toast.error("Failed to remove member.");
+      toast.error("Failed to remove member. Please try again.");
     }
   };
 
@@ -180,10 +233,10 @@ const ChatInfo = ({
   };
 
   const handleRemoveMemberAction = (participantId: number) => {
+    handleRemoveMember(participantId);
     setMemberToRemove(participantId);
     setIsConfirmModalOpen(true);
   };
-
 
   const handleOpenUpdateGroupInfoModal = () => {
     setIsOpenUpdateGroupInfo(true);
@@ -195,16 +248,49 @@ const ChatInfo = ({
 
   if (!isOpen) return null;
 
-  const handleAddMembers = (members: Member[]) => {
-    setIsAddingMember(false);
-  };
-
   const handleMembersAddedSuccess = () => {
     if (selectedChat && userId && token) {
       getChatDetailSection(selectedChat, userId, token);
     }
   };
 
+  const handleBlockUserClick = async () => {
+    if (!selectedChat || !userId || !token || !chatDetail) return;
+
+    const targetUserId = chatDetail.members?.find(m => m.id !== userId)?.id;
+    if (!targetUserId) {
+      console.error("Cannot find user ID to block");
+      return;
+    }
+
+    const success = await blockUser(userId, targetUserId, token);
+    if (success) {
+      toast.success("Blocked this user successfully!");
+      setIsBlocked(true);
+    } else {
+      toast.error("Cannot block this user. Please try again later.");
+      setIsBlocked(false);
+    }
+  };
+
+  const handleUnblockUserClick = async () => {
+    if (!selectedChat || !userId || !token || !chatDetail) return;
+
+    const targetUserId = chatDetail.members?.find(m => m.id !== userId)?.id;
+    if (!targetUserId) {
+      console.error("Cannot find user ID to unblock");
+      return;
+    }
+
+    const success = await unblockUser(userId, targetUserId, token);
+    if (success) {
+      toast.success("Unblocked this user successfully!");
+      setIsBlocked(false);
+    } else {
+      toast.error("Cannot unblock this user. Please try again later.");
+      setIsBlocked(true);
+    }
+  };
 
   return (
     <div className="bg-[#292929] text-white h-screen overflow-hidden overflow-y-auto w-1/4 p-4">
@@ -286,65 +372,12 @@ const ChatInfo = ({
 
             {isGroupChat && (
               <div className="mt-4">
-                <h3 className="text-md font-semibold">
-                  Listing Members ({chatDetail?.members?.length} Members)
-                </h3>
-                <Button className="mt-3 px-3 w-full flex gap-2" onClick={() => setIsOpenAddMembers(true)}>
-                  <LuUserRoundPlus size={20} color="white" />
-                  <span className="text-sm">Add member</span>
-                </Button>
-                <div className="mt-3 px-2">
-                  {chatDetail?.members?.map((member, i) => {
-                    const isAdmin = chatDetail?.members?.find((m) => m.id === userId)?.is_admin;
-
-                    if (member.id === userId) {
-                      return (
-                        <div key={i} className="flex items-center gap-3 p-2 justify-between">
-                          <div className="flex items-center gap-3">
-                            <Image
-                              src={member.avatar || Images.AvatarDefault}
-                              alt={"avatar"}
-                              className="w-[3.125rem] h-[3.125rem] rounded-[30px]"
-                              width={50}
-                              height={50}
-                            />
-                            <span>
-                              {member.name} (You) {member.is_admin ? "(Admin)" : ""}
-                            </span>
-                          </div>
-                        </div>
-                      );
-                    }
-
-                    return (
-                      <div
-                        key={i}
-                        className="flex items-center gap-3 p-2 justify-between"
-                      >
-                        <div className="flex items-center gap-3">
-                          <Image
-                            src={member.avatar || Images.AvatarDefault}
-                            alt={"avatar"}
-                            className="w-[3.125rem] h-[3.125rem] rounded-[30px]"
-                            width={50}
-                            height={50}
-                          />
-                          <span>
-                            {member.name} {member.is_admin ? "(Admin)" : ""}
-                          </span>
-                        </div>
-                        {isAdmin && !member.is_admin && (
-                          <Button
-                            variant="destructive"
-                            size="sm"
-                            onClick={() => handleRemoveMemberAction(Number(member.id))}
-                          >
-                            Remove
-                          </Button>
-                        )}
-                      </div>
-                    );
-                  })}
+                <h3 className="text-md font-semibold">Group members</h3>
+                <div className="flex items-center justify-between mt-2 cursor-pointer" onClick={() => setIsAddingMember(true)}>
+                  <div className="flex items-center gap-3 rounded-lg p-2 hover:bg-[#484848] w-full">
+                    <FaUserFriends size={20} color="white" className="text-white" />
+                    <span>{chatDetail?.members?.length} members</span>
+                  </div>
                 </div>
               </div>
             )}
@@ -415,8 +448,8 @@ const ChatInfo = ({
                 {isGroupChat ? (
                   <>
                     <button
-                      className="flex items-center gap-3"
-                      onClick={() => setIsOpenLeaveGroup(true)}
+                      className="flex items-center gap-3 hover:bg-[#484848] rounded-lg p-2"
+                      onClick={() => { setIsOpenLeaveGroup(true); handleLeaveGroup(); }}
                     >
                       <HiOutlineArrowRightEndOnRectangle
                         size={25}
@@ -427,36 +460,77 @@ const ChatInfo = ({
                         Leave group
                       </span>
                     </button>
-                    <button
-                      className="flex items-center gap-3"
-                      onClick={() => setIsOpenDissolveGroup(true)}
-                    >
-                      <HiOutlineArrowRightEndOnRectangle
-                        size={25}
-                        color="red"
-                        className="font-semibold"
-                      />
-                      <span className="text-sm text-[#FF0000] font-semibold leading-[25px]">
-                        Dissolve Group
-                      </span>
-                    </button>
+                    {isCurrentUserAdmin && (
+                      <button
+                        className="flex items-center gap-3 hover:bg-[#484848] rounded-lg p-2"
+                        onClick={() => setIsOpenDissolveGroup(true)}
+                      >
+                        <HiOutlineArrowRightEndOnRectangle
+                          size={25}
+                          color="red"
+                          className="font-semibold"
+                        />
+                        <span className="text-sm text-[#FF0000] font-semibold leading-[25px]">
+                          Dissolve group
+                        </span>
+                      </button>
+                    )}
                   </>
                 ) : (
-                  <button className="flex items-center gap-3">
-                    <MdBlock
-                      size={25}
-                      color="white"
-                      className="text-white font-semibold"
-                    />
-                    <span className="text-sm font-semibold leading-[25px]">
-                      Block
-                    </span>
-                  </button>
+                  chatDetail?.members?.length === 2 && chatDetail.members.some(m => m.id !== userId) ? (
+                    chatDetail?.members?.find((m) => m.id !== userId) ? (
+                      isBlocked ? (
+                        <button
+                          className="flex items-center gap-3 hover:bg-[#484848] rounded-lg p-2"
+                          onClick={handleUnblockUserClick}
+                          disabled={blockUnblockLoading}
+                        >
+                          <MdBlock
+                            size={25}
+                            color="white"
+                            className="text-white font-semibold"
+                          />
+                          <span className="text-sm font-semibold leading-[25px]">
+                            {blockUnblockLoading ? "Unblocking..." : "Unblock"}
+                          </span>
+                        </button>
+                      ) : (
+                        <button
+                          className="flex items-center gap-3 hover:bg-[#484848] rounded-lg p-2 w-full"
+                          onClick={handleBlockUserClick}
+                          disabled={blockUnblockLoading}
+                        >
+                          <MdBlock
+                            size={25}
+                            color="white"
+                            className="text-white font-semibold"
+                          />
+                          <span className="text-sm font-semibold leading-[25px]">
+                            {blockUnblockLoading ? "Blocking..." : "Block"}
+                          </span>
+                        </button>
+                      )
+                    ) : null
+                  ) : null
                 )}
 
                 <button
-                  className="flex items-center gap-3"
-                  onClick={handleDeleteChatHistory}
+                  className="flex items-center gap-3 hover:bg-[#484848] rounded-lg p-2 w-full"
+                  onClick={() => setIsNicknameModalOpen(true)}
+                >
+                  <FaInfoCircle
+                    size={25}
+                    color="skyblue"
+                    className="text-blue-500 font-semibold"
+                  />
+                  <span className="text-sm font-semibold leading-[25px] text-[#51a2ff]">
+                    Update Nickname
+                  </span>
+                </button>
+
+                <button
+                  className="flex items-center gap-3 hover:bg-[#484848] rounded-lg p-2 w-full"
+                  onClick={handleDeleteConversation}
                 >
                   <CgTrashEmpty
                     size={25}
@@ -464,7 +538,7 @@ const ChatInfo = ({
                     className="text-red font-semibold"
                   />
                   <span className="text-sm font-semibold leading-[25px] text-[#FF0000]">
-                    Delete chat history
+                    Delete conversation
                   </span>
                 </button>
               </div>
@@ -482,108 +556,127 @@ const ChatInfo = ({
             </div>
           </div>
           <div className="mt-4">
-            <Button
-              className="w-full bg-[#D9D9D9] hover:bg-white"
-              onClick={() => setIsOpenAddMembers(true)}
-            >
-              <LuUserRoundPlus size={30} color="black" />
-              <span className="text-black text-sm">Add member</span>
-            </Button>
-            <div className="mt-4">
-              List members ({chatDetail?.members?.length || 0})
-            </div>
-            <div className="mt-3 px-2">
-              {chatDetail?.members?.map((member, i) => {
-                const isAdmin = chatDetail?.members?.find((m) => m.id === userId)?.is_admin;
+            {isGroupChat && (
+              <div className="mt-4">
+                <h3 className="text-md font-semibold">
+                  Listing Members ({chatDetail?.members?.length} Members)
+                </h3>
+                <Button className="w-full bg-[#D9D9D9] hover:bg-white mt-3"
+                  onClick={() => setIsOpenAddMembers(true)}>
+                  <LuUserRoundPlus size={20} color="black" />
+                  <span className="text-black text-sm">Add member</span>
+                </Button>
 
-                if (member.id === userId) {
-                  return (
-                    <div
-                      key={i}
-                      className="flex items-center gap-3 p-2 justify-between"
-                    >
-                      <div className="flex items-center gap-3">
-                        <Image
-                          src={member.avatar || Images.AvatarDefault}
-                          alt={"avatar"}
-                          className="w-[3.125rem] h-[3.125rem] rounded-[30px]"
-                          width={50}
-                          height={50}
-                        />
-                        <span>
-                          {member.name} (You) {member.is_admin ? "(Admin)" : ""}
-                        </span>
-                      </div>
-                    </div>
-                  );
-                }
+                <div className="mt-3 px-2">
+                  {chatDetail?.members?.map((member, i) => {
+                    const isAdmin = chatDetail?.members?.find((m) => m.id === userId)?.is_admin;
 
-                return (
-                  <div
-                    key={i}
-                    className="flex items-center gap-3 p-2 justify-between"
-                  >
-                    <div className="flex items-center gap-3">
-                      <Image
-                        src={member.avatar || Images.AvatarDefault}
-                        alt={"avatar"}
-                        className="w-[3.125rem] h-[3.125rem] rounded-[30px]"
-                        width={50}
-                        height={50}
-                      />
-                      <span>
-                        {member.name} {member.is_admin ? "(Admin)" : ""}
-                      </span>
-                    </div>
-                    {isAdmin && !member.is_admin && (
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={() => handleRemoveMemberAction(Number(member.id))}
+                    if (member.id === userId) {
+                      return (
+                        <div key={i} className="flex items-center gap-3 p-2 justify-between w-full hover:bg-[#484848] rounded-lg cursor-pointer">
+                          <div className="flex items-center gap-3">
+                            <Image
+                              src={member.avatar || Images.AvatarDefault}
+                              alt={"avatar"}
+                              className="w-[3.125rem] h-[3.125rem] rounded-[30px]"
+                              width={50}
+                              height={50}
+                            />
+                            <span>
+                              {member.name} (You) {member.is_admin ? "(Admin)" : ""}
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    }
+
+                    return (
+                      <div
+                        key={i}
+                        className="flex items-center gap-3 p-2 justify-between w-full hover:bg-[#484848] rounded-lg cursor-pointer"
                       >
-                        Remove
-                      </Button>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
+                        <div className="flex items-center gap-3 w-full">
+                          <Image
+                            src={member.avatar || Images.AvatarDefault}
+                            alt={"avatar"}
+                            className="w-[3.125rem] h-[3.125rem] rounded-[30px]"
+                            width={50}
+                            height={50}
+                          />
+                          <span>
+                            {member.name} {member.is_admin ? "(Admin)" : ""}
+                          </span>
+                        </div>
+                        {/* {isCurrentUserAdmin && ( */}
+                        <Button
+                          variant="destructive"
+                          size="sm"
+                          onClick={() => handleRemoveMemberAction(Number(member.id))}
+                        >
+                          Remove
+                        </Button>
+                        {/* )} */}
+
+                        <Button
+                          variant="secondary"
+                          size="sm"
+                          onClick={() => setIsNicknameModalOpen(true)}
+                        >
+                          Update Nickname
+                        </Button>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
         </>
-      )}
+      )
+      }
 
-      {isOpenAddMembers && (
-        <ModalAddMembers
-          isOpen={isOpenAddMembers}
-          setIsOpen={setIsOpenAddMembers}
-          conversationId={selectedChat!}
-          onMembersAdded={handleMembersAddedSuccess}
-        />
-      )}
-      {isOpenLeaveGroup && (
-        <ModalLeaveGroup
-          isOpen={isOpenLeaveGroup}
-          setIsOpen={setIsOpenLeaveGroup}
-          chatId={selectedChat}
-        />
-      )}
-      {isOpenDissolveGroup && (
-        <ModalDissolveGroup
-          isOpen={isOpenDissolveGroup}
-          setIsOpen={setIsOpenDissolveGroup}
-          chatId={selectedChat}
-        />
-      )}
-      {isOpenUpdateGroupInfo && (
-        <ModalUpdateGroupInfo
-          isOpen={isOpenUpdateGroupInfo}
-          setIsOpen={setIsOpenUpdateGroupInfo}
-          conversationId={selectedChat!}
-          currentGroupName={chatDetail?.name || ""}
-          currentGroupAvatar={chatDetail?.avatar || ""}
-          onGroupInfoUpdated={handleGroupInfoUpdatedSuccess}
-        />
-      )}
+      {
+        isOpenAddMembers && (
+          <ModalAddMembers
+            isOpen={isOpenAddMembers}
+            setIsOpen={setIsOpenAddMembers}
+            conversationId={selectedChat!}
+            onMembersAdded={handleMembersAddedSuccess}
+          />
+        )
+      }
+      {
+        isOpenLeaveGroup && (
+          <ModalLeaveGroup
+            isOpen={isOpenLeaveGroup}
+            setIsOpen={setIsOpenLeaveGroup}
+            chatId={selectedChat}
+            setSelectedChatId={setSelectedChatId}
+          />
+        )
+      }
+      {
+        isOpenDissolveGroup && (
+          <ModalDissolveGroup
+            isOpen={isOpenDissolveGroup}
+            setIsOpen={setIsOpenDissolveGroup}
+            chatId={selectedChat}
+            isAdmin={isCurrentUserAdmin}
+          />
+        )
+      }
+      {
+        isOpenUpdateGroupInfo && (
+          <ModalUpdateGroupInfo
+            isOpen={isOpenUpdateGroupInfo}
+            setIsOpen={setIsOpenUpdateGroupInfo}
+            conversationId={selectedChat!}
+            currentGroupName={chatDetail?.name || ""}
+            currentGroupAvatar={chatDetail?.avatar || ""}
+            onGroupInfoUpdated={handleGroupInfoUpdatedSuccess}
+          />
+        )
+      }
       <ModalConfirm
         isOpen={isConfirmModalOpen}
         setIsOpen={setIsConfirmModalOpen}
@@ -597,7 +690,29 @@ const ChatInfo = ({
         setIsOpen={setIsSuccessModalOpen}
         message={successMessage}
       />
-    </div>
+      {
+        isOpenDeleteConversation && (
+          <ModalDeleteConversation
+            isOpen={isOpenDeleteConversation}
+            setIsOpen={setIsOpenDeleteConversation}
+            chatId={selectedChat}
+            onHistoryDeleted={onHistoryDeleted}
+          />
+        )
+      }
+      {
+        isNicknameModalOpen && (
+          <ModalUpdateNickname
+            isOpen={isNicknameModalOpen}
+            setIsOpen={setIsNicknameModalOpen}
+            conversationId={selectedChat!}
+            participantId={selectedParticipantId!}
+            currentNickname={currentNickname}
+            onNicknameUpdated={handleNicknameUpdated}
+          />
+        )
+      }
+    </div >
   );
 };
 

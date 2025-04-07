@@ -2,9 +2,19 @@
 
 import React, { useEffect, useState } from "react"
 import Image from "next/image"
+import { useSelector } from "react-redux"
+import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react"
+import { toast } from "react-toastify"
+
+import { RootState } from "~/lib/reudx/store"
+import { useConversation } from "~/hooks/use-converstation"
+import { ConversationResponse } from "~/codegen/data-contracts"
+import formatLastMessageTime from "~/lib/utils"
+import { MessageType } from "~/types/types"
+import { useBlockUnblockUser } from "~/hooks/use-user"
+
 import { Images } from "../constants/images"
 import "../styles/custom-scroll.css"
-import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react"
 import ModalCreateNewChat from "./modal-create-new-chat"
 import ModalCreateNewGroupChat from "./modal-create-new-group-chat"
 import ModalProfile from "./modal-profile"
@@ -12,12 +22,7 @@ import ChangePasswordModal from "./modal-change-password"
 import ModalFriendList from "./modal-friend-list"
 import ModalFriendRequests from "./modal-friend-requests"
 import ModalListGroup from "./modal-list-group"
-import { useSelector } from "react-redux"
-import { RootState } from "~/lib/reudx/store"
-import { useConversation } from "~/hooks/use-converstation"
-import { ConversationResponse } from "~/codegen/data-contracts"
-import formatLastMessageTime from "~/lib/utils"
-import { MessageType } from "~/types/types"
+
 import { BsPinAngleFill } from "react-icons/bs"
 import { RiUnpinFill } from "react-icons/ri"
 
@@ -28,9 +33,15 @@ interface ChatListProps {
   onPinChange: () => void
 }
 
-const ChatList = ({ setSelectedChat, setIsGroupChat, setConversationData, onPinChange }: ChatListProps) => {
+const ChatList = ({
+  setSelectedChat,
+  setIsGroupChat,
+  setConversationData,
+  onPinChange
+}: ChatListProps) => {
   const userId = useSelector((state: RootState) => state.auth.userId)
   const token = useSelector((state: RootState) => state.auth.token)
+
   const [modalCreateChatOpen, setModalCreateNewChatOpen] = useState(false)
   const [modalCreateGroupChatOpen, setModalCreateNewGroupChatOpen] = useState(false)
   const [modalProfileOpen, setModalProfileOpen] = useState(false)
@@ -39,9 +50,12 @@ const ChatList = ({ setSelectedChat, setIsGroupChat, setConversationData, onPinC
   const [isFriendListModalOpen, setIsFriendListModalOpen] = useState(false)
   const [isFriendRequestModalOpen, setIsFriendRequestModalOpen] = useState(false)
   const [modalListGroup, setModalListGroup] = useState(false)
-  const { getRecentConversation } = useConversation()
+
+  const {
+    getRecentConversation
+  } = useConversation(userId, token)
+
   const [dataConversation, setDataConversation] = useState<ConversationResponse[]>([])
-  const [needRefetchConversations, setNeedRefetchConversations] = useState(false)
 
   const fetchDataConversation = async () => {
     if (userId) {
@@ -59,7 +73,7 @@ const ChatList = ({ setSelectedChat, setIsGroupChat, setConversationData, onPinC
 
   useEffect(() => {
     fetchDataConversation()
-  }, [userId, modalCreateChatOpen, modalCreateGroupChatOpen, needRefetchConversations])
+  }, [userId, modalCreateChatOpen, modalCreateGroupChatOpen])
 
   useEffect(() => {
     if (userId) {
@@ -192,12 +206,12 @@ const ChatList = ({ setSelectedChat, setIsGroupChat, setConversationData, onPinC
                         ? chat.lastMessageType === MessageType.IMAGE
                           ? "Sent an image"
                           : chat.lastMessageType === MessageType.VIDEO
-                          ? "Sent a video"
-                          : chat.lastMessageType === MessageType.DOCUMENT
-                          ? "Sent a document"
-                          : chat.lastMessageType === MessageType.EMOJI
-                          ? "Sent a reaction"
-                          : chat.lastMessage
+                            ? "Sent a video"
+                            : chat.lastMessageType === MessageType.DOCUMENT
+                              ? "Sent a document"
+                              : chat.lastMessageType === MessageType.EMOJI
+                                ? "Sent a reaction"
+                                : chat.lastMessage
                         : "No messages"}
                     </p>
                     {chat.isSeen && (
@@ -284,9 +298,19 @@ const ChatList = ({ setSelectedChat, setIsGroupChat, setConversationData, onPinC
           friend={undefined}
         />
       )}
-      <ModalFriendList isOpen={isFriendListModalOpen} setIsOpen={setIsFriendListModalOpen} />
-      <ModalFriendRequests isOpen={isFriendRequestModalOpen} setIsOpen={setIsFriendRequestModalOpen} />
-      <ModalListGroup isOpen={modalListGroup} setIsOpen={setModalListGroup} isAdmin={true} />
+      <ModalFriendList
+        isOpen={isFriendListModalOpen}
+        setIsOpen={setIsFriendListModalOpen}
+      />
+      <ModalFriendRequests
+        isOpen={isFriendRequestModalOpen}
+        setIsOpen={setIsFriendRequestModalOpen}
+      />
+      <ModalListGroup
+        isOpen={modalListGroup}
+        setIsOpen={setModalListGroup}
+        isAdmin={true}
+      />
     </div>
   )
 }

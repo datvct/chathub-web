@@ -30,20 +30,24 @@ export async function getRecentConversationByUserID(userId: number, token: strin
 
 export async function createConversationAPI(data: ConversationRequest, token: string) {
   try {
-    if (!data) return null
+    if (!data || !data.chatType) {
+      throw new Error("Chat type is required.");
+    }
 
-    const response = (await conversationInstance.createConversation(data, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }).then(res => res.json())) as ConversationResponse[]
-    return response
+    const response = await conversationInstance.createConversation(
+      { request: { ...data } },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response; 
   } catch (error) {
-    console.error("Error checking admin token:", error)
-    return null
+    console.error("Error creating conversation:", error);
+    throw error;
   }
 }
-
 
 export async function leaveConversation(conversationId: number, userId: number, token?: string) {
   try {
@@ -54,8 +58,8 @@ export async function leaveConversation(conversationId: number, userId: number, 
     }).then(res => res.json())) as SuccessResponse
     return response
   } catch (error) {
-    console.error("Error checking admin token:", error)
-    return null
+    console.error("Error leaving conversation:", error);
+    return null;
   }
 }
 
@@ -267,26 +271,6 @@ export const addMembersToConversationAPI = async (
   }
 };
 
-export const updateNicknameAPI = async (
-  data: UpdateNickNameRequest,
-  token: string,
-) => {
-  try {
-    const response = (await conversationInstance.updateNickname(
-      data,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      },
-    ).then(res => res.json())) as SuccessResponse;
-    return response;
-  } catch (error) {
-    console.error("Error updating nickname:", error);
-    return null;
-  }
-};
-
 export const removeParticipantFromGroupConversationAPI = async (
   conversationId: number,
   userId: number,
@@ -328,6 +312,43 @@ export const leaveGroupConversationAPI = async (
     return response;
   } catch (error) {
     console.error("Error leaving group conversation:", error);
+    return null;
+  }
+};
+
+export async function findGroupsAPI(userId: number, groupName: string, token: string) {
+  try {
+    if (!userId) return [];
+    console.log("Calling API findGroupsAPI with:", { userId, groupName });
+    const response = await conversationInstance.findGroupConversations(
+      { userId, groupName },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    console.log("API Response:", response);
+    return response.data || [];
+  } catch (error) {
+    console.error("Error fetching groups:", error);
+    return [];
+  }
+};
+
+export const updateNicknameAPI = async (data: UpdateNickNameRequest, token: string) => {
+  try {
+    const response = (await conversationInstance.updateNickname(
+      data,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    ).then((res) => res.json())) as SuccessResponse;
+    return response;
+  } catch (error) {
+    console.error("Error updating nickname:", error);
     return null;
   }
 };

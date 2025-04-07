@@ -139,13 +139,17 @@ export class Conversation<SecurityDataType = unknown> extends HttpClient<Securit
    * @request POST:/conversation/create
    * @secure
    */
-  createConversation = (data: ConversationRequest, params: RequestParams = {}) =>
+  createConversation = (
+    query: {
+      request: ConversationRequest
+    },
+    params: RequestParams = {},
+  ) =>
     this.request<ConversationResponse, ErrorResponse>({
       path: `/conversation/create`,
       method: "POST",
-      body: data,
+      query: query,
       secure: true,
-      type: ContentType.Json,
       ...params,
     })
   /**

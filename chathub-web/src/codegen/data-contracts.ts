@@ -1,5 +1,6 @@
 /* eslint-disable */
 /* tslint:disable */
+// @ts-nocheck
 /*
  * ---------------------------------------------------------------
  * ## THIS FILE WAS GENERATED VIA SWAGGER-TYPESCRIPT-API        ##
@@ -80,7 +81,8 @@ export interface FriendshipRequest {
 export interface ConversationRequest {
   chatType?: "SINGLE" | "GROUP"
   groupName?: string
-  groupAvatar?: string
+  /** @format binary */
+  groupAvatar?: File
   /** @format int64 */
   creatorId?: number
   participantIds?: number[]
@@ -108,7 +110,6 @@ export interface ConversationResponse {
   participants?: ParticipantDTO[]
   pinned?: boolean
   dissolved?: boolean
-  lastMessageType?: strig | null
 }
 
 export interface ParticipantDTO {
