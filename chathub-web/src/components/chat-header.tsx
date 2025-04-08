@@ -13,7 +13,7 @@ interface ChatHeaderProps {
   avatar?: string
   setIsChatSearchOpen?: (isOpen: boolean) => void
   isChatSearchOpen?: boolean
-  isUserOnline?: string
+  isUserOnline?: boolean
 }
 
 const ChatHeader = ({

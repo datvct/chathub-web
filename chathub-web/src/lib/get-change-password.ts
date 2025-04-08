@@ -3,17 +3,13 @@ import { ChangePasswordRequest, SuccessResponse } from "../codegen/data-contract
 
 const userInstance = new User({ baseUrl: process.env.API_URL })
 
-export async function changePassword(data: ChangePasswordRequest, token: string) {
+export async function changePassword(data: ChangePasswordRequest) {
   try {
     if (!data.id) return null
-    const response = await userInstance.changePassword(data, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    })as SuccessResponse
+    const response = (await userInstance.changePassword(data).then(res => res.json())) as SuccessResponse
     return response
   } catch (error) {
-    console.error("Error changing password: ", error);
-    throw error;
+    console.error("Error changing password: ", error)
+    throw error
   }
 }

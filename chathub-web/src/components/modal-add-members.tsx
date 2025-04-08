@@ -75,7 +75,6 @@ const ModalAddMembers: React.FC<ModalAddMembersProps> = ({ isOpen, setIsOpen, co
       })
 
       const success = await addMembersToConversation(conversationId, memberIdsToAdd, token)
-      console.log("addMembersToConversation API Response:", success)
 
       if (success) {
         toast.success("Members added to group successfully!")
@@ -88,7 +87,7 @@ const ModalAddMembers: React.FC<ModalAddMembersProps> = ({ isOpen, setIsOpen, co
       console.error("Error adding members to conversation:", error)
       toast.error("Failed to add members to group.")
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
   }
 
@@ -134,9 +133,10 @@ const ModalAddMembers: React.FC<ModalAddMembersProps> = ({ isOpen, setIsOpen, co
                       <li
                         key={index}
                         className={`flex items-center justify-between rounded-lg px-3 py-3 space-x-3 transition duration-150 mb-1 cursor-pointer
-                          ${selectedMembers.some(m => m.id === member.id)
-                            ? "bg-[#93C1D2]"
-                            : "odd:bg-[#E4DEED] even:bg-[#AF9CC9]"
+                          ${
+                            selectedMembers.some(m => m.id === member.id)
+                              ? "bg-[#93C1D2]"
+                              : "odd:bg-[#E4DEED] even:bg-[#AF9CC9]"
                           }
                           ${!selectedMembers.some(m => m.id === member.id) ? "hover:rounded-lg bg-[#7a99b8]/90" : ""}
                       `}
@@ -176,8 +176,9 @@ const ModalAddMembers: React.FC<ModalAddMembersProps> = ({ isOpen, setIsOpen, co
 
                 <Button
                   onClick={handleAddMembersToGroup}
-                  className={`bg-gradient-to-r from-[#501794] to-[#3E70A1] text-white rounded-[12px] px-4 py-2 hover:bg-gradient-to-l ${loading ? "opacity-50 cursor-not-allowed" : ""
-                    }`}
+                  className={`bg-gradient-to-r from-[#501794] to-[#3E70A1] text-white rounded-[12px] px-4 py-2 hover:bg-gradient-to-l ${
+                    loading ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
                   disabled={loading}
                 >
                   {loading ? "Adding..." : "Add"}

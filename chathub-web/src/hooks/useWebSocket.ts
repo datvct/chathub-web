@@ -13,7 +13,7 @@ const useWebSocket = (conversationId: number, userId: number, token?: string) =>
   const [loading, setLoading] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
   const [client, setClient] = useState<Client | null>(null)
-
+  const [isUserOnline, setIsUserOnline] = useState<boolean>(false)
   useEffect(() => {
     if (!conversationId || !userId || !token) return
 
@@ -57,18 +57,15 @@ const useWebSocket = (conversationId: number, userId: number, token?: string) =>
         TOPICS.REACT_MESSAGE(conversationId.toString()),
       ]
 
-      // Subscribe to each topic
       topics.forEach(topic => {
         stompClient.subscribe(topic, message => {
           const data = JSON.parse(message.body)
           console.log(`📩 Received from ${topic}:`, data)
 
-          // Handle specific topics
           if (topic === TOPICS.MESSAGE(conversationId.toString())) {
             setMessages(prev => [...prev, data])
           }
 
-          // Handle other topics as needed (typing, reactions, seen messages)
           if (topic === TOPICS.TYPING_STATUS(conversationId.toString())) {
             console.log("Typing status:", data)
           } else if (topic === TOPICS.SEEN_MESSAGE(conversationId.toString())) {
@@ -76,7 +73,8 @@ const useWebSocket = (conversationId: number, userId: number, token?: string) =>
           } else if (topic === TOPICS.REACT_MESSAGE(conversationId.toString())) {
             console.log("Message reaction:", data)
           } else if (topic === TOPICS.STATUS) {
-            console.log("User status:", data) // Handle the online/offline status here
+            console.log("User status:", data)
+            setIsUserOnline(data.isOnline)
           }
         })
       })
@@ -109,7 +107,7 @@ const useWebSocket = (conversationId: number, userId: number, token?: string) =>
     }
   }
 
-  return { messages, sendMessage, loading, error }
+  return { messages, sendMessage, loading, error, isUserOnline }
 }
 
 export default useWebSocket
