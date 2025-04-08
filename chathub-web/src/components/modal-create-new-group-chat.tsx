@@ -1,22 +1,20 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Images } from "../constants/images";
 import { Dialog, DialogPanel, DialogTitle, TransitionChild } from "@headlessui/react";
 import { toast } from "react-toastify";
-import { Search, EllipsisVertical, X } from "lucide-react";
+import { Search, X } from "lucide-react";
 import { FaRegCircle } from "react-icons/fa";
-import { useUserSearch } from "~/hooks/use-user";
 import "../styles/custom-scroll.css";
 import { useSelector } from "react-redux";
 import { RootState } from "~/lib/reudx/store";
 import { useFriends } from "~/hooks/use-friends";
-import { ConversationRequest } from "~/codegen/data-contracts";
+import { ConversationRequest, UserDTO } from "~/codegen/data-contracts";
 import { useConversation } from "~/hooks/use-converstation";
-import { useSearchUserByNameOrPhone } from "~/hooks/use-user";
 
 interface ModalCreateGroupChatProps {
   isOpen: boolean;
@@ -30,48 +28,15 @@ const ModalCreateGroupChat: React.FC<ModalCreateGroupChatProps> = ({ isOpen, set
   const [groupName, setGroupName] = useState<string>("");
   const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const debounceTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const { friends, loading: friendsLoading, error: friendsError } = useFriends(userId, token);
-  const { searchUsers, searchResults, isSearching, searchError } = useUserSearch(userId!, token!);
-  const { createGroupConversation, loading: groupLoading } = useConversation(userId, token);
+  const { friends, loading: friendsLoading, error: friendsError } = useFriends(userId!, token!);
+  const { createGroupConversation, loading: groupLoading } = useConversation(userId!, token!);
 
-  const [isDisplayingSearchResults, setIsDisplayingSearchResults] = useState(false);
-
-  useEffect(() => {
-    if (debounceTimeoutRef.current) {
-      clearTimeout(debounceTimeoutRef.current);
-    }
-
-    if (!searchTerm.trim()) {
-      setIsDisplayingSearchResults(false);
-      return;
-    }
-
-    debounceTimeoutRef.current = setTimeout(() => {
-      searchUsers(searchTerm);
-      setIsDisplayingSearchResults(true);
-    }, 500);
-
-    return () => {
-      if (debounceTimeoutRef.current) {
-        clearTimeout(debounceTimeoutRef.current);
-      }
-    };
-  }, [searchTerm, searchUsers]);
-
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === 'Enter' && searchTerm.trim()) {
-      event.preventDefault();
-
-      if (debounceTimeoutRef.current) {
-        clearTimeout(debounceTimeoutRef.current);
-      }
-
-      searchUsers(searchTerm);
-      setIsDisplayingSearchResults(true);
-    }
-  };
+  const filteredFriends = friends?.filter(friend =>
+    friend &&
+    (friend.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      friend.phoneNumber?.includes(searchTerm))
+  ) || [];
 
   const handleSelectUser = (userIdToToggle: number) => {
     setSelectedUsers((prev) =>
@@ -82,8 +47,16 @@ const ModalCreateGroupChat: React.FC<ModalCreateGroupChatProps> = ({ isOpen, set
   };
 
   const handleCreateGroupChat = async () => {
-    if (!groupName || selectedUsers.length === 0) {
-      toast.error("Please provide a group name and select at least one participant.");
+    if (!groupName.trim()) {
+      toast.error("Please enter a group name.");
+      return;
+    }
+    if (selectedUsers.length === 0) {
+      toast.error("Please select at least one friend to create a group.");
+      return;
+    }
+    if (!userId) {
+      toast.error("User ID not found. Please log in again.");
       return;
     }
 
@@ -91,31 +64,39 @@ const ModalCreateGroupChat: React.FC<ModalCreateGroupChatProps> = ({ isOpen, set
       chatType: "GROUP",
       creatorId: userId,
       participantIds: [userId, ...selectedUsers],
-      groupName,
+      groupName: groupName.trim(),
     };
 
     try {
       const response = await createGroupConversation(data);
       if (response) {
-        toast.success("Group chat created successfully!");
+        toast.success(`Group "${groupName.trim()}" created successfully!`);
         setIsOpen(false);
+        setGroupName("");
+        setSelectedUsers([]);
+        setSearchTerm("");
       } else {
         toast.error("Failed to create group chat.");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error creating group chat:", error);
-      toast.error(error.message || "Failed to create group chat.");
+      toast.error(error.message || "An unexpected error occurred while creating the group.");
     }
   };
 
-  const usersToDisplay = isDisplayingSearchResults ? searchResults : friends;
-  const currentLoadingState = isDisplayingSearchResults ? isSearching : friendsLoading;
-  const currentErrorState = isDisplayingSearchResults ? searchError : friendsError;
-
-  if (friendsLoading) return <div className="loader"></div>;
+  // if (friendsLoading) return <div className="loader"></div>;
 
   return (
-    <Dialog open={isOpen} onClose={() => setIsOpen(false)} className="relative z-50">
+    <Dialog
+      open={isOpen}
+      onClose={() => {
+        setIsOpen(false);
+        setGroupName("");
+        setSelectedUsers([]);
+        setSearchTerm("");
+      }}
+      className="relative z-50"
+    >
       <div className="fixed inset-0 bg-opacity-[.40]" aria-hidden="true" />
 
       <div className="fixed inset-0 flex items-center justify-center p-2">
@@ -138,96 +119,101 @@ const ModalCreateGroupChat: React.FC<ModalCreateGroupChatProps> = ({ isOpen, set
 
             <hr className="w-full my-4 border-1 border-gray-500 mb-6" />
 
-            <div className="relative mb-6">
+            <div className="relative mb-4 flex-shrink-0">
               <Input
                 type="text"
                 placeholder="Group Name"
                 value={groupName}
                 onChange={(e) => setGroupName(e.target.value)}
-                className="w-full py-[22px] pl-4 pr-4 bg-[#fff] border border-[#545454] rounded-lg text-gray-900 focus:outline-none placeholder-[#828282]"
+                className="w-full py-3 pl-4 pr-4 bg-gray-100 text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-500 text-sm md:text-base"
               />
             </div>
 
-            <div className="relative mb-6">
+            <div className="relative mb-4 flex-shrink-0">
               <Input
                 type="text"
-                placeholder="Search user to add"
+                placeholder="Search friend to add"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                onKeyDown={handleKeyDown}
-                className="w-full py-[22px] pl-12 pr-10 bg-[#fff] border border-[#545454] rounded-lg text-gray-900 focus:outline-none placeholder-[#828282]"
+                className="w-full py-3 pl-10 pr-10 bg-gray-100 text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-500 text-sm md:text-base"
               />
-              <Search className="absolute top-1/2 left-4 -translate-y-1/2 text-gray-500" />
+              <Search className="absolute top-1/2 left-3 transform -translate-y-1/2 text-gray-400" size={18} />
               {searchTerm && (
                 <button
                   onClick={() => setSearchTerm('')}
-                  className="absolute top-1/2 right-4 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                  className="absolute top-1/2 right-3 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1"
                 >
-                  <X size={18} />
+                  <X size={16} />
                 </button>
               )}
             </div>
 
-            <ul className="max-h-[45vh] overflow-auto custom-scrollbar">
-              {currentLoadingState ? (
-                <div className="flex justify-center items-center h-32">
+            <div className="flex-grow overflow-y-auto custom-scrollbar -mr-2 pr-2">
+              {friendsLoading ? (
+                <div className="flex justify-center items-center h-full pt-10">
                   <div className="loader"></div>
                 </div>
-              ) : currentErrorState ? (
-                <p className="text-center text-red-400">{currentErrorState}</p>
-              ) : usersToDisplay && usersToDisplay.length > 0 ? (
-                usersToDisplay.map((user) => (
-                  <li
-                    key={user.id}
-                    className={`
-                      flex items-center justify-between gap-3 p-2 rounded-lg cursor-pointer mb-3 hover:bg-[#93C1D2]
-                      ${selectedUsers.includes(user.id!) ? "bg-[#7a99b8]/90" : "bg-[#fff]"}
-                    `}
-                    onClick={() => handleSelectUser(user.id!)}
-                  >
-                    <div className="flex items-center gap-3">
-                      <Image
-                        src={user.avatar || Images.AvatarDefault}
-                        alt={user.name || "avatar"}
-                        width={40}
-                        height={40}
-                        className="rounded-full"
-                      />
-                      <div>
-                        <p className="font-semibold text-black">{user.name}</p>
-                        <p className="text-sm text-gray-700">{user.phoneNumber}</p>
+              ) : friendsError ? (
+                <p className="text-center text-red-400 mt-10">{friendsError}</p>
+              ) : filteredFriends.length > 0 ? (
+                <ul>
+                  {filteredFriends.map((user) => (
+                    <li
+                      key={user.id}
+                      onClick={() => handleSelectUser(user.id!)}
+                      className={`flex items-center justify-between gap-3 p-3 rounded-lg cursor-pointer mb-2 transition-colors duration-150
+                          ${selectedUsers.includes(user.id!) ? "bg-blue-200 ring-2 ring-blue-400" : "bg-white hover:bg-gray-100"}`}
+                    >
+                      <div className="flex items-center gap-3 overflow-hidden min-w-0">
+                        <Image
+                          src={user.avatar || Images.AvatarDefault}
+                          alt={user.name || "avatar"}
+                          width={40}
+                          height={40}
+                          className="rounded-full flex-shrink-0 object-cover"
+                        />
+                        <div className="overflow-hidden">
+                          <p className="font-semibold text-black truncate text-sm md:text-base">{user.name}</p>
+                          <p className="text-sm text-gray-600 truncate">{user.phoneNumber}</p>
+                        </div>
                       </div>
-                    </div>
-
-                    <div className="flex items-center justify-center w-6 h-6">
-                      {selectedUsers.includes(user.id!) ? (
-                        <Image src={Images.IconCheckSmall} alt="check icon" width={20} height={20} />
-                      ) : (
-                        <FaRegCircle size={18} color="gray" />
-                      )}
-                    </div>
-                  </li>
-                ))
+                      <div className="flex items-center justify-center w-6 h-6 flex-shrink-0 ml-2">
+                        {selectedUsers.includes(user.id!) ? (
+                          <Image src={Images.IconCheckSmall} alt="Selected" width={20} height={20} />
+                        ) : (
+                          <FaRegCircle size={18} className="text-gray-400" />
+                        )}
+                      </div>
+                    </li>
+                  ))}
+                </ul>
               ) : (
-                <p className="text-center text-gray-400">
-                  {isDisplayingSearchResults ? "No users found." : "No friends available."}
+                <p className="text-center text-gray-400 mt-10">
+                  {searchTerm ? "No friends found matching search." : "No friends available to add."}
                 </p>
               )}
-            </ul>
+            </div>
 
-            <div className="mt-6 flex justify-end gap-5">
+            <div className="mt-6 pt-4 border-t flex justify-end gap-5 flex-shrink-0">
               <Button
-                onClick={() => setIsOpen(false)}
+                onClick={() => {
+                  setIsOpen(false);
+                  setGroupName("");
+                  setSelectedUsers([]);
+                  setSearchTerm("");
+                }}
+                variant="outline"
                 className="px-4 py-2 bg-[#71808E] rounded-lg text-white text-lg hover:bg-[#535353]"
               >
                 Cancel
               </Button>
               <Button
                 onClick={() => handleCreateGroupChat()}
-                className="w-20 px-4 py-2 bg-[#7746f5] rounded-[12px] text-lg text-white bg-gradient-to-r from-[#501794] to-[#3E70A1] hover:bg-gradient-to-l"
-                disabled={groupName === "" || selectedUsers.length === 0 || groupLoading}
+                className="w-20 px-4 py-2 bg-[#7746f5] rounded-[12px] text-lg text-white
+                  bg-gradient-to-r from-[#501794] to-[#3E70A1] hover:bg-gradient-to-l"
+                disabled={!groupName.trim() || selectedUsers.length === 0 || groupLoading}
               >
-                {groupLoading ? '...' : 'Create'}
+                {groupLoading ? 'Creating...' : 'Create Group'}
               </Button>
             </div>
           </DialogPanel>
