@@ -1,9 +1,9 @@
 import { User } from "~/codegen/User";
-import { 
-  UserDTO, 
+import {
+  UserDTO,
   BlockRequest,
-  ChangeProfileRequest, 
-  SuccessResponse 
+  ChangeProfileRequest,
+  SuccessResponse
 } from "../codegen/data-contracts";
 
 const userInstance = new User({ baseUrl: process.env.API_URL });
@@ -51,7 +51,7 @@ export async function blockUser(blockerId: number, blockedId: number, token: str
         },
       },
     );
-    return response; 
+    return response;
   } catch (error) {
     console.error("Error blocking user:", error);
     throw error;
@@ -68,9 +68,27 @@ export async function unblockUser(blockerId: number, blockedId: number, token: s
         },
       },
     );
-    return response; 
+    return response;
   } catch (error) {
     console.error("Error unblocking user:", error);
     throw error;
+  }
+}
+
+export async function findUserByIdAPI(userId: number, token: string): Promise<UserDTO | null> {
+  try {
+    if (!userId) return null;
+    const response = await userInstance.findUserByUserId(
+      userId,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data || null;
+  } catch (error) {
+    console.error(`Error fetching user by ID ${userId}:`, error);
+    return null;
   }
 }

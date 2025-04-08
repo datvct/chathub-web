@@ -1,13 +1,14 @@
 import { useState, useCallback } from "react";
-import { 
-  UserDTO, 
-  ChangeProfileRequest 
+import {
+  UserDTO,
+  ChangeProfileRequest
 } from "~/codegen/data-contracts";
-import { 
+import {
   getUserInfo,
   updateProfile as updateProfileAPI,
-  blockUser as blockUserAPI, 
+  blockUser as blockUserAPI,
   unblockUser as unblockUserAPI,
+  findUserByIdAPI,
 } from "~/lib/get-user";
 
 export function useFindUserByPhoneNumber() {
@@ -62,7 +63,7 @@ export const useUpdateProfile = () => {
 };
 
 export const useBlockUnblockUser = (
-  userId: number, 
+  userId: number,
   token: string
 ) => {
   const [loading, setLoading] = useState(false);
@@ -99,4 +100,37 @@ export const useBlockUnblockUser = (
   };
 
   return { blockUser, unblockUser, loading, errorMessage };
+};
+
+export const useCurrentUserProfile = (userId: number | null, token: string | null) => {
+  const [profile, setProfile] = useState<UserDTO | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchProfile = useCallback(async () => {
+    if (!userId || !token) {
+
+      setProfile(null);
+      return;
+    }
+
+    setIsLoading(true);
+    setError(null);
+    try {
+      const data = await findUserByIdAPI(userId, token);
+      if (data) {
+        setProfile(data);
+      } else {
+        throw new Error("User profile not found or failed to fetch.");
+      }
+    } catch (err: any) {
+      console.error("Error fetching current user profile:", err);
+      setError(err.message || "Failed to load profile.");
+      setProfile(null);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [userId, token]);
+
+  return { profile, isLoading, error, fetchProfile };
 };
