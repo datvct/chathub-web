@@ -1,41 +1,10 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback } from "react"
+import { ChangeProfileRequest } from "~/codegen/data-contracts"
 import {
-  UserDTO,
-  ChangeProfileRequest
-} from "~/codegen/data-contracts";
-import {
-  getUserInfo,
   updateProfile as updateProfileAPI,
   blockUser as blockUserAPI,
   unblockUser as unblockUserAPI,
-} from "~/lib/get-user";
-
-export function useFindUserByPhoneNumber() {
-  const [user, setUser] = useState<UserDTO | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const checkPhoneNumber = useCallback(async (phoneNumber: string, token?: string) => {
-    setLoading(true);
-    setError(null);
-
-    try {
-      const response = await getUserInfo(phoneNumber, token);
-      if (!response) {
-        setError("Không tìm thấy người dùng");
-        return { isSuccess: false };
-      }
-      setUser(response);
-      return { isSuccess: true };
-    } catch (err) {
-      setError("Error checking user info");
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  return { user, loading, error, checkPhoneNumber };
-}
+} from "~/lib/get-user"
 
 export const useUpdateProfile = () => {
   const [loading, setLoading] = useState(false)
@@ -61,12 +30,9 @@ export const useUpdateProfile = () => {
   return { updateProfile, loading, errorMessage }
 }
 
-export const useBlockUnblockUser = (
-  userId: number,
-  token: string
-) => {
-  const [loading, setLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
+export const useBlockUnblockUser = (userId: number, token: string) => {
+  const [loading, setLoading] = useState(false)
+  const [errorMessage, setErrorMessage] = useState("")
 
   const blockUser = async (blockerId: number, blockedId: number, token: string) => {
     setLoading(true)
@@ -100,6 +66,3 @@ export const useBlockUnblockUser = (
 
   return { blockUser, unblockUser, loading, errorMessage }
 }
-
-  return { blockUser, unblockUser, loading, errorMessage };
-};
