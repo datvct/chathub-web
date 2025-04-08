@@ -1,10 +1,5 @@
-import { User } from "~/codegen/User";
-import {
-  UserDTO,
-  BlockRequest,
-  ChangeProfileRequest,
-  SuccessResponse
-} from "../codegen/data-contracts";
+import { User } from "~/codegen/User"
+import { UserDTO, BlockRequest, ChangeProfileRequest, SuccessResponse } from "../codegen/data-contracts"
 
 const userInstance = new User({ baseUrl: process.env.API_URL })
 
@@ -55,8 +50,8 @@ export async function blockUser(blockerId: number, blockedId: number, token: str
       headers: {
         Authorization: `Bearer ${token}`,
       },
-    );
-    return response;
+    })
+    return response
   } catch (error) {
     console.error("Error blocking user:", error)
     throw error
@@ -69,8 +64,8 @@ export async function unblockUser(blockerId: number, blockedId: number, token: s
       headers: {
         Authorization: `Bearer ${token}`,
       },
-    );
-    return response;
+    })
+    return response
   } catch (error) {
     console.error("Error unblocking user:", error)
     throw error
