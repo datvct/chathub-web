@@ -58,7 +58,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
     }))
   }
 
-  const [date, setDate] = useState(dayjs(profileData?.dateOfBirth))
+  const [date, setDate] = useState<dayjs.Dayjs>(dayjs(dataProfile?.dateOfBirth || new Date()))
 
   const handleDateOfBirth = (newDate: dayjs.Dayjs | null) => {
     setDate(newDate || dayjs())
@@ -79,26 +79,49 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
         avatar: dataProfile.avatar,
         status: dataProfile.status,
       })
+      setDate(dayjs(dataProfile.dateOfBirth || new Date()))
     } else {
       setProfileData(dataProfile)
     }
   }, [dataProfile])
 
   const handleSubmit = async () => {
-    const formattedDate = dayjs(profileData.dateOfBirth).format("YYYY/MM/DD")
+    if (!profileData?.dateOfBirth) {
+      toast.error("Please enter your date of birth.")
+      return
+    }
+
+    if (!profileData?.gender) {
+      toast.error("Please select your gender.")
+      return
+    }
+
+    const birthDate = dayjs(profileData?.dateOfBirth)
+    const age = dayjs().diff(birthDate, "years")
+    if (age < 18) {
+      toast.error("You must be at least 18 years old.")
+      return
+    }
+
+    const formattedDate = dayjs(profileData?.dateOfBirth).format("DD-MM-YYYY");
 
     const data: ChangeProfileRequest = {
       id: userId!,
       name: profileData?.name || "",
-      avatar: selectedImage
-        ? await fetch(selectedImage)
-            .then(res => res.blob())
-            .then(blob => new File([blob], "avatar.jpg", { type: blob.type }))
-        : new File([await fetch(friend?.avatar || Images.AvatarDefault.src).then(res => res.blob())], "avatar.jpg", {
-            type: "image/jpeg",
-          }),
       dateOfBirth: formattedDate,
       gender: (profileData?.gender as "MALE" | "FEMALE") || "MALE",
+    }
+
+    if (selectedImage) {
+      if (selectedImage !== profileData.avatar) {
+        const avatarFile = await fetch(selectedImage)
+          .then(res => res.blob())
+          .then(blob => new File([blob], "avatar.jpg", { type: blob.type }));
+  
+        data.avatar = avatarFile;
+      }
+    } else if (!selectedImage && profileData?.avatar) {
+      delete data.avatar;
     }
 
     try {
