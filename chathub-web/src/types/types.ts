@@ -4,7 +4,7 @@ export enum MessageType {
   IMAGE = "IMAGE",
   VIDEO = "VIDEO",
   DOCUMENT = "DOCUMENT",
-  EMOJI = "EMOJI",
+  LINK = "LINK",
 }
 export interface Friend {
   name: string

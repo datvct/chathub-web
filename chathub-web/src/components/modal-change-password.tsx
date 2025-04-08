@@ -5,11 +5,9 @@ import React, { Fragment, useState } from "react"
 import Link from "next/link"
 import { Images } from "../constants/images"
 import Image from "next/image"
-import { useRouter } from "next/navigation"
 import { Input } from "./ui/input"
 import { Button } from "./ui/button"
-import { ChangePasswordRequest, SuccessResponse } from "~/codegen/data-contracts"
-import { changePassword } from "../lib/get-change-password"
+import { ChangePasswordRequest } from "~/codegen/data-contracts"
 import { useChangePassword } from "../hooks/use-change-password"
 import { useSelector } from "react-redux"
 import { RootState } from "~/lib/reudx/store"
@@ -54,12 +52,13 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ isOpen, setIs
       id: userId,
       oldPassword,
       newPassword,
-      changeType: 'UPDATE'
-    };
+      changeType: "UPDATE",
+    }
 
-    const response = await changePassword(data, token)
+    const response = await changePassword(data)
     if (response.success) {
       toast.success("Changed password successfully!")
+      alert("Changed password successfully!")
       setIsOpen(false)
     } else {
       setErrorMessage(response.error || "Failed to change password.")

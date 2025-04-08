@@ -25,8 +25,8 @@ export default function Home() {
   }, [])
 
   const handleHistoryDeletedSuccess = useCallback(() => {
-    setSelectedChat(null);
-  }, []);
+    setSelectedChat(null)
+  }, [])
 
   useEffect(() => {
     if (selectedChat) {
@@ -44,7 +44,6 @@ export default function Home() {
 
   return (
     <>
-      <ToastContainer position="top-center" autoClose={3000} closeOnClick />
       <div className="flex flex-row justify-between h-screen">
         <ChatList
           setSelectedChat={setSelectedChat}

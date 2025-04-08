@@ -17,8 +17,7 @@ const ResetPasswordPage: React.FC = () => {
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const router = useRouter()
-  const [loading, setLoading] = useState(false)
-  const [errorMessage, setErrorMessage] = useState("")
+
   const handlePasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setPassword(e.target.value)
   }
@@ -27,28 +26,24 @@ const ResetPasswordPage: React.FC = () => {
   }
 
   const handleSubmit = async () => {
-    setLoading(true)
-    setErrorMessage("")
-
     if (!password || !confirmPassword) {
-      setErrorMessage("Please fill in all fields.")
-      setLoading(false)
+      toast.error("Please fill in all fields.")
       return
     }
 
     if (confirmPassword !== password) {
-      setErrorMessage("New passwords do not match.")
-      setLoading(false)
+      toast.error("New passwords do not match.")
       return
     }
 
     const data: ChangePasswordRequest = {
       id: parseInt(userId),
       newPassword: password,
-      changeType: "REST",
+      changeType: "RESET",
     }
 
     const response = await changePassword(data)
+    console.log("response", response)
     if (response.success) {
       toast.success("Rest password successfully!", {
         position: "top-right",
@@ -60,7 +55,6 @@ const ResetPasswordPage: React.FC = () => {
       })
       router.push("/sign-in")
     } else {
-      setErrorMessage(response.error || "Failed to change password.")
       toast.error(response.error || "Failed to change password.")
     }
   }

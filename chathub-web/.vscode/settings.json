@@ -3,6 +3,6 @@
   "editor.formatOnSave": true,
   "eslint.run": "onSave",
   "typescript.preferences.importModuleSpecifier": "relative",
- "prettier.requireConfig": true,
+  "prettier.requireConfig": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode"
 }

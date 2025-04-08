@@ -6,151 +6,73 @@ import {
   SuccessResponse
 } from "../codegen/data-contracts";
 
-const userInstance = new User({ baseUrl: process.env.API_URL });
+const userInstance = new User({ baseUrl: process.env.API_URL })
 
 export async function updateProfile(data: ChangeProfileRequest, token: string) {
   try {
-    if (!data.id) return null;
-    const response = await userInstance.updateProfile(data, {
+    if (!data.id) return null
+    const response = (await userInstance.updateProfile(data, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
-    }) as SuccessResponse;
-    return response;
+    })) as SuccessResponse
+    return response
   } catch (error) {
-    console.error("Error updating profile:", error);
-    throw error;
+    console.error("Error updating profile:", error)
+    throw error
   }
 }
 
-export async function getUserInfo(phoneNumber: string, token?: string) {
+export async function findByPhoneNumber(phoneNumber: string) {
   try {
-    const response = await userInstance.findUserByPhoneNumber(
-      { phoneNumber },
-      {
-        headers: {
-          ...(token && { Authorization: `Bearer ${token}` }),
-        },
-      },
-    );
-    const userData: UserDTO = response.data;
-    return userData || null;
+    const response = (await userInstance.findUserByPhoneNumber({ phoneNumber }).then(res => res.json())) as UserDTO
+    return response
   } catch (error) {
-    console.error("Error fetching user info:", error);
-    return null;
+    console.error("Error checking admin token:", error)
+    return null
+  }
+}
+
+export async function findUserById(userId: number, token: string) {
+  try {
+    const response = (await userInstance
+      .findUserByUserId(userId, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      })
+      .then(res => res.json())) as UserDTO
+    return response
+  } catch (error) {
+    console.error("Error checking admin token:", error)
+    return null
   }
 }
 
 export async function blockUser(blockerId: number, blockedId: number, token: string) {
   try {
-    const response = await userInstance.blockUser(
-      { blockerId, blockedId } as BlockRequest,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+    const response = await userInstance.blockUser({ blockerId, blockedId } as BlockRequest, {
+      headers: {
+        Authorization: `Bearer ${token}`,
       },
     );
     return response;
   } catch (error) {
-    console.error("Error blocking user:", error);
-    throw error;
+    console.error("Error blocking user:", error)
+    throw error
   }
 }
 
 export async function unblockUser(blockerId: number, blockedId: number, token: string) {
   try {
-    const response = await userInstance.unblockUser(
-      { blockerId, blockedId } as BlockRequest,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+    const response = await userInstance.unblockUser({ blockerId, blockedId } as BlockRequest, {
+      headers: {
+        Authorization: `Bearer ${token}`,
       },
     );
     return response;
   } catch (error) {
-    console.error("Error unblocking user:", error);
-    throw error;
-  }
-}
-
-export async function searchUserByNameOrPhone(
-  userId: number,
-  query: string,
-  token: string
-): Promise<UserDTO[]> {
-  try {
-    const response = await userInstance.search(
-      { userId, query },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    return response?.data || [];
-  } catch (error) {
-    console.error("Error searching user by name or phone:", error);
-    throw error;
-  }
-}
-
-export async function findUserByPhoneNumber(
-  phoneNumber: string,
-  token: string
-): Promise<UserDTO | null> {
-  try {
-    const response = await userInstance.findUserByPhoneNumber(
-      { phoneNumber },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    return response.data || null;
-  } catch (error) {
-    console.error("Error finding user by phone number:", error);
-    throw error;
-  }
-}
-
-export async function findUserById(
-  userId: number,
-  token: string
-): Promise<UserDTO | null> {
-  try {
-    const response = await userInstance.findUserByUserId(userId, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    return response.data || null;
-  } catch (error) {
-    console.error("Error finding user by ID:", error);
-    throw error;
-  }
-}
-
-export async function searchUsersAPI(
-  userId: number,
-  query: string,
-  token: string
-): Promise<UserDTO[]> {
-  try {
-    if (!userId || !query) return [];
-    const response = await userInstance.search(
-      { userId, query },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      }
-    );
-    return response?.data || [];
-  } catch (error) {
-    console.error("Error searching users:", error);
-    return [];
+    console.error("Error unblocking user:", error)
+    throw error
   }
 }
