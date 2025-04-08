@@ -2,8 +2,6 @@
   "extends": "next/core-web-vitals",
   "rules": {
     "no-unused-vars": "off",
-    "no-redeclare": "warn",
-      "@typescript-eslint/no-explicit-any": "off", // Tắt cảnh báo về `any`
-    "@typescript-eslint/explicit-module-boundary-types": "off",
+    "no-redeclare": "warn"
   }
 }

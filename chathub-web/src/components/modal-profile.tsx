@@ -17,28 +17,28 @@ import { useUpdateProfile } from "~/hooks/use-user"
 import { ChangeProfileRequest, UserDTO } from "~/codegen/data-contracts"
 import dayjs from "dayjs"
 import { toast, ToastContainer } from "react-toastify"
+import { findUserById } from "~/lib/get-user"
 
 interface ProfileModalProps {
   isOpen: boolean
   setIsOpen: (open: boolean) => void
   setIsChangePasswordModalOpen?: any
   friend: UserDTO | null
+  dataProfile: UserDTO | null
 }
 
 const ProfileModal: React.FC<ProfileModalProps> = ({
   isOpen,
   setIsOpen,
   setIsChangePasswordModalOpen,
-  friend
+  friend,
+  dataProfile,
 }) => {
-  const userId = useSelector((state: RootState) => state.auth.userId);
-  const token = useSelector((state: RootState) => state.auth.token);
-
-  const { updateProfile, loading } = useUpdateProfile();
-  const [errorMessage, setErrorMessage] = useState("")
+  const userId = useSelector((state: RootState) => state.auth.userId)
+  const token = useSelector((state: RootState) => state.auth.token)
+  const { updateProfile, loading } = useUpdateProfile()
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
   const [profileData, setProfileData] = useState<UserDTO | null>(null)
-
   const handleOpenChangePassword = () => {
     setIsOpen(false)
     setIsChangePasswordModalOpen(true)
@@ -54,8 +54,8 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
   const handleChange = (field: keyof UserDTO, value: string | Date | "MALE" | "FEMALE") => {
     setProfileData(prev => ({
       ...prev,
-      ...(prev && { [field]: value })
-    }));
+      ...(prev && { [field]: value }),
+    }))
   }
 
   const [date, setDate] = useState(dayjs(profileData?.dateOfBirth))
@@ -69,46 +69,50 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
   }
 
   useEffect(() => {
-    if (friend) {
+    if (dataProfile) {
       setProfileData({
-        id: friend.id,
-        phoneNumber: friend.phoneNumber,
-        name: friend.name || "",
-        dateOfBirth: friend.dateOfBirth,
-        gender: friend.gender as "MALE" | "FEMALE",
-        avatar: friend.avatar,
-        status: friend.status,
-      });
+        id: dataProfile.id,
+        phoneNumber: dataProfile.phoneNumber,
+        name: dataProfile.name || "",
+        dateOfBirth: dataProfile.dateOfBirth,
+        gender: dataProfile.gender as "MALE" | "FEMALE",
+        avatar: dataProfile.avatar,
+        status: dataProfile.status,
+      })
     } else {
-      setProfileData(friend);
+      setProfileData(dataProfile)
     }
-  }, [friend]);
+  }, [dataProfile])
 
   const handleSubmit = async () => {
-    const formattedDate = dayjs(profileData.dateOfBirth).format('YYYY/MM/DD');
+    const formattedDate = dayjs(profileData.dateOfBirth).format("YYYY/MM/DD")
 
     const data: ChangeProfileRequest = {
       id: userId!,
       name: profileData?.name || "",
       avatar: selectedImage
-        ? await fetch(selectedImage).then(res => res.blob()).then(blob => new File([blob], "avatar.jpg", { type: blob.type }))
-        : new File([await fetch(friend?.avatar || Images.AvatarDefault.src).then(res => res.blob())], "avatar.jpg", { type: "image/jpeg" }),
+        ? await fetch(selectedImage)
+            .then(res => res.blob())
+            .then(blob => new File([blob], "avatar.jpg", { type: blob.type }))
+        : new File([await fetch(friend?.avatar || Images.AvatarDefault.src).then(res => res.blob())], "avatar.jpg", {
+            type: "image/jpeg",
+          }),
       dateOfBirth: formattedDate,
-      gender: profileData?.gender as "MALE" | "FEMALE" || "MALE",
-    };
+      gender: (profileData?.gender as "MALE" | "FEMALE") || "MALE",
+    }
 
     try {
-      const response = await updateProfile(data, token!);
+      const response = await updateProfile(data, token!)
       if (response) {
-        toast.success('Updated profile successfully');
+        toast.success("Updated profile successfully")
         setTimeout(() => {
-          setIsOpen(false);
-        }, 5000);
+          setIsOpen(false)
+        }, 5000)
       }
     } catch (error: any) {
-      toast.error('Failed to update profile. Please try again later!');
+      toast.error("Failed to update profile. Please try again later!")
     }
-  };
+  }
 
   return (
     <Transition appear show={isOpen} as={React.Fragment}>
@@ -192,7 +196,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
                       <Input
                         id="display-name"
                         type="text"
-                        value={friend?.name}
+                        value={profileData?.name}
                         className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500"
                         onChange={e => handleChange("name", e.target.value)}
                       />
