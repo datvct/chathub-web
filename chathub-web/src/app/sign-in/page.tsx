@@ -9,7 +9,7 @@ import { useSignUp } from "~/hooks/use-login"
 import { useRouter } from "next/navigation"
 import { useDispatch } from "react-redux"
 import { setUser } from "~/lib/reudx/authSlice"
-
+import { setCookie } from "cookies-next"
 const SignInPage: React.FC = () => {
   const [phoneNumber, setPhoneNumber] = useState("")
   const [password, setPassword] = useState("")
@@ -53,18 +53,12 @@ const SignInPage: React.FC = () => {
 
     try {
       const response = await submitSignUp(data)
-
+      console.log("Response:", response)
       if (response.status === 200) {
-        localStorage.setItem("authToken", response?.response?.token)
         dispatch(setUser({ userId: response?.response?.userId, token: response?.response?.token }))
-        const res = await fetch("/api/cookies", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ token: response.response.token, userId: response?.response?.userId }),
-        })
-        if (res.ok) {
-          router.push("/")
-        }
+        setCookie("authToken", response?.response?.token, { maxAge: 60 * 60 * 24 * 7 })
+        setCookie("userId", response?.response?.userId, { maxAge: 60 * 60 * 24 * 7 })
+        router.push("/")
       } else {
         setErrorMessage("Invalid phone number or password.")
       }

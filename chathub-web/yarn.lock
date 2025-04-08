@@ -1930,7 +1930,7 @@ chalk@^4.0.0:
     "@reduxjs/toolkit" "^2.5.1"
     "@stomp/stompjs" "^7.0.0"
     "@types/sockjs-client" "^1.5.4"
-    chathub-web "file:../../../../Library/Caches/Yarn/v6/npm-chathub-web-0.1.0-1a38b47c-b205-4170-ab6b-00eb92a020f6-1744123955838/node_modules/chathub-web"
+    chathub-web "file:../../../../Library/Caches/Yarn/v6/npm-chathub-web-0.1.0-7df1f758-d875-413b-98bd-f77c10b812f3-1744130324557/node_modules/chathub-web"
     class-variance-authority "^0.7.1"
     dayjs "^1.11.13"
     emoji-picker-react "^4.12.0"
@@ -2044,6 +2044,18 @@ convert-source-map@^1.5.0:
   version "1.9.0"
   resolved "https://registry.npmjs.org/convert-source-map/-/convert-source-map-1.9.0.tgz"
   integrity sha512-ASFBup0Mz1uyiIjANan1jzLQami9z1PoYSZCiiYW2FczPbenXc45FZdBZLzOT+r6+iciuEModtmCti+hjaAk0A==
+
+cookie@^1.0.1:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/cookie/-/cookie-1.0.2.tgz#27360701532116bd3f1f9416929d176afe1e4610"
+  integrity sha512-9Kr/j4O16ISv8zBBhJoi4bXOYNTkFLOqSL3UDB0njXxCXNezjeyVrJyGOWtgfs/q2km1gwBcfH8q1yEGoMYunA==
+
+cookies-next@^5.1.0:
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/cookies-next/-/cookies-next-5.1.0.tgz#b6e1c7d11a4e1d38ed0586a7847cd0f403c539e1"
+  integrity sha512-9Ekne+q8hfziJtnT9c1yDUBqT0eDMGgPrfPl4bpR3xwQHLTd/8gbSf6+IEkP/pjGsDZt1TGbC6emYmFYRbIXwQ==
+  dependencies:
+    cookie "^1.0.1"
 
 cosmiconfig@^7.0.0:
   version "7.1.0"

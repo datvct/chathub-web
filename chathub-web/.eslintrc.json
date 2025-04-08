@@ -2,6 +2,19 @@
   "extends": "next/core-web-vitals",
   "rules": {
     "no-unused-vars": "off",
-    "no-redeclare": "warn"
+    "no-redeclare": "warn",
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/explicit-module-boundary-types": "off",
+    "@typescript-eslint/no-empty-function": "off",
+    "@typescript-eslint/no-non-null-assertion": "off",
+    "@typescript-eslint/no-unused-vars": [
+      "warn",
+      {
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_",
+        "ignoreRestSiblings": true
+      }
+    ],
+    "react/no-unescaped-entities": "off"
   }
 }

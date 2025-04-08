@@ -25,6 +25,7 @@
     "@types/sockjs-client": "^1.5.4",
     "chathub-web": "file:",
     "class-variance-authority": "^0.7.1",
+    "cookies-next": "^5.1.0",
     "dayjs": "^1.11.13",
     "emoji-picker-react": "^4.12.0",
     "firebase": "^11.2.0",
