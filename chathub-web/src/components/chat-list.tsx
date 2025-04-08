@@ -8,7 +8,7 @@ import { toast } from "react-toastify"
 
 import { RootState } from "~/lib/reudx/store"
 import { useConversation } from "~/hooks/use-converstation"
-import { ConversationResponse } from "~/codegen/data-contracts"
+import { ConversationResponse, UserDTO } from "~/codegen/data-contracts"
 import formatLastMessageTime from "~/lib/utils"
 import { MessageType } from "~/types/types"
 import { useBlockUnblockUser } from "~/hooks/use-user"
@@ -25,6 +25,7 @@ import ModalListGroup from "./modal-list-group"
 
 import { BsPinAngleFill } from "react-icons/bs"
 import { RiUnpinFill } from "react-icons/ri"
+import { findUserById } from "~/lib/get-user"
 
 interface ChatListProps {
   setSelectedChat: (id: number) => void
@@ -33,12 +34,21 @@ interface ChatListProps {
   onPinChange: () => void
 }
 
-const ChatList = ({
-  setSelectedChat,
-  setIsGroupChat,
-  setConversationData,
-  onPinChange
-}: ChatListProps) => {
+const useGetUserById = (userId: number, token?: string) => {
+  const [data, setData] = useState<UserDTO | null>(null)
+  useEffect(() => {
+    const init = async () => {
+      const data = await findUserById(userId, token)
+      setData(data)
+    }
+
+    init()
+  }, [userId])
+
+  return data
+}
+
+const ChatList = ({ setSelectedChat, setIsGroupChat, setConversationData, onPinChange }: ChatListProps) => {
   const userId = useSelector((state: RootState) => state.auth.userId)
   const token = useSelector((state: RootState) => state.auth.token)
 
@@ -50,12 +60,11 @@ const ChatList = ({
   const [isFriendListModalOpen, setIsFriendListModalOpen] = useState(false)
   const [isFriendRequestModalOpen, setIsFriendRequestModalOpen] = useState(false)
   const [modalListGroup, setModalListGroup] = useState(false)
-
-  const {
-    getRecentConversation
-  } = useConversation(userId, token)
+  const { getRecentConversation } = useConversation(userId, token)
 
   const [dataConversation, setDataConversation] = useState<ConversationResponse[]>([])
+
+  const dataProfile = useGetUserById(userId, token)
 
   const fetchDataConversation = async () => {
     if (userId) {
@@ -64,7 +73,6 @@ const ChatList = ({
         const response = await getRecentConversation(userId, token)
         if (response) {
           setDataConversation(response)
-          console.log(response)
         }
       }
       init()
@@ -209,9 +217,11 @@ const ChatList = ({
                             ? "Sent a video"
                             : chat.lastMessageType === MessageType.DOCUMENT
                               ? "Sent a document"
-                              : chat.lastMessageType === MessageType.EMOJI
-                                ? "Sent a reaction"
-                                : chat.lastMessage
+                              : chat.lastMessageType === MessageType.TEXT
+                                ? "Sent a text"
+                                : chat.lastMessageType === MessageType.LINK
+                                  ? "Sent a link"
+                                  : chat.lastMessage
                         : "No messages"}
                     </p>
                     {chat.isSeen && (
@@ -279,7 +289,6 @@ const ChatList = ({
         </MenuItems>
       </Menu>
 
-      {/* Render the modals */}
       <ModalCreateNewChat isOpen={modalCreateChatOpen} setIsOpen={setModalCreateNewChatOpen} />
       <ModalCreateNewGroupChat isOpen={modalCreateGroupChatOpen} setIsOpen={setModalCreateNewGroupChatOpen} />
       <ModalProfile
@@ -287,30 +296,22 @@ const ChatList = ({
         setIsOpen={setModalProfileOpen}
         setIsChangePasswordModalOpen={setIsChangePasswordModalOpen}
         friend={undefined}
+        dataProfile={dataProfile}
       />
       {isChangePasswordModalOpen ? (
         <ChangePasswordModal isOpen={isChangePasswordModalOpen} setIsOpen={handleCloseChangePassword} />
       ) : (
         <ModalProfile
+          dataProfile={dataProfile}
           isOpen={isModalProfileOpen}
           setIsOpen={setIsProfileModalOpen}
           setIsChangePasswordModalOpen={handleOpenChangePassword}
           friend={undefined}
         />
       )}
-      <ModalFriendList
-        isOpen={isFriendListModalOpen}
-        setIsOpen={setIsFriendListModalOpen}
-      />
-      <ModalFriendRequests
-        isOpen={isFriendRequestModalOpen}
-        setIsOpen={setIsFriendRequestModalOpen}
-      />
-      <ModalListGroup
-        isOpen={modalListGroup}
-        setIsOpen={setModalListGroup}
-        isAdmin={true}
-      />
+      <ModalFriendList isOpen={isFriendListModalOpen} setIsOpen={setIsFriendListModalOpen} />
+      <ModalFriendRequests isOpen={isFriendRequestModalOpen} setIsOpen={setIsFriendRequestModalOpen} />
+      <ModalListGroup isOpen={modalListGroup} setIsOpen={setModalListGroup} isAdmin={true} />
     </div>
   )
 }

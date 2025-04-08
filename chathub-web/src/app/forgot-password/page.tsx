@@ -9,14 +9,24 @@ import ModalOTP from "~/components/modal-otp"
 import { Button } from "~/components/ui/button"
 import { Input } from "~/components/ui/input"
 import { Images } from "~/constants/images"
-import { useFindUserByPhoneNumber } from "~/hooks/use-user"
+import { useFindUserByPhoneNumber } from "~/hooks/use-find-user-by-phone-number"
 import { auth, signInWithPhoneNumber } from "~/lib/firebase"
 
+const removeCountryCode = (input: string) => {
+  let value = input.replace(/\s/g, "") // xóa khoảng trắng
+
+  if (value.startsWith("+84")) {
+    value = "0" + value.slice(3) // thay +84 bằng 0
+  }
+
+  return value
+}
 const ForgotPasswordPage: React.FC = () => {
   const [phoneNumber, setPhoneNumber] = useState("")
   const [openModal, setOpenModal] = useState(false)
   const [confirmationResult, setConfirmationResult] = useState<ConfirmationResult>()
   const [recaptchaVerifier, setRecaptchaVerifier] = useState<RecaptchaVerifier | null>(null)
+  const { user, loading, error, checkPhoneNumber } = useFindUserByPhoneNumber()
 
   useEffect(() => {
     if (!recaptchaVerifier) {
@@ -48,8 +58,8 @@ const ForgotPasswordPage: React.FC = () => {
     }
 
     if (loading) return
-
-    await checkPhoneNumber(formatPhoneNumber(phoneNumber))
+    await checkPhoneNumber(removeCountryCode(phoneNumber))
+    console.log("User data: abs", user)
     if (!user) {
       toast.error("Phone number not found!")
       return
@@ -105,8 +115,7 @@ const ForgotPasswordPage: React.FC = () => {
         <Button
           onClick={handleSubmit}
           className={`w-full py-4 text-lg text-white rounded-[12px] bg-gradient-to-r from-[#501794] to-[#3E70A1] hover:bg-gradient-to-l
-            ${!isFormValid ? "opacity-50 cursor-not-allowed" : ""}`
-          }
+            ${!isFormValid ? "opacity-50 cursor-not-allowed" : ""}`}
           disabled={!isFormValid}
         >
           Continue

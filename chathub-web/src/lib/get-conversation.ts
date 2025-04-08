@@ -8,7 +8,6 @@ import {
   UpdateGroupInfoRequest,
   UpdateNickNameRequest,
 } from "~/codegen/data-contracts"
-import { ContentType } from "~/codegen/http-client"
 
 const conversationInstance = new Conversation({ baseUrl: process.env.API_URL })
 
@@ -16,11 +15,16 @@ export async function getRecentConversationByUserID(userId: number, token: strin
   try {
     if (!userId) return null
 
-    const response = (await conversationInstance.getRecentConversations({ userId }, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }).then(res => res.json())) as ConversationResponse[]
+    const response = (await conversationInstance
+      .getRecentConversations(
+        { userId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      )
+      .then(res => res.json())) as ConversationResponse[]
     return response
   } catch (error) {
     console.error("Error checking admin token:", error)
@@ -31,7 +35,7 @@ export async function getRecentConversationByUserID(userId: number, token: strin
 export async function createConversationAPI(data: ConversationRequest, token: string) {
   try {
     if (!data || !data.chatType) {
-      throw new Error("Chat type is required.");
+      throw new Error("Chat type is required.")
     }
 
     const response = await conversationInstance.createConversation(
@@ -40,37 +44,48 @@ export async function createConversationAPI(data: ConversationRequest, token: st
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      }
-    );
-    return response; 
+      },
+    )
+    return response
   } catch (error) {
-    console.error("Error creating conversation:", error);
-    throw error;
+    console.error("Error creating conversation:", error)
+    throw error
   }
 }
 
 export async function leaveConversation(conversationId: number, userId: number, token?: string) {
   try {
-    const response = (await conversationInstance.leaveGroupConversation(conversationId, { userId: userId }, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }).then(res => res.json())) as SuccessResponse
+    const response = (await conversationInstance
+      .leaveGroupConversation(
+        conversationId,
+        { userId: userId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      )
+      .then(res => res.json())) as SuccessResponse
     return response
   } catch (error) {
-    console.error("Error leaving conversation:", error);
-    return null;
+    console.error("Error leaving conversation:", error)
+    return null
   }
 }
 
 export async function putDissolveGroup(conversationId: number, userId: number, token?: string) {
   try {
-
-    const response = (await conversationInstance.dissolveGroupConversation(conversationId, { userId: userId }, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }).then(res => res.json())) as SuccessResponse
+    const response = (await conversationInstance
+      .dissolveGroupConversation(
+        conversationId,
+        { userId: userId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      )
+      .then(res => res.json())) as SuccessResponse
     return response
   } catch (error) {
     console.error("Error dissolving group conversation:", error)
@@ -81,14 +96,18 @@ export async function putDissolveGroup(conversationId: number, userId: number, t
 export async function getGroupConversationsByUserId(userId: number, token: string) {
   try {
     if (!userId) return null
-    const response = (await conversationInstance.getGroupConversations({ userId: userId }, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }).then(res => res.json())) as ConversationResponse[]
+    const response = (await conversationInstance
+      .getGroupConversations(
+        { userId: userId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      )
+      .then(res => res.json())) as ConversationResponse[]
     return response
-  }
-  catch {
+  } catch {
     return null
   }
 }
@@ -96,11 +115,17 @@ export async function getGroupConversationsByUserId(userId: number, token: strin
 export async function findMessagesByConversationId(conversationId: number, message: string, token: string) {
   try {
     if (!conversationId || !message) return null
-    const response = (await conversationInstance.findMessage(conversationId, { message }, {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    }).then(res => res.json())) as MessageFindedResponse[]
+    const response = (await conversationInstance
+      .findMessage(
+        conversationId,
+        { message },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      )
+      .then(res => res.json())) as MessageFindedResponse[]
     return response
   } catch (error) {
     console.error("Error checking admin token:", error)
@@ -108,56 +133,47 @@ export async function findMessagesByConversationId(conversationId: number, messa
   }
 }
 
-export const getChatDetailSectionAPI = async (
-  conversationId: number,
-  userId: number,
-  token: string,
-) => {
+export const getChatDetailSectionAPI = async (conversationId: number, userId: number, token: string) => {
   try {
-    const response = (await conversationInstance.getChatDetailSection(
-      conversationId,
-      { userId },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
+    const response = (await conversationInstance
+      .getChatDetailSection(
+        conversationId,
+        { userId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
-      },
-    ).then(res => res.json())) as ChatDetailSectionResponse;
-    return response;
+      )
+      .then(res => res.json())) as ChatDetailSectionResponse
+    return response
   } catch (error) {
-    console.error("Error fetching chat detail section:", error);
-    return null;
-  }
-};
-
-export const updateGroupInfoAPI = async (
-  conversationId: number,
-  data: UpdateGroupInfoRequest,
-  token: string,
-) => {
-  try {
-    const response = (await conversationInstance.updateGroupInfo(
-      conversationId,
-      { request: data },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      },
-    ).then(res => res.json())) as SuccessResponse;
-    return response;
-  } catch (error) {
-    console.error("Error updating group info:", error);
-    return null;
+    console.error("Error fetching chat detail section:", error)
+    return null
   }
 }
 
-export const pinConversationAPI = async (
-  conversationId: number,
-  userId: number,
-  isPinned: boolean,
-  token: string,
-) => {
+export const updateGroupInfoAPI = async (conversationId: number, data: UpdateGroupInfoRequest, token: string) => {
+  try {
+    const response = (await conversationInstance
+      .updateGroupInfo(
+        conversationId,
+        { request: data },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      )
+      .then(res => res.json())) as SuccessResponse
+    return response
+  } catch (error) {
+    console.error("Error updating group info:", error)
+    return null
+  }
+}
+
+export const pinConversationAPI = async (conversationId: number, userId: number, isPinned: boolean, token: string) => {
   try {
     const response = await conversationInstance.pinConversation(
       conversationId,
@@ -167,13 +183,13 @@ export const pinConversationAPI = async (
           Authorization: `Bearer ${token}`,
         },
       },
-    );
-    return response;
+    )
+    return response
   } catch (error: any) {
-    console.error("Error pinning conversation:", error);
-    return null;
+    console.error("Error pinning conversation:", error)
+    return null
   }
-};
+}
 
 export const unpinConversationAPI = async (
   conversationId: number,
@@ -190,86 +206,75 @@ export const unpinConversationAPI = async (
           Authorization: `Bearer ${token}`,
         },
       },
-    );
-    return { success: true, data: response };
-
+    )
+    return { success: true, data: response }
   } catch (error: any) {
-    console.error("Error unpinning conversation:", error);
+    console.error("Error unpinning conversation:", error)
     return {
       success: false,
-      error: error.message || "Failed to unpin conversation"
-    };
+      error: error.message || "Failed to unpin conversation",
+    }
   }
-};
+}
 
-export const dissolveGroupConversationAPI = async (
-  conversationId: number,
-  userId: number,
-  token: string,
-) => {
+export const dissolveGroupConversationAPI = async (conversationId: number, userId: number, token: string) => {
   try {
-    const response = (await conversationInstance.dissolveGroupConversation(
-      conversationId,
-      { userId },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
+    const response = (await conversationInstance
+      .dissolveGroupConversation(
+        conversationId,
+        { userId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
-      },
-    ).then(res => res.json())) as SuccessResponse;
-    return response;
+      )
+      .then(res => res.json())) as SuccessResponse
+    return response
   } catch (error) {
-    console.error("Error dissolving group conversation:", error);
-    return null;
+    console.error("Error dissolving group conversation:", error)
+    return null
   }
-};
+}
 
-export const deleteConversationAPI = async (
-  conversationId: number,
-  userId: number,
-  token: string,
-) => {
+export const deleteConversationAPI = async (conversationId: number, userId: number, token: string) => {
   try {
-    const response = (await conversationInstance.deleteConversation(
-      conversationId,
-      { userId },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
+    const response = (await conversationInstance
+      .deleteConversation(
+        conversationId,
+        { userId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
-      },
-    ).then(res => res.json())) as SuccessResponse;
-    return { success: true, data: response };
+      )
+      .then(res => res.json())) as SuccessResponse
+    return { success: true, data: response }
   } catch (error) {
-    console.error("Error deleting conversation:", error);
+    console.error("Error deleting conversation:", error)
     return {
       success: false,
-      error: error.message || "Failed to delete conversation"
-    };
+      error: error.message || "Failed to delete conversation",
+    }
   }
-};
+}
 
-export const addMembersToConversationAPI = async (
-  conversationId: number,
-  memberIds: number[],
-  token: string,
-) => {
+export const addMembersToConversationAPI = async (conversationId: number, memberIds: number[], token: string) => {
   try {
-    const response = (await conversationInstance.addMembersToConversation(
-      conversationId,
-      memberIds,
-      {
+    const response = (await conversationInstance
+      .addMembersToConversation(conversationId, memberIds, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      },
-    ).then(res => res.json())) as SuccessResponse;
-    return response;
+      })
+      .then(res => res.json())) as SuccessResponse
+    return response
   } catch (error) {
-    console.error("Error adding members to conversation:", error);
-    return null;
+    console.error("Error adding members to conversation:", error)
+    return null
   }
-};
+}
 
 export const removeParticipantFromGroupConversationAPI = async (
   conversationId: number,
@@ -278,77 +283,76 @@ export const removeParticipantFromGroupConversationAPI = async (
   token: string,
 ) => {
   try {
-    const response = (await conversationInstance.removeParticipantFromGroupConversation(
-      conversationId,
-      { userId, participantId },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
+    const response = (await conversationInstance
+      .removeParticipantFromGroupConversation(
+        conversationId,
+        { userId, participantId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
-      },
-    ).then(res => res.json())) as SuccessResponse;
-    return response;
+      )
+      .then(res => res.json())) as SuccessResponse
+    return response
   } catch (error) {
-    console.error("Error removing participant:", error);
-    return null;
+    console.error("Error removing participant:", error)
+    return null
   }
-};
+}
 
-export const leaveGroupConversationAPI = async (
-  conversationId: number,
-  userId: number,
-  token: string,
-) => {
+export const leaveGroupConversationAPI = async (conversationId: number, userId: number, token: string) => {
   try {
-    const response = (await conversationInstance.leaveGroupConversation(
-      conversationId,
-      { userId },
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
+    const response = (await conversationInstance
+      .leaveGroupConversation(
+        conversationId,
+        { userId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         },
-      },
-    ).then(res => res.json())) as SuccessResponse;
-    return response;
+      )
+      .then(res => res.json())) as SuccessResponse
+    return response
   } catch (error) {
-    console.error("Error leaving group conversation:", error);
-    return null;
+    console.error("Error leaving group conversation:", error)
+    return null
   }
-};
+}
 
 export async function findGroupsAPI(userId: number, groupName: string, token: string) {
   try {
-    if (!userId) return [];
-    console.log("Calling API findGroupsAPI with:", { userId, groupName });
+    if (!userId) return []
+    console.log("Calling API findGroupsAPI with:", { userId, groupName })
     const response = await conversationInstance.findGroupConversations(
       { userId, groupName },
       {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      }
-    );
-    console.log("API Response:", response);
-    return response.data || [];
+      },
+    )
+    console.log("API Response:", response)
+    return response.data || []
   } catch (error) {
-    console.error("Error fetching groups:", error);
-    return [];
+    console.error("Error fetching groups:", error)
+    return []
   }
-};
+}
 
 export const updateNicknameAPI = async (data: UpdateNickNameRequest, token: string) => {
   try {
-    const response = (await conversationInstance.updateNickname(
-      data,
-      {
+    const response = (await conversationInstance
+      .updateNickname(data, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      },
-    ).then((res) => res.json())) as SuccessResponse;
-    return response;
+      })
+      .then(res => res.json())) as SuccessResponse
+    return response
   } catch (error) {
-    console.error("Error updating nickname:", error);
-    return null;
+    console.error("Error updating nickname:", error)
+    return null
   }
-};
+}
