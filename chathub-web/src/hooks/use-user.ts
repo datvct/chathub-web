@@ -77,10 +77,10 @@ export const useCurrentUserProfile = (userId: number | null, token: string | nul
   const [error, setError] = useState<string | null>(null);
 
   const fetchProfile = useCallback(async () => {
-    // if (!userId || !token) {
-    //   setProfile(null);
-    //   return;
-    // }
+    if (!userId || !token) {
+      setProfile(null);
+      return;
+    }
     setIsLoading(true);
     setError(null);
     try {
