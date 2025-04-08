@@ -1,7 +1,7 @@
 "use client"
 
-import React, { useState, useEffect } from "react"
-import { Camera } from "lucide-react"
+import React, { useState, useEffect, useCallback, Fragment } from "react"
+import { Camera, X as IconX } from "lucide-react"
 import Image from "next/image"
 import { Dialog, DialogPanel, DialogTitle, Transition, TransitionChild } from "@headlessui/react"
 import { Input } from "./ui/input"
@@ -13,112 +13,142 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider"
 import { DatePicker } from "@mui/x-date-pickers/DatePicker"
 import { useSelector } from "react-redux"
 import { RootState } from "~/lib/reudx/store"
-import { useUpdateProfile } from "~/hooks/use-user"
+import { useUpdateProfile, useCurrentUserProfile } from "~/hooks/use-user"
 import { ChangeProfileRequest, UserDTO } from "~/codegen/data-contracts"
 import dayjs from "dayjs"
 import { toast, ToastContainer } from "react-toastify"
-import { findUserById } from "~/lib/get-user"
+import "react-toastify/dist/ReactToastify.css"
 
 interface ProfileModalProps {
   isOpen: boolean
   setIsOpen: (open: boolean) => void
-  setIsChangePasswordModalOpen?: any
-  friend: UserDTO | null
-  dataProfile: UserDTO | null
+  setIsChangePasswordModalOpen?: (open: boolean) => void
 }
 
-const ProfileModal: React.FC<ProfileModalProps> = ({
-  isOpen,
-  setIsOpen,
-  setIsChangePasswordModalOpen,
-  friend,
-  dataProfile,
-}) => {
+const ProfileModal: React.FC<ProfileModalProps> = ({ isOpen, setIsOpen, setIsChangePasswordModalOpen }) => {
   const userId = useSelector((state: RootState) => state.auth.userId)
   const token = useSelector((state: RootState) => state.auth.token)
-  const { updateProfile, loading } = useUpdateProfile()
-  const [selectedImage, setSelectedImage] = useState<string | null>(null)
-  const [profileData, setProfileData] = useState<UserDTO | null>(null)
+
+  const [formData, setFormData] = useState<Partial<UserDTO>>({})
+  const [selectedImageFile, setSelectedImageFile] = useState<File | null>(null)
+  const [previewImage, setPreviewImage] = useState<string | null>(null)
+  const [dateValue, setDateValue] = useState<dayjs.Dayjs | null>(null)
+
+  const {
+    profile: initialUserData,
+    isLoading: isLoadingProfile,
+    error: profileError,
+    fetchProfile,
+  } = useCurrentUserProfile(userId, token)
+
+  const {
+    updateProfile,
+    loading: isUpdatingProfile,
+  } = useUpdateProfile()
+
+  useEffect(() => {
+    if (initialUserData) {
+      console.log("Syncing initialUserData to form:", initialUserData)
+      setFormData({
+        name: initialUserData.name,
+        dateOfBirth: initialUserData.dateOfBirth,
+        gender: initialUserData.gender as "MALE" | "FEMALE" | undefined,
+      })
+      setDateValue(initialUserData.dateOfBirth ? dayjs(initialUserData.dateOfBirth) : null)
+      if (previewImage === null || !previewImage.startsWith("blob:")) {
+        setPreviewImage(initialUserData.avatar || null)
+      }
+    } else {
+      setFormData({})
+      setDateValue(null)
+      setPreviewImage(null)
+      setSelectedImageFile(null)
+    }
+  }, [initialUserData])
+
   const handleOpenChangePassword = () => {
     setIsOpen(false)
-    setIsChangePasswordModalOpen(true)
+    if (setIsChangePasswordModalOpen) {
+      setIsChangePasswordModalOpen(true)
+    }
   }
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (file) {
-      setSelectedImage(URL.createObjectURL(file))
+      if (file.size > 2 * 1024 * 1024) {
+        toast.error("Image size < 2MB.")
+        return
+      }
+      if (!["image/jpeg", "image/png", "image/gif"].includes(file.type)) {
+        toast.error("Invalid image file (JPG, PNG, GIF).")
+        return
+      }
+      setSelectedImageFile(file)
+      setPreviewImage(URL.createObjectURL(file))
     }
   }
 
-  const handleChange = (field: keyof UserDTO, value: string | Date | "MALE" | "FEMALE") => {
-    setProfileData(prev => ({
-      ...prev,
-      ...(prev && { [field]: value }),
-    }))
+  const handleInputChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = event.target
+    setFormData(prev => ({ ...prev, [name]: value }))
   }
 
-  const [date, setDate] = useState(dayjs(profileData?.dateOfBirth))
-
-  const handleDateOfBirth = (newDate: dayjs.Dayjs | null) => {
-    setDate(newDate || dayjs())
-    setProfileData(prev => ({
-      ...prev,
-      dateOfBirth: newDate ? newDate.toISOString() : prev?.dateOfBirth,
-    }))
+  const handleGenderChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData(prev => ({ ...prev, gender: event.target.value as "MALE" | "FEMALE" }))
   }
 
-  useEffect(() => {
-    if (dataProfile) {
-      setProfileData({
-        id: dataProfile.id,
-        phoneNumber: dataProfile.phoneNumber,
-        name: dataProfile.name || "",
-        dateOfBirth: dataProfile.dateOfBirth,
-        gender: dataProfile.gender as "MALE" | "FEMALE",
-        avatar: dataProfile.avatar,
-        status: dataProfile.status,
-      })
-    } else {
-      setProfileData(dataProfile)
-    }
-  }, [dataProfile])
+  const handleDateChange = (newDate: dayjs.Dayjs | null) => {
+    setDateValue(newDate)
+    setFormData(prev => ({ ...prev, dateOfBirth: newDate ? newDate.format("YYYY-MM-DD") : undefined }))
+  }
 
   const handleSubmit = async () => {
-    const formattedDate = dayjs(profileData.dateOfBirth).format("YYYY/MM/DD")
-
-    const data: ChangeProfileRequest = {
-      id: userId!,
-      name: profileData?.name || "",
-      avatar: selectedImage
-        ? await fetch(selectedImage)
-            .then(res => res.blob())
-            .then(blob => new File([blob], "avatar.jpg", { type: blob.type }))
-        : new File([await fetch(friend?.avatar || Images.AvatarDefault.src).then(res => res.blob())], "avatar.jpg", {
-            type: "image/jpeg",
-          }),
-      dateOfBirth: formattedDate,
-      gender: (profileData?.gender as "MALE" | "FEMALE") || "MALE",
+    if (!userId || !token) {
+      toast.error("Authentication error.")
+      return
+    }
+    if (!formData.name?.trim()) {
+      toast.error("Display Name cannot be empty.")
+      return
     }
 
+    const dataForHook: ChangeProfileRequest = {
+      id: userId,
+      name: formData.name.trim(),
+      ...(formData.dateOfBirth && { dateOfBirth: formData.dateOfBirth }),
+      ...(formData.gender && { gender: formData.gender }),
+      ...(selectedImageFile && { avatar: selectedImageFile }),
+    }
+
+    console.log("Submitting profile update (as object):", dataForHook)
+
     try {
-      const response = await updateProfile(data, token!)
-      if (response) {
-        toast.success("Updated profile successfully")
-        setTimeout(() => {
-          setIsOpen(false)
-        }, 5000)
+      const response = await updateProfile(dataForHook, token)
+      console.log("Update profile response:", response)
+
+      if (response?.statusCode === 200) {
+        toast.success("Profile updated successfully!", { autoClose: 2000 })
+        setSelectedImageFile(null)
+        await fetchProfile()
+      } else {
+        console.error(response?.message || "Failed to update profile.")
       }
     } catch (error: any) {
-      toast.error("Failed to update profile. Please try again later!")
+      console.error("Update profile failed:", error)
+      const msg = error?.message || "An error occurred. Please try again."
+      toast.error(msg)
     }
   }
 
+  const renderLoadingInsideModal = isLoadingProfile && !initialUserData && isOpen
+  const renderErrorInsideModal = !!profileError && !initialUserData && isOpen
+
   return (
-    <Transition appear show={isOpen} as={React.Fragment}>
-      <Dialog as="div" className="relative z-50" onClose={() => setIsOpen(false)}>
+    <Transition appear show={isOpen} as={Fragment}>
+      <Dialog as="div" className="relative z-50" onClose={() => !isUpdatingProfile && setIsOpen(false)}>
         <TransitionChild
-          as={React.Fragment}
+          as={Fragment}
           enter="ease-out duration-300"
           enterFrom="opacity-0"
           enterTo="opacity-100"
@@ -126,13 +156,13 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
           leaveFrom="opacity-100"
           leaveTo="opacity-0"
         >
-          <div className="fixed inset-0 bg-black bg-opacity-25" aria-hidden="true" />
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm" aria-hidden="true" />
         </TransitionChild>
 
         <div className="fixed inset-0 overflow-y-auto">
           <div className="flex min-h-full items-center justify-center p-4 text-center">
             <TransitionChild
-              as={React.Fragment}
+              as={Fragment}
               enter="ease-out duration-300"
               enterFrom="opacity-0 scale-95"
               enterTo="opacity-100 scale-100"
@@ -140,147 +170,235 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <DialogPanel className="w-full max-w-md transform overflow-hidden rounded-[5%] bg-white p-6 text-left align-middle shadow-xl transition-all">
-                <ToastContainer />
-                <DialogTitle
-                  as="h3"
-                  className="text-lg font-medium leading-6 text-gray-900 flex items-center justify-between"
-                >
-                  <span className="text-[25px] font-bold">Profile</span>
-                  <button onClick={() => setIsOpen(false)}>
-                    <Image src={Images.IconClosePurple} alt="close modal" width={40} height={40} />
-                  </button>
-                </DialogTitle>
+              <DialogPanel
+                className="w-full max-w-md transform overflow-hidden rounded-2xl
+                  bg-gradient-to-br from-gray-50 to-gray-100 p-6 text-left align-middle shadow-xl
+                  transition-all border border-gray-200"
+              >
+                <ToastContainer position="bottom-center" theme="colored" autoClose={3000} hideProgressBar />
 
-                <div className="mt-2">
-                  <div className="relative">
-                    <label htmlFor="profile-upload" className="relative cursor-pointer">
-                      {selectedImage ? (
-                        <Image
-                          src={selectedImage}
-                          alt="profile icon"
-                          width={100}
-                          height={100}
-                          className="cursor-pointer mx-auto w-24 h-24 rounded-[50px] border border-white transition duration-150 transform hover:scale-105 shadow-2xl hover:shadow-cyan"
-                        />
-                      ) : (
-                        <Image
-                          src={profileData?.avatar || Images.ProfileImage}
-                          alt="profile default"
-                          width={100}
-                          height={100}
-                          className="mx-auto cursor-pointer w-24 h-24 rounded-[50px] border border-white transition duration-150 transform hover:scale-105 shadow-2xl hover:shadow-cyan"
-                        />
-                      )}
-
-                      <span className="absolute bottom-[-10px] left-[55%] rounded-[50px] bg-[#F1F1F1] hover:bg-slate-300 w-[37px] h-[37px] flex items-center justify-center">
-                        <Camera className="text-[#797979] w-5 h-5" strokeWidth={1.5} />
-                      </span>
-
-                      <input
-                        id="profile-upload"
-                        type="file"
-                        accept=".png,.jpg,.gif,.jpeg"
-                        className="opacity-0 absolute top-0 inset-0 w-full h-full cursor-pointer"
-                        onChange={handleImageChange}
-                      />
-                    </label>
-                  </div>
-
-                  <div className="mt-4">
-                    <label htmlFor="display-name" className="block text-sm font-medium text-black">
-                      Display Name
-                    </label>
-
-                    <div className="mt-1">
-                      <Input
-                        id="display-name"
-                        type="text"
-                        value={profileData?.name}
-                        className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500"
-                        onChange={e => handleChange("name", e.target.value)}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="mt-4 relative">
-                    <label htmlFor="date-of-birth" className="block text-sm font-medium text-black">
-                      Date of Birth
-                    </label>
-
-                    <LocalizationProvider dateAdapter={AdapterDayjs}>
-                      <DemoContainer components={["DatePicker"]}>
-                        <DatePicker
-                          label="Date of Birth"
-                          value={date}
-                          onChange={handleDateOfBirth}
-                          className="w-full block bg-white border border-slate-300"
-                        />
-                      </DemoContainer>
-                    </LocalizationProvider>
-                  </div>
-
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium text-black">Gender</label>
-
-                    <div className="mt-2">
-                      <div className="flex items-center gap-x-3 mb-2.5">
-                        <input
-                          id="male"
-                          type="radio"
-                          value="Male"
-                          className="w-4 h-4 text-[#6568FF] bg-gray-100 border-gray-300"
-                          checked={profileData?.gender === "MALE"}
-                          onChange={() => handleChange("gender", "MALE")}
-                        />
-
-                        <label htmlFor="male" className="block text-sm leading-6">
-                          Male
-                        </label>
-                      </div>
-
-                      <div className="flex items-center gap-x-3">
-                        <input
-                          id="female"
-                          type="radio"
-                          value="Female"
-                          className="w-4 h-4 text-[#6568FF] bg-gray-100 border-gray-300"
-                          checked={profileData?.gender === "FEMALE"}
-                          onChange={() => handleChange("gender", "FEMALE")}
-                        />
-
-                        <label htmlFor="female" className="block text-sm leading-6">
-                          Female
-                        </label>
-                      </div>
-                    </div>
-                  </div>
-
-                  <button
-                    onClick={handleOpenChangePassword}
-                    className="bg-white w-full justify-between flex items-center border-[1px] rounded-lg px-3 h-[48px] hover:bg-slate-50 hover:text-gray-900 hover:border-[#93C1D2] border-[#D4D4D4] text-[#282828] mt-4"
-                  >
-                    <span>Change Password</span>
-                    <Image src={Images.IconNext} alt="Icon Next" width={10} height={10} />
-                  </button>
-
-                  <div className="flex items-end justify-end gap-4 mt-9 w-full">
-                    <Button
-                      onClick={handleSubmit}
-                      disabled={loading}
-                      className="w-30 px-4 py-2 bg-[#7746f5] rounded-[12px] text-lg text-white
-                        bg-gradient-to-r from-[#501794] to-[#3E70A1] hover:bg-gradient-to-l"
+                {renderLoadingInsideModal ? (
+                  <div className="flex flex-col items-center justify-center py-10">
+                    <svg
+                      className="animate-spin h-8 w-8 text-blue-600 mb-3"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
                     >
-                      {loading ? "Loading..." : "Save changes"}
+                      {" "}
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>{" "}
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                      ></path>{" "}
+                    </svg>
+                    <p className="text-gray-600">Loading Profile...</p>
+                  </div>
+                ) : renderErrorInsideModal ? (
+                  <div className="py-10 text-center">
+                    <DialogTitle as="h3" className="text-lg font-medium leading-6 text-red-700 mb-2">
+                      Error Loading Profile
+                    </DialogTitle>
+                    <p className="text-sm text-gray-600 mb-4">{profileError}</p>
+                    <Button
+                      onClick={() => {
+                        fetchProfile()
+                      }}
+                      variant="outline"
+                    >
+                      Retry
                     </Button>
                   </div>
-                </div>
+                ) : (
+                  <>
+                    <DialogTitle
+                      as="h3"
+                      className="text-xl font-semibold leading-6 text-gray-800 flex items-center justify-between mb-5"
+                    >
+                      <span>My Profile</span>
+                      <button
+                        onClick={() => !isUpdatingProfile && setIsOpen(false)}
+                        disabled={isUpdatingProfile}
+                        className="p-1 rounded-full text-gray-500 hover:bg-gray-200 transition-colors disabled:opacity-50"
+                      >
+                        <IconX size={20} />
+                      </button>
+                    </DialogTitle>
+
+                    <div className="mt-2 space-y-5">
+                      <div className="relative flex justify-center">
+                        <label htmlFor="profile-upload" className="relative cursor-pointer group">
+                          <Image
+                            src={previewImage || Images.ProfileImage.src}
+                            alt="Profile Avatar"
+                            width={112}
+                            height={112}
+                            className="mx-auto w-28 h-28 rounded-full border-4 border-white object-cover shadow-lg group-hover:opacity-90 transition-opacity bg-gray-300"
+                            key={previewImage || initialUserData?.avatar}
+                          />
+                          <div className="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <Camera className="text-white w-7 h-7" strokeWidth={1.5} />
+                          </div>
+                          <input
+                            id="profile-upload"
+                            type="file"
+                            accept="image/png, image/jpeg, image/gif"
+                            className="sr-only"
+                            onChange={handleImageChange}
+                          />
+                        </label>
+                      </div>
+
+                      <div>
+                        <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+                          Display Name
+                        </label>
+                        <Input
+                          id="name"
+                          name="name"
+                          type="text"
+                          value={formData?.name || initialUserData?.name}
+                          placeholder="Enter your display name"
+                          className="block w-full px-3 py-2 bg-white border border-gray-300 rounded-md text-sm shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                          onChange={handleInputChange}
+                        />
+                      </div>
+                      <div className="relative">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Date of Birth</label>
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                          {" "}
+                          <DatePicker
+                            value={dateValue}
+                            onChange={handleDateChange}
+                            format="DD/MM/YYYY"
+                            slotProps={{
+                              textField: {
+                                size: "small",
+                                fullWidth: true,
+                                placeholder: "Select date",
+                                InputLabelProps: { shrink: true },
+                                sx: {
+                                  "& .MuiOutlinedInput-root": {
+                                    backgroundColor: "white",
+                                    borderRadius: "0.375rem",
+                                    fontSize: "0.875rem",
+                                  },
+                                  "& .MuiInputLabel-root": { fontSize: "0.875rem" },
+                                },
+                              },
+                            }}
+                          />{" "}
+                        </LocalizationProvider>
+                      </div>
+                      <div>
+                        <label className="block text-sm font-medium text-gray-700 mb-1.5">Gender</label>
+                        <div className="mt-1 flex items-center space-x-6">
+                          <div className="flex items-center">
+                            <input
+                              id="male"
+                              type="radio"
+                              name="gender"
+                              value="MALE"
+                              className="h-4 w-4 text-blue-600 focus:ring-blue-500 cursor-pointer"
+                              checked={formData.gender === "MALE"}
+                              onChange={handleGenderChange}
+                            />{" "}
+                            <label htmlFor="male" className="ml-2 text-sm text-gray-800 cursor-pointer">
+                              Male
+                            </label>{" "}
+                          </div>
+                          <div className="flex items-center">
+                            <input
+                              id="female"
+                              type="radio"
+                              name="gender"
+                              value="FEMALE"
+                              className="h-4 w-4 text-pink-600 focus:ring-pink-500 cursor-pointer"
+                              checked={formData.gender === "FEMALE"}
+                              onChange={handleGenderChange}
+                            />{" "}
+                            <label htmlFor="female" className="ml-2 text-sm text-gray-800 cursor-pointer">
+                              Female
+                            </label>{" "}
+                          </div>
+                        </div>
+                      </div>
+                      {setIsChangePasswordModalOpen && (
+                        <button
+                          onClick={handleOpenChangePassword}
+                          className="w-full flex items-center justify-between text-left px-3 py-2.5 bg-white border rounded-md text-sm text-gray-700 shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        >
+                          {" "}
+                          <span>Change Password</span>{" "}
+                          {Images.IconNext && (
+                            <Image src={Images.IconNext} alt=">" width={12} height={12} className="opacity-50" />
+                          )}{" "}
+                        </button>
+                      )}
+                    </div>
+
+                    <div className="mt-8 pt-5 border-t border-gray-200 flex justify-end gap-3">
+                      <Button
+                        onClick={() => !isUpdatingProfile && setIsOpen(false)}
+                        variant="outline"
+                        className="px-5 py-2 rounded-lg border-gray-200 bg-gray-500 text-white hover:text-white hover:bg-gray-600"
+                        disabled={isUpdatingProfile}
+                      >
+                        {" "}
+                        Cancel {" "}
+                      </Button>
+                      <Button
+                        onClick={handleSubmit}
+                        disabled={isUpdatingProfile || isLoadingProfile}
+                        className="min-w-[120px] px-5 py-2 bg-gradient-to-r from-[#501794] to-[#3E70A1] hover:bg-gradient-to-l text-white rounded-md disabled:opacity-60 flex items-center justify-center"
+                      >
+                        {isUpdatingProfile ? (
+                          <>
+                            {" "}
+                            <svg
+                              className="animate-spin -ml-1 mr-2 h-4 w-4"
+                              xmlns="http://www.w3.org/2000/svg"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                            >
+                              {" "}
+                              <circle
+                                cx="12"
+                                cy="12"
+                                r="10"
+                                stroke="currentColor"
+                                strokeWidth="4"
+                                className="opacity-25"
+                              ></circle>{" "}
+                              <path
+                                fill="currentColor"
+                                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                                className="opacity-75"
+                              ></path>{" "}
+                            </svg>{" "}
+                            Saving...{" "}
+                          </>
+                        ) : (
+                          "Save Changes"
+                        )}
+                      </Button>
+                    </div>
+                  </>
+                )}
               </DialogPanel>
             </TransitionChild>
           </div>
         </div>
       </Dialog>
-    </Transition>
+    </Transition >
   )
 }
 
