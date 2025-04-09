@@ -6,7 +6,7 @@ import { Dialog, DialogPanel, DialogTitle, Transition, TransitionChild } from "@
 import { useSelector } from "react-redux"
 import { RootState } from "~/lib/reudx/store"
 import { Images } from "../constants/images"
-import { Search, X } from "lucide-react"
+import { Search } from "lucide-react"
 import { Button } from "./ui/button"
 import { Input } from "./ui/input"
 import DropdownFriendList from "./dropdown-friend-list"
@@ -17,26 +17,16 @@ import { useFriends } from "~/hooks/use-friends"
 import { useUnfriend } from "~/hooks/use-unfriend"
 import { toast } from "react-toastify"
 import { UserDTO } from "~/codegen/data-contracts"
-import { useSearchUserByNameOrPhone } from "~/hooks/use-user"
 
 const ModalFriendList: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) => void }> = ({ isOpen, setIsOpen }) => {
   const userId = useSelector((state: RootState) => state.auth.userId)
   const token = useSelector((state: RootState) => state.auth.token)
 
-  const {
-    friends: fetchedFriends,
-    loading,
-    error
-  } = useFriends(userId, token)
-
-  const {
-    unfriend,
-    isUnfriending,
-    unfriendUserId,
-    unfriendError
-  } = useUnfriend()
+  const { friends: fetchedFriends, loading, error } = useFriends(userId, token)
+  const { unfriend, isUnfriending, unfriendUserId, unfriendError } = useUnfriend()
 
   const [activeTab, setActiveTab] = useState("all")
+  const [searchTerm, setSearchTerm] = useState("")
   const [selectedFriend, setSelectedFriend] = useState<UserDTO | null>(null)
   const [isDropDownOpen, setIsDropDownOpen] = useState(false)
   const [isProfileViewModalOpen, setIsProfileViewModalOpen] = useState(false)
@@ -45,32 +35,15 @@ const ModalFriendList: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) =>
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
   const [friendIdToUnfriend, setFriendIdToUnfriend] = useState<number | null>(null);
   const [successMessage, setSuccessMessage] = useState<string>("");
-  const [searchTerm, setSearchTerm] = useState("")
-
-  const {
-    users,
-    loading: searchLoading,
-    search
-  } = useSearchUserByNameOrPhone();
 
   const handleOpenProfile = (friend: UserDTO) => {
     setSelectedFriend({ ...friend, gender: friend.gender as "Male" | "Female" })
     setIsProfileViewModalOpen(true)
   }
 
-  const handleSearch = () => {
-    if (searchTerm.trim() === "") return;
-    search(userId, searchTerm, token);
-  };
+  const filteredFriends = fetchedFriends?.filter(friend => friend.name.toLowerCase().includes(searchTerm.toLowerCase()))
 
-  const filteredFriends = fetchedFriends?.filter(friend =>
-    friend.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    friend.phoneNumber?.toLowerCase().includes(searchTerm.toLowerCase())
-  ) || [];
-
-  const friendsToDisplay = activeTab === "recent"
-    ? filteredFriends.filter(friend => friend.status === "ONLINE")
-    : filteredFriends;
+  const friendsToDisplay = activeTab === "recent" ? filteredFriends.filter(friend => friend.status === "ONLINE") : filteredFriends
 
   const handleUnfriendAction = async (friendId: number) => {
     if (!token || !userId || !friendId) return;
@@ -150,20 +123,12 @@ const ModalFriendList: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) =>
                   <div className="relative mb-4 rounded-lg">
                     <Input
                       type="text"
-                      placeholder="Search by name or phone"
+                      placeholder="Search by phoneNumber number or name"
                       value={searchTerm}
                       onChange={e => setSearchTerm(e.target.value)}
-                      className="w-full py-[22px] pl-12 pr-10 bg-[#fff] border border-[#545454] rounded-lg text-gray-900 focus:outline-none placeholder-[#828282] focus:border-indigo-500 focus:ring-indigo-500"
+                      className="w-full py-[22px] pl-12 pr-4 bg-[#fff] border border-[#545454] rounded-lg text-gray-900 focus:outline-none placeholder-[#828282] focus:border-indigo-500 focus:ring-indigo-500"
                     />
-                    <Search className="absolute top-1/2 left-4 -translate-y-1/2 text-gray-500" />
-                    {searchTerm && (
-                      <button
-                        onClick={() => setSearchTerm('')}
-                        className="absolute top-1/2 right-4 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                      >
-                        <X size={18} />
-                      </button>
-                    )}
+                    <Search className="h-8 w-8 absolute top-1/2 left-4 -translate-y-1/2 text-gray-400 pr-2" />
                   </div>
 
                   <div className="flex space-x-4 mb-5">
@@ -176,7 +141,7 @@ const ModalFriendList: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) =>
                         }`
                       }
                     >
-                      All ({filteredFriends.length})
+                      All ({fetchedFriends?.length || 0})
                     </button>
                     <button
                       onClick={() => setActiveTab("recent")}
@@ -186,23 +151,17 @@ const ModalFriendList: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) =>
                           : "bg-[#8C8595] hover:bg-[#7746F5]"
                         }`}
                     >
-                      Recently online ({filteredFriends.filter(friend => friend.status == "ONLINE")?.length || 0})
+                      Recently online ({fetchedFriends?.filter(friend => friend.status == "ONLINE")?.length || 0})
                     </button>
                   </div>
 
                   <div className="max-h-[55vh] overflow-y-auto custom-scrollbar pr-2">
                     {loading ? (
-                      <div className="flex justify-center items-center h-32">
-                        <div className="loader"></div>
-                      </div>
+                      <div>Loading friends...</div>
                     ) : error ? (
-                      <div className="text-center text-red-400">
-                        Error loading friends: {error}
-                      </div>
+                      <div>Error loading friends: {error}</div>
                     ) : !friendsToDisplay || friendsToDisplay.length === 0 ? (
-                      <div className="text-center text-gray-400">
-                        No friends found matching criteria.
-                      </div>
+                      <div>No friends found.</div>
                     ) : (
                       friendsToDisplay.map((friend, index) => {
                         return (
@@ -210,15 +169,12 @@ const ModalFriendList: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) =>
                             key={index}
                             className="flex items-center odd:bg-[#E4DEED] even:bg-[#AF9CC9] rounded-lg p-3 mb-3 space-x-3"
                           >
-                            <Image
-                              src={friend.avatar || Images.AvatarDefault}
-                              alt={friend.name}
-                              width={45} height={45}
-                              className="rounded-full"
-                            />
+                            <Image src={friend.avatar} alt={friend.name} width={45} height={45} className="rounded-full" />
 
                             <div className="flex-1">
-                              <p className="text-black font-medium">{friend.name}</p>
+                              <div className="flex items-start justify-between">
+                                <p className="text-black font-medium">{friend.name}</p>
+                              </div>
                               <p className="text-gray-600 text-sm">{friend.phoneNumber}</p>
                             </div>
 
@@ -260,9 +216,7 @@ const ModalFriendList: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) =>
         onConfirm={handleConfirmUnfriendYes}
         onCancel={handleConfirmUnfriendCancel}
         title="Confirm Unfriend"
-        message={`
-          Are you sure you want to unfriend ${fetchedFriends?.find(f => f.id === friendIdToUnfriend)?.name || 'this friend'}?
-        `}
+        message={`Are you sure you want to unfriend ${selectedFriend?.name}?`}
       />
       <ModalSuccess
         isOpen={isSuccessModalOpen}
