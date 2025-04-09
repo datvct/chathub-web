@@ -11,7 +11,7 @@ import { ChangePasswordRequest } from "~/codegen/data-contracts"
 import { useChangePassword } from "../hooks/use-change-password"
 import { useSelector } from "react-redux"
 import { RootState } from "~/lib/reudx/store"
-import { toast } from "react-toastify"
+import { toast, ToastContainer } from "react-toastify"
 
 interface ChangePasswordModalProps {
   isOpen: boolean
@@ -42,9 +42,18 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ isOpen, setIs
       return
     }
 
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{6,20}$/
+
     if (newPassword !== confirmNewPassword) {
       setErrorMessage("New passwords do not match.")
       setLoading(false)
+      return
+    }
+
+    if (!passwordRegex.test(newPassword)) {
+      toast.error(
+        "Password must be 6-20 characters and include at least one uppercase letter, one lowercase letter, one number, and one special character (!@#$%^&*).",
+      )
       return
     }
 
@@ -58,7 +67,7 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ isOpen, setIs
     const response = await changePassword(data)
     if (response.success) {
       toast.success("Changed password successfully!")
-      alert("Changed password successfully!")
+
       setIsOpen(false)
     } else {
       setErrorMessage(response.error || "Failed to change password.")
@@ -69,6 +78,8 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ isOpen, setIs
 
   return (
     <Transition appear show={isOpen} as={Fragment}>
+      <ToastContainer position="top-center" autoClose={3000} closeOnClick />
+
       <Dialog as="div" className="relative z-50" onClose={() => setIsOpen(false)}>
         <TransitionChild
           as={Fragment}
