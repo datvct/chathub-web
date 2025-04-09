@@ -58,9 +58,8 @@ const ForgotPasswordPage: React.FC = () => {
     }
 
     if (loading) return
-    await checkPhoneNumber(removeCountryCode(phoneNumber))
-    console.log("User data: abs", user)
-    if (!user) {
+    const res = await checkPhoneNumber(removeCountryCode(phoneNumber))
+    if (!res.isSuccess) {
       toast.error("Phone number not found!")
       return
     }
