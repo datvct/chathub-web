@@ -12,7 +12,7 @@ import { ChangePasswordRequest } from "~/codegen/data-contracts"
 
 const ResetPasswordPage: React.FC = () => {
   const searchParams = useSearchParams()
-  const userId = searchParams.get("userId") // Lấy số điện thoại từ URL
+  const userId = searchParams.get("userId")
   const { changePassword } = useChangePassword()
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
@@ -36,6 +36,15 @@ const ResetPasswordPage: React.FC = () => {
       return
     }
 
+    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*])[A-Za-z\d!@#$%^&*]{6,20}$/
+
+    if (!passwordRegex.test(password)) {
+      toast.error(
+        "Password must be 6-20 characters and include at least one uppercase letter, one lowercase letter, one number, and one special character (!@#$%^&*).",
+      )
+      return
+    }
+
     const data: ChangePasswordRequest = {
       id: parseInt(userId),
       newPassword: password,
@@ -43,7 +52,6 @@ const ResetPasswordPage: React.FC = () => {
     }
 
     const response = await changePassword(data)
-    console.log("response", response)
     if (response.success) {
       toast.success("Rest password successfully!", {
         position: "top-right",
