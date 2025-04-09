@@ -112,18 +112,6 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
       gender: (profileData?.gender as "MALE" | "FEMALE") || "MALE",
     }
 
-    if (selectedImage) {
-      if (selectedImage !== profileData.avatar) {
-        const avatarFile = await fetch(selectedImage)
-          .then(res => res.blob())
-          .then(blob => new File([blob], "avatar.jpg", { type: blob.type }));
-  
-        data.avatar = avatarFile;
-      }
-    } else if (!selectedImage && profileData?.avatar) {
-      delete data.avatar;
-    }
-
     try {
       const response = await updateProfile(data, token!)
       if (response) {
