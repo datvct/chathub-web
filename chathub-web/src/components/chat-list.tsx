@@ -144,6 +144,15 @@ const ChatList = ({ setSelectedChat, setIsGroupChat, setConversationData, onPinC
           <MenuItem>
             <button
               className="w-full group rounded-lg px-4 py-2 flex items-center cursor-pointer hover:bg-gray-600"
+            >
+              <Image src={Images.IconUserSearch} alt="FriendList" width={24} height={24} />
+              <span className="ml-3 block font-medium truncate">Find Friend</span>
+            </button>
+          </MenuItem>
+
+          <MenuItem>
+            <button
+              className="w-full group rounded-lg px-4 py-2 flex items-center cursor-pointer hover:bg-gray-600"
               onClick={() => setIsFriendRequestModalOpen(true)}
             >
               <Image src={Images.IconAddFriend} alt="Friend Requests" width={24} height={24} />
@@ -158,6 +167,15 @@ const ChatList = ({ setSelectedChat, setIsGroupChat, setConversationData, onPinC
             >
               <Image src={Images.IconGroup} alt="Group List" width={24} height={24} />
               <span className="ml-3 block font-medium truncate">Group List</span>
+            </button>
+          </MenuItem>
+
+          <MenuItem>
+            <button
+              className="w-full group rounded-lg px-4 py-2 flex items-center cursor-pointer hover:bg-gray-600"
+            >
+              <Image src={Images.IconLogOut} alt="FriendList" width={24} height={24} />
+              <span className="ml-3 block font-medium truncate">Log Out</span>
             </button>
           </MenuItem>
         </MenuItems>
