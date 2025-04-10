@@ -24,7 +24,7 @@ const ChatInput = ({ onSendMessage }: { onSendMessage: (msg: string, messageType
   const [previewFile, setPreviewFile] = useState<string | null>(null)
 
   const handleLikeClick = () => {
-    onSendMessage("👍", MessageType.EMOJI)
+    onSendMessage("👍", MessageType.TEXT)
   }
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -52,10 +52,11 @@ const ChatInput = ({ onSendMessage }: { onSendMessage: (msg: string, messageType
     if (
       (fileType === MessageType.IMAGE && selectedFile.type.startsWith("image/")) ||
       (fileType === MessageType.VIDEO && selectedFile.type.startsWith("video/")) ||
-      (fileType === MessageType.DOCUMENT && selectedFile.type.startsWith("application/"))
+      (fileType === MessageType.DOCUMENT &&
+        (selectedFile.type.startsWith("application/") || selectedFile.type.startsWith("text/")))
     ) {
       setFile(selectedFile)
-      setPreviewFile(URL.createObjectURL(selectedFile)) // Tạo URL xem trước
+      setPreviewFile(URL.createObjectURL(selectedFile))
     } else {
       alert("Invalid file type. Please select a valid image, video, or document file.")
     }
@@ -65,9 +66,7 @@ const ChatInput = ({ onSendMessage }: { onSendMessage: (msg: string, messageType
     if (file) {
       try {
         const response = await fetch(
-          `http://localhost:8080/aws/s3/presigned-url?fileName=${encodeURIComponent(
-            file.name,
-          )}&contentType=${encodeURIComponent(file.type)}`,
+          `http://localhost:8080/aws/s3/presigned-url?fileName=${file.name}&contentType=${file.type}`,
           {
             method: "GET",
             headers: {
@@ -89,13 +88,11 @@ const ChatInput = ({ onSendMessage }: { onSendMessage: (msg: string, messageType
           },
         })
 
-        console.log(uploadResponse.url.split("?")[0], "urlFile")
         const messageType = file.type.startsWith("image/")
           ? MessageType.IMAGE
           : file.type.startsWith("video/")
-          ? MessageType.VIDEO
-          : MessageType.DOCUMENT
-        console.log(messageType, "messageType", uploadResponse.url.split("?")[0])
+            ? MessageType.VIDEO
+            : MessageType.DOCUMENT
         onSendMessage(uploadResponse.url.split("?")[0], messageType)
         setFile(null)
         setPreviewFile(null)
@@ -180,7 +177,7 @@ const ChatInput = ({ onSendMessage }: { onSendMessage: (msg: string, messageType
             type="file"
             ref={documentInputRef}
             className="hidden"
-            accept="application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            accept="application/*,text/*"
             onChange={handleFileChange}
           />
 

@@ -1,12 +1,12 @@
 import React, { useState, useRef, useEffect } from "react"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
-import { Button } from "./ui/button"
-import { Input } from "./ui/input"
-import { Images } from "../constants/images"
+import { Button } from "../ui/button"
+import { Input } from "../ui/input"
+import { Images } from "../../constants/images"
 import { Dialog, DialogPanel, DialogTitle, TransitionChild } from "@headlessui/react"
 import { Search, EllipsisVertical } from "lucide-react"
-import "../styles/custom-scroll.css"
+import "../../styles/custom-scroll.css"
 import { LogOut } from "lucide-react"
 import { CircleX } from "lucide-react"
 import { useSelector } from "react-redux"
@@ -20,31 +20,23 @@ interface ModalListGroupProps {
   isAdmin: boolean
 }
 
-const ModalListGroup: React.FC<ModalListGroupProps> = ({
-  isOpen,
-  setIsOpen,
-  isAdmin
-}) => {
-  const router = useRouter();
+const ModalListGroup: React.FC<ModalListGroupProps> = ({ isOpen, setIsOpen, isAdmin }) => {
+  const router = useRouter()
 
   const userId = useSelector((state: RootState) => state.auth.userId)
   const token = useSelector((state: RootState) => state.auth.token)
 
   const [dataGroup, setDataGroup] = useState<ConversationResponse[]>([])
   const [groupName, setGroupName] = useState<string>("")
-  const [activeTab, setActiveTab] = useState<string>("all");
+  const [activeTab, setActiveTab] = useState<string>("all")
 
-  const {
-    groups: fetchedGroups,
-    getGroupConversations,
-    findGroups,
-  } = useConversation(userId, token)
+  const { groups: fetchedGroups, getGroupConversations, findGroups } = useConversation(userId, token)
 
   const groupRefs = useRef<(HTMLLIElement | null)[]>([])
 
-  const [selectedGroup, setSelectedGroup] = useState<number | null>(null);
-  const [showOptionsForGroup, setShowOptionsForGroup] = useState<number | null>(null);
-  const [modalPosition, setModalPosition] = useState<{ top: number; left: number } | null>(null);
+  const [selectedGroup, setSelectedGroup] = useState<number | null>(null)
+  const [showOptionsForGroup, setShowOptionsForGroup] = useState<number | null>(null)
+  const [modalPosition, setModalPosition] = useState<{ top: number; left: number } | null>(null)
 
   useEffect(() => {
     if (userId) {
@@ -120,12 +112,13 @@ const ModalListGroup: React.FC<ModalListGroupProps> = ({
                 type="text"
                 placeholder="Search by group name"
                 value={groupName}
-                onChange={(e) => setGroupName(e.target.value)}
+                onChange={e => setGroupName(e.target.value)}
                 className="w-full py-[22px] pl-12 pr-4 bg-[#fff] border border-[#545454] rounded-lg text-gray-900 focus:outline-none placeholder-[#828282]"
               />
               <Search className="absolute top-1/2 left-4 -translate-y-1/2 text-gray-500 pr-2" />
             </div>
-            <Button className={`w-20 py-2 px-4 mb-2 bg-[#7746f5] rounded-[12px] text-lg text-white bg-gradient-to-r from-[#501794] to-[#3E70A1] hover:bg-gradient-to-l
+            <Button
+              className={`w-20 py-2 px-4 mb-2 bg-[#7746f5] rounded-[12px] text-lg text-white bg-gradient-to-r from-[#501794] to-[#3E70A1] hover:bg-gradient-to-l
               ${activeTab === "all" ? "bg-[#501794]" : "bg-[#8C8595] hover:bg-[#7746F5]"}
             `}
             >
@@ -138,10 +131,11 @@ const ModalListGroup: React.FC<ModalListGroupProps> = ({
                   <li
                     key={group.id}
                     ref={el => {
-                      groupRefs.current[index] = el;
+                      groupRefs.current[index] = el
                     }}
-                    className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer mb-3 ${selectedGroup === index ? "bg-[#7a99b8]/90" : ""
-                      } bg-[#fff] hover:bg-[#93C1D2]`}
+                    className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer mb-3 ${
+                      selectedGroup === index ? "bg-[#7a99b8]/90" : ""
+                    } bg-[#fff] hover:bg-[#93C1D2]`}
                   >
                     <Image
                       src={group.groupAvatar ?? Images.AvatarDefault}
@@ -151,12 +145,8 @@ const ModalListGroup: React.FC<ModalListGroupProps> = ({
                       className="rounded-full"
                     />
                     <div>
-                      <p className="font-semibold text-black">
-                        {group.groupName || "Unnamed Group"}
-                      </p>
-                      <p className="text-sm text-gray-700">
-                        {group.lastMessage || "No messages yet"}
-                      </p>
+                      <p className="font-semibold text-black">{group.groupName || "Unnamed Group"}</p>
+                      <p className="text-sm text-gray-700">{group.lastMessage || "No messages yet"}</p>
                     </div>
                     <EllipsisVertical
                       className="ml-auto text-gray-500"
@@ -167,9 +157,7 @@ const ModalListGroup: React.FC<ModalListGroupProps> = ({
                   </li>
                 ))
               ) : (
-                <p className="text-white">
-                  No groups found
-                </p>
+                <p className="text-white">No groups found</p>
               )}
             </ul>
 
@@ -207,7 +195,7 @@ const ModalListGroup: React.FC<ModalListGroupProps> = ({
           </DialogPanel>
         </div>
       </div>
-    </Dialog >
+    </Dialog>
   )
 }
 

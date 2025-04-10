@@ -1,43 +1,41 @@
-"use client";
+"use client"
 
-import React, { useState } from "react";
-import Image from "next/image";
-import { Button } from "./ui/button";
-import { Input } from "./ui/input";
-import { Images } from "../constants/images";
-import { Dialog, DialogPanel, DialogTitle, TransitionChild } from "@headlessui/react";
-import { toast } from "react-toastify";
-import { Search, EllipsisVertical } from "lucide-react";
-import "../styles/custom-scroll.css";
-import { useSelector } from "react-redux";
-import { RootState } from "~/lib/reudx/store";
-import { useFriends } from "~/hooks/use-friends";
-import { ConversationRequest } from "~/codegen/data-contracts";
-import { useConversation } from "~/hooks/use-converstation";
+import React, { useState } from "react"
+import Image from "next/image"
+import { Button } from "../ui/button"
+import { Input } from "../ui/input"
+import { Images } from "../../constants/images"
+import { Dialog, DialogPanel, DialogTitle, TransitionChild } from "@headlessui/react"
+import { toast } from "react-toastify"
+import { Search, EllipsisVertical } from "lucide-react"
+import "../../styles/custom-scroll.css"
+import { useSelector } from "react-redux"
+import { RootState } from "~/lib/reudx/store"
+import { useFriends } from "~/hooks/use-friends"
+import { ConversationRequest } from "~/codegen/data-contracts"
+import { useConversation } from "~/hooks/use-converstation"
 
 interface ModalCreateGroupChatProps {
-  isOpen: boolean;
-  setIsOpen: (open: boolean) => void;
+  isOpen: boolean
+  setIsOpen: (open: boolean) => void
 }
 
 const ModalCreateGroupChat: React.FC<ModalCreateGroupChatProps> = ({ isOpen, setIsOpen }) => {
-  const userId = useSelector((state: RootState) => state.auth.userId);
-  const token = useSelector((state: RootState) => state.auth.token);
-  const [groupName, setGroupName] = useState<string>("");
-  const [selectedUsers, setSelectedUsers] = useState<number[]>([]);
-  const { friends, loading: friendsLoading } = useFriends(userId, token);
-  const { createGroupConversation, loading: groupLoading } = useConversation(userId, token);
+  const userId = useSelector((state: RootState) => state.auth.userId)
+  const token = useSelector((state: RootState) => state.auth.token)
+  const [groupName, setGroupName] = useState<string>("")
+  const [selectedUsers, setSelectedUsers] = useState<number[]>([])
+  const { friends, loading: friendsLoading } = useFriends(userId, token)
+  const { createGroupConversation, loading: groupLoading } = useConversation(userId, token)
 
   const handleSelectUser = (userId: number) => {
-    setSelectedUsers((prev) =>
-      prev.includes(userId) ? prev.filter((id) => id !== userId) : [...prev, userId]
-    );
-  };
+    setSelectedUsers(prev => (prev.includes(userId) ? prev.filter(id => id !== userId) : [...prev, userId]))
+  }
 
   const handleCreateGroupChat = async () => {
     if (!groupName || selectedUsers.length === 0) {
-      toast.error("Please provide a group name and select at least one participant.");
-      return;
+      toast.error("Please provide a group name and select at least one participant.")
+      return
     }
 
     const data: ConversationRequest = {
@@ -45,23 +43,23 @@ const ModalCreateGroupChat: React.FC<ModalCreateGroupChatProps> = ({ isOpen, set
       creatorId: userId,
       participantIds: [userId, ...selectedUsers],
       groupName,
-    };
+    }
 
     try {
-      const response = await createGroupConversation(data);
+      const response = await createGroupConversation(data)
       if (response) {
-        toast.success("Group chat created successfully!");
-        setIsOpen(false);
+        toast.success("Group chat created successfully!")
+        setIsOpen(false)
       } else {
-        toast.error("Failed to create group chat.");
+        toast.error("Failed to create group chat.")
       }
     } catch (error) {
-      console.error("Error creating group chat:", error);
-      toast.error(error.message || "Failed to create group chat.");
+      console.error("Error creating group chat:", error)
+      toast.error(error.message || "Failed to create group chat.")
     }
-  };
+  }
 
-  if (friendsLoading) return <div className="loader"></div>;
+  if (friendsLoading) return <div className="loader"></div>
 
   return (
     <Dialog open={isOpen} onClose={() => setIsOpen(false)} className="relative z-50">
@@ -92,13 +90,13 @@ const ModalCreateGroupChat: React.FC<ModalCreateGroupChatProps> = ({ isOpen, set
                 type="text"
                 placeholder="Group Name"
                 value={groupName}
-                onChange={(e) => setGroupName(e.target.value)}
+                onChange={e => setGroupName(e.target.value)}
                 className="w-full py-[22px] pl-4 pr-4 bg-[#fff] border border-[#545454] rounded-lg text-gray-900 focus:outline-none placeholder-[#828282]"
               />
             </div>
 
             <ul className="max-h-[55vh] overflow-auto custom-scrollbar">
-              {friends.map((user) => (
+              {friends.map(user => (
                 <li
                   key={user.id}
                   className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer mb-3 hover:bg-[#93C1D2]
@@ -134,7 +132,7 @@ const ModalCreateGroupChat: React.FC<ModalCreateGroupChatProps> = ({ isOpen, set
         </TransitionChild>
       </div>
     </Dialog>
-  );
-};
+  )
+}
 
-export default ModalCreateGroupChat;
+export default ModalCreateGroupChat
