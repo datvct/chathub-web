@@ -102,8 +102,10 @@ export async function unsentFriendRequest(userId: number, friendId: number, toke
   }
 }
 
-export async function sendFriendRequest(data: FriendshipRequest, token: string) {
+export async function sendFriendRequest(data: FriendshipRequest, token: string): Promise<SuccessResponse> {
   try {
+    if (!data || !token) throw new Error("Request data and Token are required");
+
     const response = await friendInstance.sendFriendRequest(
       data,
       {
@@ -112,14 +114,16 @@ export async function sendFriendRequest(data: FriendshipRequest, token: string) 
         },
       }
     );
+
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData?.message || `HTTP error! status: ${response.status}`);
+      const errorData = await response.json().catch(() => ({ message: `HTTP error! status: ${response.status}` }));
+      console.error("Error sending friend request:", response.status, errorData);
+      throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
     }
     const successData = await response.json() as SuccessResponse;
     return successData;
   } catch (error: any) {
-    console.error("Error sending friend request:", error);
-    throw new Error(error.message || "Failed to send friend request");
+    console.error("Error in sendFriendRequest:", error);
+    throw error;
   }
 }
