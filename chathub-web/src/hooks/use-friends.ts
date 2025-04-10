@@ -84,5 +84,13 @@ export function useFriends(userId: number, token: string) {
     }
   }
 
-  return { friends, loading, error, getListFriendRequests, acceptFriendRequestHook, rejectFriendRequestHook, unsentFriendRequestHook };
+  return {
+    friends,
+    loading,
+    error,
+    getListFriendRequests,
+    acceptFriendRequestHook,
+    rejectFriendRequestHook,
+    unsentFriendRequestHook
+  };
 }

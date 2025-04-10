@@ -1,5 +1,10 @@
 import { Friend } from "~/codegen/Friend";
-import { FriendRequestResponse, FriendshipRequest, SuccessResponse, UserDTO } from "~/codegen/data-contracts";
+import {
+  FriendRequestResponse,
+  FriendshipRequest,
+  SuccessResponse,
+  UserDTO
+} from "~/codegen/data-contracts";
 
 const friendInstance = new Friend({ baseUrl: process.env.API_URL });
 
@@ -94,5 +99,27 @@ export async function unsentFriendRequest(userId: number, friendId: number, toke
   } catch (error) {
     console.error("Error checking admin token:", error)
     return null
+  }
+}
+
+export async function sendFriendRequest(data: FriendshipRequest, token: string) {
+  try {
+    const response = await friendInstance.sendFriendRequest(
+      data,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData?.message || `HTTP error! status: ${response.status}`);
+    }
+    const successData = await response.json() as SuccessResponse;
+    return successData;
+  } catch (error: any) {
+    console.error("Error sending friend request:", error);
+    throw new Error(error.message || "Failed to send friend request");
   }
 }
