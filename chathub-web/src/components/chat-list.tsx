@@ -237,7 +237,8 @@ const ChatList = ({ setSelectedChat, setIsGroupChat, setConversationData, onPinC
               </li>
             ))
         ) : (
-          <div className="loader"></div>
+          // <div className="loader"></div>
+          <></>
         )}
       </ul>
 

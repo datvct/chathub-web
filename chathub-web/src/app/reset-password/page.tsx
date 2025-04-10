@@ -40,7 +40,7 @@ const ResetPasswordPage: React.FC = () => {
 
     if (!passwordRegex.test(password)) {
       toast.error(
-        "Password must be 6-20 characters and include at least one uppercase letter, one lowercase letter, one number, and one special character (!@#$%^&*).",
+        "Password must be 6-20 characters and include at least one uppercase letter, one lowercase letter, one number, and one special character.",
       )
       return
     }

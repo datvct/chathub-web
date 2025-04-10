@@ -52,7 +52,7 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ isOpen, setIs
 
     if (!passwordRegex.test(newPassword)) {
       toast.error(
-        "Password must be 6-20 characters and include at least one uppercase letter, one lowercase letter, one number, and one special character (!@#$%^&*).",
+        "Password must be 6-20 characters and include at least one uppercase letter, one lowercase letter, one number, and one special character.",
       )
       return
     }
