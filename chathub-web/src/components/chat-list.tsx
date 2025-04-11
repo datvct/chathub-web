@@ -137,8 +137,8 @@ const ChatList = ({ setSelectedChat, setIsGroupChat, setConversationData, onPinC
 
       toast.success("Logged out successfully!")
 
-      router.push("/login")
-      console.log("Redirecting to /login")
+      router.push("/sign-in")
+      console.log("Redirecting to /sign-in")
     } catch (error) {
       console.error("Logout failed:", error)
       toast.error("Logout failed. Please try again.")
