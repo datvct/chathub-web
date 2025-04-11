@@ -15,14 +15,13 @@ import { useBlockUnblockUser } from "~/hooks/use-user"
 
 import { Images } from "../constants/images"
 import "../styles/custom-scroll.css"
-import ModalCreateNewChat from "./modal-create-new-chat"
-import ModalCreateNewGroupChat from "./modal-create-new-group-chat"
-import ModalProfile from "./modal-profile"
-import ChangePasswordModal from "./modal-change-password"
-import ModalFriendList from "./modal-friend-list"
-import ModalFriendRequests from "./modal-friend-requests"
-import ModalListGroup from "./modal-list-group"
-import ModalFindFriend from "./modal-find-friend"
+import ModalCreateNewChat from "./modal/modal-create-new-chat"
+import ModalCreateNewGroupChat from "./modal/modal-create-new-group-chat"
+import ModalProfile from "./modal/modal-profile"
+import ChangePasswordModal from "./modal/modal-change-password"
+import ModalFriendList from "./modal/modal-friend-list"
+import ModalFriendRequests from "./modal/modal-friend-requests"
+import ModalListGroup from "./modal/modal-list-group"
 
 import { BsPinAngleFill } from "react-icons/bs"
 import { RiUnpinFill } from "react-icons/ri"
@@ -61,9 +60,10 @@ const ChatList = ({ setSelectedChat, setIsGroupChat, setConversationData, onPinC
   const [isFriendListModalOpen, setIsFriendListModalOpen] = useState(false)
   const [isFriendRequestModalOpen, setIsFriendRequestModalOpen] = useState(false)
   const [modalListGroup, setModalListGroup] = useState(false)
-  const [isFindFriendModalOpen, setIsFindFriendModalOpen] = useState(false)
   const { getRecentConversation } = useConversation(userId, token)
+
   const [dataConversation, setDataConversation] = useState<ConversationResponse[]>([])
+
   const dataProfile = useGetUserById(userId, token)
 
   const fetchDataConversation = async () => {
@@ -144,16 +144,6 @@ const ChatList = ({ setSelectedChat, setIsGroupChat, setConversationData, onPinC
           <MenuItem>
             <button
               className="w-full group rounded-lg px-4 py-2 flex items-center cursor-pointer hover:bg-gray-600"
-              onClick={() => setIsFindFriendModalOpen(true)}
-            >
-              <Image src={Images.IconUserSearch} alt="FriendList" width={24} height={24} />
-              <span className="ml-3 block font-medium truncate">Find Friend</span>
-            </button>
-          </MenuItem>
-
-          <MenuItem>
-            <button
-              className="w-full group rounded-lg px-4 py-2 flex items-center cursor-pointer hover:bg-gray-600"
               onClick={() => setIsFriendRequestModalOpen(true)}
             >
               <Image src={Images.IconAddFriend} alt="Friend Requests" width={24} height={24} />
@@ -168,15 +158,6 @@ const ChatList = ({ setSelectedChat, setIsGroupChat, setConversationData, onPinC
             >
               <Image src={Images.IconGroup} alt="Group List" width={24} height={24} />
               <span className="ml-3 block font-medium truncate">Group List</span>
-            </button>
-          </MenuItem>
-
-          <MenuItem>
-            <button
-              className="w-full group rounded-lg px-4 py-2 flex items-center cursor-pointer hover:bg-gray-600"
-            >
-              <Image src={Images.IconLogOut} alt="FriendList" width={24} height={24} />
-              <span className="ml-3 block font-medium truncate">Log Out</span>
             </button>
           </MenuItem>
         </MenuItems>
@@ -256,7 +237,8 @@ const ChatList = ({ setSelectedChat, setIsGroupChat, setConversationData, onPinC
               </li>
             ))
         ) : (
-          <div className="loader"></div>
+          // <div className="loader"></div>
+          <></>
         )}
       </ul>
 
@@ -331,7 +313,6 @@ const ChatList = ({ setSelectedChat, setIsGroupChat, setConversationData, onPinC
       <ModalFriendList isOpen={isFriendListModalOpen} setIsOpen={setIsFriendListModalOpen} />
       <ModalFriendRequests isOpen={isFriendRequestModalOpen} setIsOpen={setIsFriendRequestModalOpen} />
       <ModalListGroup isOpen={modalListGroup} setIsOpen={setModalListGroup} isAdmin={true} />
-      <ModalFindFriend isOpen={isFindFriendModalOpen} setIsOpen={setIsFindFriendModalOpen} />
     </div>
   )
 }

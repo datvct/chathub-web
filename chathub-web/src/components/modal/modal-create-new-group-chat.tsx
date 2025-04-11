@@ -1,5 +1,6 @@
-"use client";
+"use client"
 
+<<<<<<< HEAD:chathub-web/src/components/modal-create-new-group-chat.tsx
 import React, { useState } from "react";
 import Image from "next/image";
 import { Button } from "./ui/button";
@@ -15,13 +16,30 @@ import { RootState } from "~/lib/reudx/store";
 import { useFriends } from "~/hooks/use-friends";
 import { ConversationRequest, UserDTO } from "~/codegen/data-contracts";
 import { useConversation } from "~/hooks/use-converstation";
+=======
+import React, { useState } from "react"
+import Image from "next/image"
+import { Button } from "../ui/button"
+import { Input } from "../ui/input"
+import { Images } from "../../constants/images"
+import { Dialog, DialogPanel, DialogTitle, TransitionChild } from "@headlessui/react"
+import { toast } from "react-toastify"
+import { Search, EllipsisVertical } from "lucide-react"
+import "../../styles/custom-scroll.css"
+import { useSelector } from "react-redux"
+import { RootState } from "~/lib/reudx/store"
+import { useFriends } from "~/hooks/use-friends"
+import { ConversationRequest } from "~/codegen/data-contracts"
+import { useConversation } from "~/hooks/use-converstation"
+>>>>>>> 28c0e5fae504493ab038b74c9e28b46d014129db:chathub-web/src/components/modal/modal-create-new-group-chat.tsx
 
 interface ModalCreateGroupChatProps {
-  isOpen: boolean;
-  setIsOpen: (open: boolean) => void;
+  isOpen: boolean
+  setIsOpen: (open: boolean) => void
 }
 
 const ModalCreateGroupChat: React.FC<ModalCreateGroupChatProps> = ({ isOpen, setIsOpen }) => {
+<<<<<<< HEAD:chathub-web/src/components/modal-create-new-group-chat.tsx
   const userId = useSelector((state: RootState) => state.auth.userId);
   const token = useSelector((state: RootState) => state.auth.token);
 
@@ -58,33 +76,70 @@ const ModalCreateGroupChat: React.FC<ModalCreateGroupChatProps> = ({ isOpen, set
     if (!userId) {
       toast.error("User ID not found. Please log in again.");
       return;
+=======
+  const userId = useSelector((state: RootState) => state.auth.userId)
+  const token = useSelector((state: RootState) => state.auth.token)
+  const [groupName, setGroupName] = useState<string>("")
+  const [selectedUsers, setSelectedUsers] = useState<number[]>([])
+  const { friends, loading: friendsLoading } = useFriends(userId, token)
+  const { createGroupConversation, loading: groupLoading } = useConversation(userId, token)
+
+  const handleSelectUser = (userId: number) => {
+    setSelectedUsers(prev => (prev.includes(userId) ? prev.filter(id => id !== userId) : [...prev, userId]))
+  }
+
+  const handleCreateGroupChat = async () => {
+    if (!groupName || selectedUsers.length === 0) {
+      toast.error("Please provide a group name and select at least one participant.")
+      return
+>>>>>>> 28c0e5fae504493ab038b74c9e28b46d014129db:chathub-web/src/components/modal/modal-create-new-group-chat.tsx
     }
 
     const data: ConversationRequest = {
       chatType: "GROUP",
       creatorId: userId,
       participantIds: [userId, ...selectedUsers],
+<<<<<<< HEAD:chathub-web/src/components/modal-create-new-group-chat.tsx
       groupName: groupName.trim(),
     };
+=======
+      groupName,
+    }
+>>>>>>> 28c0e5fae504493ab038b74c9e28b46d014129db:chathub-web/src/components/modal/modal-create-new-group-chat.tsx
 
     try {
-      const response = await createGroupConversation(data);
+      const response = await createGroupConversation(data)
       if (response) {
+<<<<<<< HEAD:chathub-web/src/components/modal-create-new-group-chat.tsx
         toast.success(`Group "${groupName.trim()}" created successfully!`);
         setIsOpen(false);
         setGroupName("");
         setSelectedUsers([]);
         setSearchTerm("");
+=======
+        toast.success("Group chat created successfully!")
+        setIsOpen(false)
+>>>>>>> 28c0e5fae504493ab038b74c9e28b46d014129db:chathub-web/src/components/modal/modal-create-new-group-chat.tsx
       } else {
-        toast.error("Failed to create group chat.");
+        toast.error("Failed to create group chat.")
       }
+<<<<<<< HEAD:chathub-web/src/components/modal-create-new-group-chat.tsx
     } catch (error: any) {
       console.error("Error creating group chat:", error);
       toast.error(error.message || "An unexpected error occurred while creating the group.");
+=======
+    } catch (error) {
+      console.error("Error creating group chat:", error)
+      toast.error(error.message || "Failed to create group chat.")
+>>>>>>> 28c0e5fae504493ab038b74c9e28b46d014129db:chathub-web/src/components/modal/modal-create-new-group-chat.tsx
     }
-  };
+  }
 
+<<<<<<< HEAD:chathub-web/src/components/modal-create-new-group-chat.tsx
   // if (friendsLoading) return <div className="loader"></div>;
+=======
+  if (friendsLoading) return <div className="loader"></div>
+>>>>>>> 28c0e5fae504493ab038b74c9e28b46d014129db:chathub-web/src/components/modal/modal-create-new-group-chat.tsx
 
   return (
     <Dialog
@@ -124,6 +179,7 @@ const ModalCreateGroupChat: React.FC<ModalCreateGroupChatProps> = ({ isOpen, set
                 type="text"
                 placeholder="Group Name"
                 value={groupName}
+<<<<<<< HEAD:chathub-web/src/components/modal-create-new-group-chat.tsx
                 onChange={(e) => setGroupName(e.target.value)}
                 className="w-full py-3 pl-4 pr-4 bg-gray-100 text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 placeholder-gray-500 text-sm md:text-base"
               />
@@ -142,6 +198,20 @@ const ModalCreateGroupChat: React.FC<ModalCreateGroupChatProps> = ({ isOpen, set
                 <button
                   onClick={() => setSearchTerm('')}
                   className="absolute top-1/2 right-3 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 p-1"
+=======
+                onChange={e => setGroupName(e.target.value)}
+                className="w-full py-[22px] pl-4 pr-4 bg-[#fff] border border-[#545454] rounded-lg text-gray-900 focus:outline-none placeholder-[#828282]"
+              />
+            </div>
+
+            <ul className="max-h-[55vh] overflow-auto custom-scrollbar">
+              {friends.map(user => (
+                <li
+                  key={user.id}
+                  className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer mb-3 hover:bg-[#93C1D2]
+                  ${selectedUsers.includes(user.id) ? "bg-[#7a99b8]/90" : "bg-[#fff]"}`}
+                  onClick={() => handleSelectUser(user.id)}
+>>>>>>> 28c0e5fae504493ab038b74c9e28b46d014129db:chathub-web/src/components/modal/modal-create-new-group-chat.tsx
                 >
                   <X size={16} />
                 </button>
@@ -220,7 +290,11 @@ const ModalCreateGroupChat: React.FC<ModalCreateGroupChatProps> = ({ isOpen, set
         </TransitionChild>
       </div>
     </Dialog>
-  );
-};
+  )
+}
 
+<<<<<<< HEAD:chathub-web/src/components/modal-create-new-group-chat.tsx
 export default ModalCreateGroupChat;
+=======
+export default ModalCreateGroupChat
+>>>>>>> 28c0e5fae504493ab038b74c9e28b46d014129db:chathub-web/src/components/modal/modal-create-new-group-chat.tsx
