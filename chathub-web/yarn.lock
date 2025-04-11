@@ -4510,10 +4510,10 @@ swagger-schema-official@2.0.0-bab6bed:
   resolved "https://registry.npmjs.org/swagger-schema-official/-/swagger-schema-official-2.0.0-bab6bed.tgz"
   integrity sha512-rCC0NWGKr/IJhtRuPq/t37qvZHI/mH4I4sxflVM+qgVe5Z2uOCivzWaVbuioJaB61kvm5UvB7b49E+oBY0M8jA==
 
-swagger-typescript-api@^13.0.25:
-  version "13.0.25"
-  resolved "https://registry.npmjs.org/swagger-typescript-api/-/swagger-typescript-api-13.0.25.tgz"
-  integrity sha512-ZXjEQ7e4MN9uRutnmKE5sKTk4dIrnUFLbzeqIXeieHi6k5DwNJsNt0ttCPIoo3OjQr+LworNpEw2lfRtSqVXog==
+swagger-typescript-api@^13.0.28:
+  version "13.0.28"
+  resolved "https://registry.npmjs.org/swagger-typescript-api/-/swagger-typescript-api-13.0.28.tgz"
+  integrity sha512-8IwPD6nCFDTtzSl8rS7xlAx0NGMpBUlFfccJwgMV7t8d/nKw1yQWPVdC7h94XDsDPrLFvICd5xAJJm2TK2Pcpw==
   dependencies:
     "@types/swagger-schema-official" "^2.0.25"
     citty "^0.1.6"

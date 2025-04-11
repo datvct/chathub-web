@@ -1,5 +1,6 @@
 /* eslint-disable */
 /* tslint:disable */
+// @ts-nocheck
 /*
  * ---------------------------------------------------------------
  * ## THIS FILE WAS GENERATED VIA SWAGGER-TYPESCRIPT-API        ##
@@ -10,7 +11,7 @@
  */
 
 import { ErrorResponse, MessageResponse } from "./data-contracts"
-import { HttpClient, RequestParams } from "./http-client"
+import { ContentType, HttpClient, RequestParams } from "./http-client"
 
 export class Message<SecurityDataType = unknown> extends HttpClient<SecurityDataType> {
   /**
@@ -35,6 +36,58 @@ export class Message<SecurityDataType = unknown> extends HttpClient<SecurityData
       method: "PUT",
       query: query,
       secure: true,
+      ...params,
+    })
+  /**
+   * No description
+   *
+   * @tags message-controller
+   * @name DeleteMessage
+   * @request PUT:/message/delete
+   * @secure
+   */
+  deleteMessage = (
+    query: {
+      /** @format int64 */
+      userId: number
+      /** @format int64 */
+      messageId: number
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<string, ErrorResponse>({
+      path: `/message/delete`,
+      method: "PUT",
+      query: query,
+      secure: true,
+      ...params,
+    })
+  /**
+   * No description
+   *
+   * @tags message-controller
+   * @name ForwardMessage
+   * @request POST:/message/forward/{conversationId}
+   * @secure
+   */
+  forwardMessage = (
+    conversationId: number,
+    query: {
+      /** @format int64 */
+      senderId: number
+      /** @format int64 */
+      originalMessageId: number
+    },
+    data: string,
+    params: RequestParams = {},
+  ) =>
+    this.request<MessageResponse, ErrorResponse>({
+      path: `/message/forward/${conversationId}`,
+      method: "POST",
+      query: query,
+      body: data,
+      secure: true,
+      type: ContentType.Json,
       ...params,
     })
   /**
