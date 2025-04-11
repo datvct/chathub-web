@@ -112,8 +112,6 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
       gender: (profileData?.gender as "MALE" | "FEMALE") || "MALE",
     }
 
-<<<<<<< HEAD:chathub-web/src/components/modal-profile.tsx
-=======
     if (selectedImage) {
       if (selectedImage !== profileData.avatar) {
         const avatarFile = await fetch(selectedImage)
@@ -126,7 +124,6 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
       delete data.avatar
     }
 
->>>>>>> 28c0e5fae504493ab038b74c9e28b46d014129db:chathub-web/src/components/modal/modal-profile.tsx
     try {
       const response = await updateProfile(data, token!)
       if (response) {
