@@ -15,6 +15,7 @@ import { useFindUserByPhoneNumber } from "~/hooks/use-find-user-by-phone-number"
 import { useFriends } from "~/hooks/use-friends"
 import { UserDTO, FriendshipRequest, FriendRequestResponse } from "~/codegen/data-contracts"
 import "../styles/custom-scroll.css"
+import { FriendshipStatus } from "~/types/types"
 
 const formatPhoneNumberForAPI = (phone: string): string => {
 	let cleaned = phone.replace(/\s+/g, "")
@@ -30,16 +31,6 @@ interface ModalFindFriendProps {
 	isOpen: boolean
 	setIsOpen: (open: boolean) => void
 }
-
-type FriendshipStatus =
-	| "idle"
-	| "loading"
-	| "not_found"
-	| "not_friend"
-	| "request_sent"
-	| "request_received"
-	| "already_friend"
-	| "is_self"
 
 const ModalFindFriend: React.FC<ModalFindFriendProps> = ({ isOpen, setIsOpen }) => {
 	const currentUser = useSelector((state: RootState) => state.auth)
