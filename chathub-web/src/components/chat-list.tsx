@@ -17,15 +17,6 @@ import { MessageType } from "~/types/types"
 import { useBlockUnblockUser } from "~/hooks/use-user"
 import { Images } from "../constants/images"
 import "../styles/custom-scroll.css"
-<<<<<<< HEAD
-import ModalCreateNewChat from "./modal-create-new-chat"
-import ModalCreateNewGroupChat from "./modal-create-new-group-chat"
-import ModalProfile from "./modal-profile"
-import ChangePasswordModal from "./modal-change-password"
-import ModalFriendList from "./modal-friend-list"
-import ModalFriendRequests from "./modal-friend-requests"
-import ModalListGroup from "./modal-list-group"
-=======
 import { findUserById } from "~/lib/get-user"
 import { Search, X, AlertTriangle } from "lucide-react"
 
@@ -38,7 +29,6 @@ import ModalFriendRequests from "./modal/modal-friend-requests"
 import ModalListGroup from "./modal/modal-list-group"
 import ModalConfirm from "./modal/modal-confirm"
 import ModalFindFriend from "./modal-find-friend"
->>>>>>> 8e4a6c2a950f6aed9770ccfd1f2f5105e202fbf7
 
 import { BsPinAngleFill } from "react-icons/bs"
 import { RiUnpinFill } from "react-icons/ri"
