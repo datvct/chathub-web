@@ -2,12 +2,12 @@
 
 import React, { useState } from "react"
 import Image from "next/image"
-import { Button } from "./ui/button"
-import { Input } from "./ui/input"
-import { Images } from "../constants/images"
+import { Button } from "../ui/button"
+import { Input } from "../ui/input"
+import { Images } from "../../constants/images"
 import { Dialog, DialogPanel, DialogTitle, TransitionChild } from "@headlessui/react"
 import { Search, EllipsisVertical } from "lucide-react"
-import "../styles/custom-scroll.css"
+import "../../styles/custom-scroll.css"
 import { useSelector } from "react-redux"
 import { RootState } from "~/lib/reudx/store"
 import { useFriends } from "~/hooks/use-friends"
@@ -25,15 +25,8 @@ const ModalCreateNewChat: React.FC<ModalCreateNewChatProps> = ({ isOpen, setIsOp
   const token = useSelector((state: RootState) => state.auth.token)
 
   const [selectedUser, setSelectedUser] = useState<number | null>(null)
-  const {
-    friends,
-    loading: friendsLoading,
-    error
-  } = useFriends(userId, token)
-  const {
-    createConversation,
-    loading: conversationLoading,
-  } = useConversation(userId, token)
+  const { friends, loading: friendsLoading, error } = useFriends(userId, token)
+  const { createConversation, loading: conversationLoading } = useConversation(userId, token)
 
   const handleSelectUser = (userId: number) => {
     setSelectedUser(userId)
@@ -41,29 +34,29 @@ const ModalCreateNewChat: React.FC<ModalCreateNewChatProps> = ({ isOpen, setIsOp
 
   const handleCreateChat = async () => {
     if (!selectedUser) {
-      console.error("No user selected.");
-      return;
+      console.error("No user selected.")
+      return
     }
 
     const data: ConversationRequest = {
       chatType: "SINGLE",
       creatorId: userId,
       participantIds: [selectedUser, userId],
-    };
+    }
 
     try {
-      const response = await createConversation(data);
+      const response = await createConversation(data)
       if (response) {
-        toast.success("Chat created successfully!");
-        setIsOpen(false);
+        toast.success("Chat created successfully!")
+        setIsOpen(false)
       } else {
-        toast.error("Failed to create chat.");
+        toast.error("Failed to create chat.")
       }
     } catch (error) {
-      console.error("Error creating chat:", error);
-      toast.error(error.message || "Failed to create chat.");
+      console.error("Error creating chat:", error)
+      toast.error(error.message || "Failed to create chat.")
     }
-  };
+  }
 
   if (friendsLoading) return <div className="loader"></div>
   return (

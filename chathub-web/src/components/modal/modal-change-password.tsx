@@ -3,12 +3,12 @@
 import { Dialog, DialogPanel, DialogTitle, Transition, TransitionChild } from "@headlessui/react"
 import React, { Fragment, useState } from "react"
 import Link from "next/link"
-import { Images } from "../constants/images"
+import { Images } from "../../constants/images"
 import Image from "next/image"
-import { Input } from "./ui/input"
-import { Button } from "./ui/button"
+import { Input } from "../ui/input"
+import { Button } from "../ui/button"
 import { ChangePasswordRequest } from "~/codegen/data-contracts"
-import { useChangePassword } from "../hooks/use-change-password"
+import { useChangePassword } from "../../hooks/use-change-password"
 import { useSelector } from "react-redux"
 import { RootState } from "~/lib/reudx/store"
 import { toast, ToastContainer } from "react-toastify"
@@ -52,7 +52,7 @@ const ChangePasswordModal: React.FC<ChangePasswordModalProps> = ({ isOpen, setIs
 
     if (!passwordRegex.test(newPassword)) {
       toast.error(
-        "Password must be 6-20 characters and include at least one uppercase letter, one lowercase letter, one number, and one special character (!@#$%^&*).",
+        "Password must be 6-20 characters and include at least one uppercase letter, one lowercase letter, one number, and one special character.",
       )
       return
     }

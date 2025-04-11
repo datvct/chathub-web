@@ -2,8 +2,8 @@
 
 import React from "react"
 import { useRouter } from "next/navigation"
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog"
-import { Button } from "./ui/button"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog"
+import { Button } from "../ui/button"
 import { useConversation } from "~/hooks/use-converstation"
 import { useSelector } from "react-redux"
 import { RootState } from "~/lib/reudx/store"
@@ -16,44 +16,35 @@ interface ModalLeaveGroupProps {
   isAdmin: boolean
 }
 
-const ModalDissolveGroup = ({
-  isOpen,
-  setIsOpen,
-  chatId,
-  isAdmin
-}: ModalLeaveGroupProps) => {
+const ModalDissolveGroup = ({ isOpen, setIsOpen, chatId, isAdmin }: ModalLeaveGroupProps) => {
   const userId = useSelector((state: RootState) => state.auth.userId)
   const token = useSelector((state: RootState) => state.auth.token)
   const router = useRouter()
 
-  const {
-    dissolveGroup,
-    loading,
-    error
-  } = useConversation(userId, token)
+  const { dissolveGroup, loading, error } = useConversation(userId, token)
 
   const handleDissolveGroup = async () => {
     if (!isAdmin) {
-      toast.error("Only admins can dissolve the group!");
-      return;
+      toast.error("Only admins can dissolve the group!")
+      return
     }
 
     try {
-      const response = await dissolveGroup(chatId, userId, token);
+      const response = await dissolveGroup(chatId, userId, token)
 
       if (response?.statusCode === 200) {
-        toast.success("Group dissolved successfully!");
-        setIsOpen(false);
+        toast.success("Group dissolved successfully!")
+        setIsOpen(false)
         setTimeout(() => {
-          router.push("/");
-        }, 1000);
+          router.push("/")
+        }, 1000)
       } else {
-        toast.error("Failed to dissolve group");
-        console.error("Failed to dissolve group: ", response?.message || "Unknown error");
+        toast.error("Failed to dissolve group")
+        console.error("Failed to dissolve group: ", response?.message || "Unknown error")
       }
     } catch (error) {
-      console.error("Error dissolving group:", error);
-      toast.error("An error occurred while dissolving the group.");
+      console.error("Error dissolving group:", error)
+      toast.error("An error occurred while dissolving the group.")
     }
   }
 
@@ -61,14 +52,10 @@ const ModalDissolveGroup = ({
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogContent className="max-w-md rounded-xl bg-[#363636] border-[#363636]">
         <DialogHeader>
-          <DialogTitle className="text-[20px] font-bold text-center text-white uppercase">
-            Dissolve Group
-          </DialogTitle>
+          <DialogTitle className="text-[20px] font-bold text-center text-white uppercase">Dissolve Group</DialogTitle>
         </DialogHeader>
 
-        <div className="text-center text-base text-white">
-          Are you sure you want to dissolve this group?
-        </div>
+        <div className="text-center text-base text-white">Are you sure you want to dissolve this group?</div>
 
         <div className="flex items-center justify-around">
           <Button

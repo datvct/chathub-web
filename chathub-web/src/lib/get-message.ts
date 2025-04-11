@@ -7,7 +7,7 @@ export const getMessageByConversationId = async (conversationId: number, userId:
   try {
     console.log(token)
     if (!conversationId) return null
-
+    console.log("Fetching messages for conversationId:", conversationId, "userId:", userId, "token:", token)
     const response = (await messageInstance
       .getMessages(
         conversationId,

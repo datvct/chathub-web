@@ -1,22 +1,26 @@
-import { Dialog, DialogPanel, DialogTitle, Transition, TransitionChild } from "@headlessui/react";
-import { Fragment } from "react";
-import { Button } from "./ui/button";
+import { Dialog, DialogPanel, DialogTitle, Transition, TransitionChild } from "@headlessui/react"
+import { Fragment } from "react"
+import { Button } from "../ui/button"
 
 interface ModalConfirmProps {
-  isOpen: boolean;
-  setIsOpen: (open: boolean) => void;
-  onConfirm: () => void;
-  onCancel?: () => void;
-  title: string;
-  message: string;
+  isOpen: boolean
+  setIsOpen: (open: boolean) => void
+  onConfirm: () => void
+  onCancel?: () => void
+  title: string
+  message: string
 }
 
 const ModalConfirm: React.FC<ModalConfirmProps> = ({ isOpen, setIsOpen, onConfirm, onCancel, title, message }) => {
   return (
     <Transition appear show={isOpen} as={Fragment}>
-      <Dialog as="div" className="relative z-50" onClose={() => {
-        onCancel ? onCancel() : setIsOpen(false);
-      }}>
+      <Dialog
+        as="div"
+        className="relative z-50"
+        onClose={() => {
+          onCancel ? onCancel() : setIsOpen(false)
+        }}
+      >
         <TransitionChild
           as={Fragment}
           enter="ease-out duration-300"
@@ -44,7 +48,10 @@ const ModalConfirm: React.FC<ModalConfirmProps> = ({ isOpen, setIsOpen, onConfir
               <p className="text-gray-600 mt-2">{message}</p>
 
               <div className="flex justify-end space-x-3 mt-4">
-                <Button onClick={() => setIsOpen(false)} className="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded">
+                <Button
+                  onClick={() => setIsOpen(false)}
+                  className="bg-gray-400 hover:bg-gray-500 text-white px-4 py-2 rounded"
+                >
                   Cancel
                 </Button>
                 <Button onClick={onConfirm} className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded">
@@ -56,7 +63,7 @@ const ModalConfirm: React.FC<ModalConfirmProps> = ({ isOpen, setIsOpen, onConfir
         </div>
       </Dialog>
     </Transition>
-  );
-};
+  )
+}
 
-export default ModalConfirm;
+export default ModalConfirm

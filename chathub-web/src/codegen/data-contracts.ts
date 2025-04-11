@@ -70,6 +70,37 @@ export interface ReactionRequest {
   reactionEmoji?: string
 }
 
+export interface ForwardedMessageInfo {
+  originalSenderAvatar?: string
+  originalSenderName?: string
+  messageType?: string
+  originalContentSnapshot?: string
+}
+
+export interface MessageResponse {
+  /** @format int64 */
+  id?: number
+  /** @format int64 */
+  conversationId?: number
+  /** @format int64 */
+  senderId?: number
+  senderName?: string
+  content?: string
+  avatar?: string
+  messageType?: "TEXT" | "IMAGE" | "VIDEO" | "DOCUMENT" | "LINK"
+  /** @format date-time */
+  sentAt?: string
+  forwardedMessage?: ForwardedMessageInfo
+  reactions?: ReactionDTO[]
+  forwarded?: boolean
+  unsent?: boolean
+}
+
+export interface ReactionDTO {
+  senderName?: string
+  reactionEmoji?: string
+}
+
 export interface FriendshipRequest {
   /** @format int64 */
   senderId?: number
@@ -108,8 +139,8 @@ export interface ConversationResponse {
   /** @format date-time */
   createAt?: string
   participants?: ParticipantDTO[]
-  pinned?: boolean
   dissolved?: boolean
+  pinned?: boolean
 }
 
 export interface ParticipantDTO {
@@ -162,28 +193,6 @@ export interface UserDTO {
   dateOfBirth?: string
   gender?: string
   status?: string
-}
-
-export interface MessageResponse {
-  /** @format int64 */
-  id?: number
-  /** @format int64 */
-  conversationId?: number
-  /** @format int64 */
-  senderId?: number
-  senderName?: string
-  content?: string
-  avatar?: string
-  messageType?: "TEXT" | "IMAGE" | "VIDEO" | "DOCUMENT" | "LINK"
-  /** @format date-time */
-  sentAt?: string
-  reactions?: ReactionDTO[]
-  unsent?: boolean
-}
-
-export interface ReactionDTO {
-  senderName?: string
-  reactionEmoji?: string
 }
 
 export interface FriendRequestResponse {
