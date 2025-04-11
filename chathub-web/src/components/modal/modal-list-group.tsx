@@ -5,21 +5,10 @@ import { Button } from "../ui/button"
 import { Input } from "../ui/input"
 import { Images } from "../../constants/images"
 import { Dialog, DialogPanel, DialogTitle, TransitionChild } from "@headlessui/react"
-<<<<<<< HEAD
-<<<<<<< HEAD:chathub-web/src/components/modal-list-group.tsx
-import { Search, EllipsisVertical, X, LogOut, CircleX } from "lucide-react"
-import "../styles/custom-scroll.css"
-=======
-=======
->>>>>>> 8e4a6c2a950f6aed9770ccfd1f2f5105e202fbf7
 import { Search, EllipsisVertical } from "lucide-react"
 import "../../styles/custom-scroll.css"
 import { LogOut } from "lucide-react"
 import { CircleX } from "lucide-react"
-<<<<<<< HEAD
->>>>>>> 28c0e5fae504493ab038b74c9e28b46d014129db:chathub-web/src/components/modal/modal-list-group.tsx
-=======
->>>>>>> 8e4a6c2a950f6aed9770ccfd1f2f5105e202fbf7
 import { useSelector } from "react-redux"
 import { RootState } from "~/lib/reudx/store"
 import { useConversation } from "~/hooks/use-converstation"
@@ -41,15 +30,6 @@ const ModalListGroup: React.FC<ModalListGroupProps> = ({ isOpen, setIsOpen, isAd
   const [groupName, setGroupName] = useState<string>("")
   const [activeTab, setActiveTab] = useState<string>("all")
 
-<<<<<<< HEAD
-<<<<<<< HEAD:chathub-web/src/components/modal-list-group.tsx
-  const groupRefs = useRef<(HTMLLIElement | null)[]>([])
-  const [selectedGroup, setSelectedGroup] = useState<number | null>(null);
-  const [showOptionsForGroup, setShowOptionsForGroup] = useState<number | null>(null);
-  const [modalPosition, setModalPosition] = useState<{ top: number; left: number } | null>(null);
-=======
-=======
->>>>>>> 8e4a6c2a950f6aed9770ccfd1f2f5105e202fbf7
   const { groups: fetchedGroups, getGroupConversations, findGroups } = useConversation(userId, token)
 
   const groupRefs = useRef<(HTMLLIElement | null)[]>([])
@@ -57,10 +37,6 @@ const ModalListGroup: React.FC<ModalListGroupProps> = ({ isOpen, setIsOpen, isAd
   const [selectedGroup, setSelectedGroup] = useState<number | null>(null)
   const [showOptionsForGroup, setShowOptionsForGroup] = useState<number | null>(null)
   const [modalPosition, setModalPosition] = useState<{ top: number; left: number } | null>(null)
-<<<<<<< HEAD
->>>>>>> 28c0e5fae504493ab038b74c9e28b46d014129db:chathub-web/src/components/modal/modal-list-group.tsx
-=======
->>>>>>> 8e4a6c2a950f6aed9770ccfd1f2f5105e202fbf7
 
   useEffect(() => {
     if (userId) {
@@ -135,42 +111,16 @@ const ModalListGroup: React.FC<ModalListGroupProps> = ({ isOpen, setIsOpen, isAd
               <Input
                 type="text"
                 placeholder="Search by group name"
-<<<<<<< HEAD
-<<<<<<< HEAD:chathub-web/src/components/modal-list-group.tsx
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                onKeyDown={handleKeyDown}
-                className="w-full py-[22px] pl-12 pr-10 bg-[#fff] border border-[#545454] rounded-lg text-gray-900 focus:outline-none placeholder-[#828282]"
-=======
                 value={groupName}
                 onChange={e => setGroupName(e.target.value)}
                 className="w-full py-[22px] pl-12 pr-4 bg-[#fff] border border-[#545454] rounded-lg text-gray-900 focus:outline-none placeholder-[#828282]"
->>>>>>> 28c0e5fae504493ab038b74c9e28b46d014129db:chathub-web/src/components/modal/modal-list-group.tsx
-=======
-                value={groupName}
-                onChange={e => setGroupName(e.target.value)}
-                className="w-full py-[22px] pl-12 pr-4 bg-[#fff] border border-[#545454] rounded-lg text-gray-900 focus:outline-none placeholder-[#828282]"
->>>>>>> 8e4a6c2a950f6aed9770ccfd1f2f5105e202fbf7
               />
               <Search className="absolute top-1/2 left-4 -translate-y-1/2 text-gray-500 pr-2" />
             </div>
-<<<<<<< HEAD
-<<<<<<< HEAD:chathub-web/src/components/modal-list-group.tsx
-
-            <Button
-              className={`w-auto px-4 py-2 mb-2 rounded-[12px] text-lg text-white bg-[#8C8595]`}
-              disabled
-=======
-=======
->>>>>>> 8e4a6c2a950f6aed9770ccfd1f2f5105e202fbf7
             <Button
               className={`w-20 py-2 px-4 mb-2 bg-[#7746f5] rounded-[12px] text-lg text-white bg-gradient-to-r from-[#501794] to-[#3E70A1] hover:bg-gradient-to-l
               ${activeTab === "all" ? "bg-[#501794]" : "bg-[#8C8595] hover:bg-[#7746F5]"}
             `}
-<<<<<<< HEAD
->>>>>>> 28c0e5fae504493ab038b74c9e28b46d014129db:chathub-web/src/components/modal/modal-list-group.tsx
-=======
->>>>>>> 8e4a6c2a950f6aed9770ccfd1f2f5105e202fbf7
             >
               All ({dataGroup?.length || 0})
             </Button>
@@ -180,30 +130,6 @@ const ModalListGroup: React.FC<ModalListGroupProps> = ({ isOpen, setIsOpen, isAd
                 dataGroup.map((group, index) => (
                   <li
                     key={group.id}
-<<<<<<< HEAD
-<<<<<<< HEAD:chathub-web/src/components/modal-list-group.tsx
-                    ref={el => { groupRefs.current[index] = el; }}
-                    className={`flex items-center justify-between gap-3 p-2 rounded-lg cursor-pointer mb-3 bg-[#fff] hover:bg-[#93C1D2]`}
-                  >
-                    <div className="flex items-center gap-3 flex-1 overflow-hidden">
-                      <Image
-                        src={group.groupAvatar ?? Images.AvatarDefault}
-                        alt={group.groupName ?? "Group Avatar"}
-                        width={40}
-                        height={40}
-                        className="rounded-full flex-shrink-0"
-                      />
-                      <div className="overflow-hidden">
-                        <p className="font-semibold text-black truncate">
-                          {group.groupName || "Unnamed Group"}
-                        </p>
-                        <p className="text-sm text-gray-700 truncate">
-                          {group.lastMessage ? `${group.senderName || 'System'}: ${group.lastMessage}` : "No messages yet"}
-                        </p>
-                      </div>
-=======
-=======
->>>>>>> 8e4a6c2a950f6aed9770ccfd1f2f5105e202fbf7
                     ref={el => {
                       groupRefs.current[index] = el
                     }}
@@ -220,10 +146,6 @@ const ModalListGroup: React.FC<ModalListGroupProps> = ({ isOpen, setIsOpen, isAd
                     <div>
                       <p className="font-semibold text-black">{group.groupName || "Unnamed Group"}</p>
                       <p className="text-sm text-gray-700">{group.lastMessage || "No messages yet"}</p>
-<<<<<<< HEAD
->>>>>>> 28c0e5fae504493ab038b74c9e28b46d014129db:chathub-web/src/components/modal/modal-list-group.tsx
-=======
->>>>>>> 8e4a6c2a950f6aed9770ccfd1f2f5105e202fbf7
                     </div>
                     <EllipsisVertical
                       className="ml-auto text-gray-500"
@@ -234,17 +156,7 @@ const ModalListGroup: React.FC<ModalListGroupProps> = ({ isOpen, setIsOpen, isAd
                   </li>
                 ))
               ) : (
-<<<<<<< HEAD
-<<<<<<< HEAD:chathub-web/src/components/modal-list-group.tsx
-                <p className="text-center text-gray-400">
-                  {searchTerm ? "No groups found matching search." : "No groups joined."}
-                </p>
-=======
                 <p className="text-white">No groups found</p>
->>>>>>> 28c0e5fae504493ab038b74c9e28b46d014129db:chathub-web/src/components/modal/modal-list-group.tsx
-=======
-                <p className="text-white">No groups found</p>
->>>>>>> 8e4a6c2a950f6aed9770ccfd1f2f5105e202fbf7
               )}
             </ul>
 
