@@ -20,3 +20,13 @@ export interface ProfileData {
   dateOfBirth?: string | Date
   gender: string
 }
+
+export type FriendshipStatus =
+  | "idle"
+  | "loading"
+  | "not_found"
+  | "not_friend"
+  | "request_sent"
+  | "request_received"
+  | "already_friend"
+  | "is_self"
