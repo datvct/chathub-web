@@ -16,36 +16,11 @@ interface ModalLeaveGroupProps {
   setSelectedChatId: Dispatch<SetStateAction<number | null>>
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD:chathub-web/src/components/modal-leave-group.tsx
-const ModalLeaveGroup = ({
-  isOpen,
-  setIsOpen,
-  chatId,
-  setSelectedChatId,
-}: ModalLeaveGroupProps) => {
-  const router = useRouter()
-
-  const userId = useSelector((state: RootState) => state.auth.userId)
-  const token = useSelector((state: RootState) => state.auth.token)
-
-  const {
-    leaveConversationById,
-    loading,
-    error
-  } = useConversation(userId, token)
-=======
-=======
->>>>>>> 8e4a6c2a950f6aed9770ccfd1f2f5105e202fbf7
 const ModalLeaveGroup = ({ isOpen, setIsOpen, chatId, setSelectedChatId }: ModalLeaveGroupProps) => {
   const userId = useSelector((state: RootState) => state.auth.userId)
   const token = useSelector((state: RootState) => state.auth.token)
   const { leaveConversationById, loading, error } = useConversation(userId, token)
   const router = useRouter()
-<<<<<<< HEAD
->>>>>>> 28c0e5fae504493ab038b74c9e28b46d014129db:chathub-web/src/components/modal/modal-leave-group.tsx
-=======
->>>>>>> 8e4a6c2a950f6aed9770ccfd1f2f5105e202fbf7
 
   const handleLeaveGroup = async () => {
     if (!chatId || !userId || !token) return
