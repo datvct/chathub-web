@@ -10,7 +10,6 @@ export async function signIn(data?: AuthRequest) {
     const response = (await signInInstance.login(data).then(res => res.json())) as AuthResponse
     return response
   } catch (error) {
-    console.error("Error checking admin token:", error)
     return null
   }
 }

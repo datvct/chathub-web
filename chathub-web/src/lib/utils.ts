@@ -60,3 +60,36 @@ const formatLastMessageTime = (timestamp: string) => {
 }
 
 export default formatLastMessageTime
+
+// export const getFileName = (url: string) => {
+//   const fileName = url.split("/").pop()
+//   return fileName.split("_")[0]
+// }
+export const getFileName = (url: string): string => {
+  const fileName = url.split("/").pop() || ""
+
+  const lastUnderscoreIndex = fileName.lastIndexOf("_")
+  const lastDotIndex = fileName.lastIndexOf(".")
+
+  if (lastUnderscoreIndex !== -1 && lastDotIndex !== -1 && lastUnderscoreIndex < lastDotIndex) {
+    const nameWithoutSuffix = fileName.slice(0, lastUnderscoreIndex)
+    const extension = fileName.slice(lastDotIndex)
+    return `${nameWithoutSuffix}${extension}`
+  }
+
+  return fileName
+}
+
+export const formatDisplayDate = (dateString: string) => {
+  const today = moment().format("YYYY-MM-DD")
+  const yesterday = moment().subtract(1, "days").format("YYYY-MM-DD")
+
+  if (dateString === today) return "Hôm nay"
+  if (dateString === yesterday) return "Hôm qua"
+
+  return moment(dateString).format("MMM DD, YYYY")
+}
+
+export const formatTimeSendAt = (dateString: string) => {
+  return moment(dateString).format("h:mm A")
+}

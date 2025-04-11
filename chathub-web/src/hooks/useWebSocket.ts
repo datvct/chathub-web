@@ -23,6 +23,7 @@ const useWebSocket = (conversationId: number, userId: number, token?: string) =>
       setError(null)
       try {
         const data: MessageResponse[] = await getMessageByConversationId(conversationId, userId, token)
+        console.log("Fetched messages:", data)
         setMessages(data || [])
       } catch (err) {
         setError("Failed to fetch messages")

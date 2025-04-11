@@ -3,18 +3,18 @@
 import { Fragment, useState, useEffect } from "react"
 import { Dialog, DialogPanel, DialogTitle, Transition } from "@headlessui/react"
 import Image from "next/image"
-import { Images } from "../constants/images"
-import { Input } from "./ui/input"
+import { Images } from "../../constants/images"
+import { Input } from "../ui/input"
 import { Search } from "lucide-react"
-import { Button } from "./ui/button"
-import "../styles/custom-scroll.css"
+import { Button } from "../ui/button"
+import "../../styles/custom-scroll.css"
 import { FaRegCircle } from "react-icons/fa"
 import { useFriends } from "~/hooks/use-friends"
 import { useSelector } from "react-redux"
 import { RootState } from "~/lib/reudx/store"
 import { UserDTO } from "~/codegen/data-contracts"
-import { useConversation } from "~/hooks/use-converstation"
 import { toast } from "react-toastify"
+import { useConversation } from "~/hooks/use-converstation"
 
 interface ModalAddMembersProps {
   isOpen: boolean
@@ -28,7 +28,7 @@ const ModalAddMembers: React.FC<ModalAddMembersProps> = ({ isOpen, setIsOpen, co
   const userId = useSelector((state: RootState) => state.auth.userId)
   const token = useSelector((state: RootState) => state.auth.token)
   const { friends, loading: friendsLoading, error: friendsError } = useFriends(userId!, token!)
-  const { addMembersToConversation, loading: addMembersLoading } = useConversation()
+  const { addMembersToConversation, loading: addMembersLoading } = useConversation(userId, token)
   const [selectedMembers, setSelectedMembers] = useState<UserDTO[]>([])
 
   useEffect(() => {

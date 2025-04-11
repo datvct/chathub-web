@@ -1,5 +1,6 @@
 "use client"
 
+<<<<<<< HEAD:chathub-web/src/components/modal-create-new-chat.tsx
 import React, { useState } from "react";
 import { useSelector } from "react-redux";
 import { Dialog, DialogPanel, DialogTitle, TransitionChild } from "@headlessui/react";
@@ -14,6 +15,22 @@ import { Search, X, Check } from "lucide-react";
 import { toast } from "react-toastify";
 import "../styles/custom-scroll.css";
 import { RootState } from "~/lib/reudx/store";
+=======
+import React, { useState } from "react"
+import Image from "next/image"
+import { Button } from "../ui/button"
+import { Input } from "../ui/input"
+import { Images } from "../../constants/images"
+import { Dialog, DialogPanel, DialogTitle, TransitionChild } from "@headlessui/react"
+import { Search, EllipsisVertical } from "lucide-react"
+import "../../styles/custom-scroll.css"
+import { useSelector } from "react-redux"
+import { RootState } from "~/lib/reudx/store"
+import { useFriends } from "~/hooks/use-friends"
+import { ConversationRequest } from "~/codegen/data-contracts"
+import { useConversation } from "~/hooks/use-converstation"
+import { toast } from "react-toastify"
+>>>>>>> 28c0e5fae504493ab038b74c9e28b46d014129db:chathub-web/src/components/modal/modal-create-new-chat.tsx
 
 interface ModalCreateNewChatProps {
   isOpen: boolean
@@ -27,11 +44,17 @@ const ModalCreateNewChat: React.FC<ModalCreateNewChatProps> = ({ isOpen, setIsOp
   const [selectedUser, setSelectedUser] = useState<number | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
 
+<<<<<<< HEAD:chathub-web/src/components/modal-create-new-chat.tsx
   const {
     friends,
     loading: friendsLoading,
     error: friendsError
   } = useFriends(userId!, token!);
+=======
+  const [selectedUser, setSelectedUser] = useState<number | null>(null)
+  const { friends, loading: friendsLoading, error } = useFriends(userId, token)
+  const { createConversation, loading: conversationLoading } = useConversation(userId, token)
+>>>>>>> 28c0e5fae504493ab038b74c9e28b46d014129db:chathub-web/src/components/modal/modal-create-new-chat.tsx
 
   const { createConversation, loading: conversationLoading } = useConversation(userId!, token!);
 
@@ -49,35 +72,51 @@ const ModalCreateNewChat: React.FC<ModalCreateNewChatProps> = ({ isOpen, setIsOp
 
   const handleCreateChat = async () => {
     if (!selectedUser) {
+<<<<<<< HEAD:chathub-web/src/components/modal-create-new-chat.tsx
       toast.error("Please select a user to chat with.");
       return;
     }
     if (!userId) {
       toast.error("User ID not found. Please log in again.");
       return;
+=======
+      console.error("No user selected.")
+      return
+>>>>>>> 28c0e5fae504493ab038b74c9e28b46d014129db:chathub-web/src/components/modal/modal-create-new-chat.tsx
     }
 
     const data: ConversationRequest = {
       chatType: "SINGLE",
       creatorId: userId,
       participantIds: [selectedUser, userId],
-    };
+    }
 
     try {
-      const response = await createConversation(data);
+      const response = await createConversation(data)
       if (response) {
+<<<<<<< HEAD:chathub-web/src/components/modal-create-new-chat.tsx
         toast.success("Chat created successfully!");
         setIsOpen(false);
         setSearchTerm("");
         setSelectedUser(null);
+=======
+        toast.success("Chat created successfully!")
+        setIsOpen(false)
+>>>>>>> 28c0e5fae504493ab038b74c9e28b46d014129db:chathub-web/src/components/modal/modal-create-new-chat.tsx
       } else {
-        toast.error("Failed to create chat.");
+        toast.error("Failed to create chat.")
       }
+<<<<<<< HEAD:chathub-web/src/components/modal-create-new-chat.tsx
     } catch (error: any) {
       console.error("Error creating chat:", error);
       toast.error(error.message || "An unexpected error occurred while creating the chat.");
+=======
+    } catch (error) {
+      console.error("Error creating chat:", error)
+      toast.error(error.message || "Failed to create chat.")
+>>>>>>> 28c0e5fae504493ab038b74c9e28b46d014129db:chathub-web/src/components/modal/modal-create-new-chat.tsx
     }
-  };
+  }
 
 
   return (

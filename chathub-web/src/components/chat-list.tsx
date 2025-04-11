@@ -22,7 +22,6 @@ import ChangePasswordModal from "./modal-change-password"
 import ModalFriendList from "./modal-friend-list"
 import ModalFriendRequests from "./modal-friend-requests"
 import ModalListGroup from "./modal-list-group"
-import ModalFindFriend from "./modal-find-friend"
 
 import { BsPinAngleFill } from "react-icons/bs"
 import { RiUnpinFill } from "react-icons/ri"
@@ -256,7 +255,8 @@ const ChatList = ({ setSelectedChat, setIsGroupChat, setConversationData, onPinC
               </li>
             ))
         ) : (
-          <div className="loader"></div>
+          // <div className="loader"></div>
+          <></>
         )}
       </ul>
 

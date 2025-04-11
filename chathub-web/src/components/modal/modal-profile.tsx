@@ -4,9 +4,9 @@ import React, { useState, useEffect } from "react"
 import { Camera } from "lucide-react"
 import Image from "next/image"
 import { Dialog, DialogPanel, DialogTitle, Transition, TransitionChild } from "@headlessui/react"
-import { Input } from "./ui/input"
-import { Button } from "./ui/button"
-import { Images } from "../constants/images"
+import { Input } from "../ui/input"
+import { Button } from "../ui/button"
+import { Images } from "../../constants/images"
 import { DemoContainer } from "@mui/x-date-pickers/internals/demo"
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs"
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider"
@@ -103,7 +103,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
       return
     }
 
-    const formattedDate = dayjs(profileData?.dateOfBirth).format("DD-MM-YYYY");
+    const formattedDate = dayjs(profileData?.dateOfBirth).format("DD-MM-YYYY")
 
     const data: ChangeProfileRequest = {
       id: userId!,
@@ -112,6 +112,21 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
       gender: (profileData?.gender as "MALE" | "FEMALE") || "MALE",
     }
 
+<<<<<<< HEAD:chathub-web/src/components/modal-profile.tsx
+=======
+    if (selectedImage) {
+      if (selectedImage !== profileData.avatar) {
+        const avatarFile = await fetch(selectedImage)
+          .then(res => res.blob())
+          .then(blob => new File([blob], "avatar.jpg", { type: blob.type }))
+
+        data.avatar = avatarFile
+      }
+    } else if (!selectedImage && profileData?.avatar) {
+      delete data.avatar
+    }
+
+>>>>>>> 28c0e5fae504493ab038b74c9e28b46d014129db:chathub-web/src/components/modal/modal-profile.tsx
     try {
       const response = await updateProfile(data, token!)
       if (response) {

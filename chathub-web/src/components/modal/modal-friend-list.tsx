@@ -5,11 +5,11 @@ import Image from "next/image"
 import { Dialog, DialogPanel, DialogTitle, Transition, TransitionChild } from "@headlessui/react"
 import { useSelector } from "react-redux"
 import { RootState } from "~/lib/reudx/store"
-import { Images } from "../constants/images"
+import { Images } from "../../constants/images"
 import { Search } from "lucide-react"
-import { Button } from "./ui/button"
-import { Input } from "./ui/input"
-import DropdownFriendList from "./dropdown-friend-list"
+import { Button } from "../ui/button"
+import { Input } from "../ui/input"
+import DropdownFriendList from "../dropdown-friend-list"
 import ProfileViewModal from "./modal-profile-view"
 import ModalConfirm from "./modal-confirm"
 import ModalSuccess from "./modal-success"
@@ -31,10 +31,10 @@ const ModalFriendList: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) =>
   const [isDropDownOpen, setIsDropDownOpen] = useState(false)
   const [isProfileViewModalOpen, setIsProfileViewModalOpen] = useState(false)
 
-  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
-  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
-  const [friendIdToUnfriend, setFriendIdToUnfriend] = useState<number | null>(null);
-  const [successMessage, setSuccessMessage] = useState<string>("");
+  const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false)
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false)
+  const [friendIdToUnfriend, setFriendIdToUnfriend] = useState<number | null>(null)
+  const [successMessage, setSuccessMessage] = useState<string>("")
 
   const handleOpenProfile = (friend: UserDTO) => {
     setSelectedFriend({ ...friend, gender: friend.gender as "Male" | "Female" })
@@ -43,42 +43,43 @@ const ModalFriendList: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) =>
 
   const filteredFriends = fetchedFriends?.filter(friend => friend.name.toLowerCase().includes(searchTerm.toLowerCase()))
 
-  const friendsToDisplay = activeTab === "recent" ? filteredFriends.filter(friend => friend.status === "ONLINE") : filteredFriends
+  const friendsToDisplay =
+    activeTab === "recent" ? filteredFriends.filter(friend => friend.status === "ONLINE") : filteredFriends
 
   const handleUnfriendAction = async (friendId: number) => {
-    if (!token || !userId || !friendId) return;
+    if (!token || !userId || !friendId) return
     try {
-      const res = await unfriend(token, userId, friendId);
+      const res = await unfriend(token, userId, friendId)
       if (res === "Unfriend Success") {
-        setSuccessMessage("Unfriend successfully!");
-        setIsSuccessModalOpen(true);
+        setSuccessMessage("Unfriend successfully!")
+        setIsSuccessModalOpen(true)
       }
     } catch (error: any) {
-      toast.error("Failed to unfriend. Please try again.");
+      toast.error("Failed to unfriend. Please try again.")
     } finally {
       setTimeout(() => {
-        window.location.reload();
-      }, 6000);
+        window.location.reload()
+      }, 6000)
     }
-  };
+  }
 
   const handleConfirmUnfriend = (friendId: number) => {
-    setFriendIdToUnfriend(friendId);
-    setIsConfirmModalOpen(true);
-  };
+    setFriendIdToUnfriend(friendId)
+    setIsConfirmModalOpen(true)
+  }
 
   const handleConfirmUnfriendYes = () => {
     if (friendIdToUnfriend !== null) {
-      handleUnfriendAction(friendIdToUnfriend);
+      handleUnfriendAction(friendIdToUnfriend)
     }
-    setIsConfirmModalOpen(false);
-    setFriendIdToUnfriend(null);
-  };
+    setIsConfirmModalOpen(false)
+    setFriendIdToUnfriend(null)
+  }
 
   const handleConfirmUnfriendCancel = () => {
-    setIsConfirmModalOpen(false);
-    setFriendIdToUnfriend(null);
-  };
+    setIsConfirmModalOpen(false)
+    setFriendIdToUnfriend(null)
+  }
 
   return (
     <div>
@@ -135,21 +136,14 @@ const ModalFriendList: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) =>
                     <button
                       onClick={() => setActiveTab("all")}
                       className={`px-4 py-2 rounded-lg text-white font-semibold
-                        ${activeTab === "all"
-                          ? "bg-[#501794]"
-                          : "bg-[#8C8595] hover:bg-[#7746F5]"
-                        }`
-                      }
+                        ${activeTab === "all" ? "bg-[#501794]" : "bg-[#8C8595] hover:bg-[#7746F5]"}`}
                     >
                       All ({fetchedFriends?.length || 0})
                     </button>
                     <button
                       onClick={() => setActiveTab("recent")}
                       className={`px-4 py-2 rounded-lg text-white font-semibold
-                        ${activeTab === "recent"
-                          ? "bg-[#501794]"
-                          : "bg-[#8C8595] hover:bg-[#7746F5]"
-                        }`}
+                        ${activeTab === "recent" ? "bg-[#501794]" : "bg-[#8C8595] hover:bg-[#7746F5]"}`}
                     >
                       Recently online ({fetchedFriends?.filter(friend => friend.status == "ONLINE")?.length || 0})
                     </button>
@@ -169,7 +163,13 @@ const ModalFriendList: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) =>
                             key={index}
                             className="flex items-center odd:bg-[#E4DEED] even:bg-[#AF9CC9] rounded-lg p-3 mb-3 space-x-3"
                           >
-                            <Image src={friend.avatar} alt={friend.name} width={45} height={45} className="rounded-full" />
+                            <Image
+                              src={friend.avatar}
+                              alt={friend.name}
+                              width={45}
+                              height={45}
+                              className="rounded-full"
+                            />
 
                             <div className="flex-1">
                               <div className="flex items-start justify-between">
@@ -185,13 +185,15 @@ const ModalFriendList: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) =>
                                 onClick={() => handleConfirmUnfriend(parseInt(friend.id?.toString() || "0"))}
                                 disabled={isUnfriending && parseInt(friend.id?.toString() || "0") === unfriendUserId}
                               >
-                                {
-                                  isUnfriending &&
-                                    parseInt(friend.id?.toString() || "0") === unfriendUserId
-                                    ? "Unfriending..." : "Unfriend"
-                                }
+                                {isUnfriending && parseInt(friend.id?.toString() || "0") === unfriendUserId
+                                  ? "Unfriending..."
+                                  : "Unfriend"}
                               </Button>
-                              <DropdownFriendList friend={friend as any} key={index} onOpenProfile={handleOpenProfile} />
+                              <DropdownFriendList
+                                friend={friend as any}
+                                key={index}
+                                onOpenProfile={handleOpenProfile}
+                              />
                             </div>
                           </div>
                         )
@@ -205,11 +207,7 @@ const ModalFriendList: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) =>
         </Dialog>
       </Transition>
 
-      <ProfileViewModal
-        isOpen={isProfileViewModalOpen}
-        setIsOpen={setIsProfileViewModalOpen}
-        friend={selectedFriend}
-      />
+      <ProfileViewModal isOpen={isProfileViewModalOpen} setIsOpen={setIsProfileViewModalOpen} friend={selectedFriend} />
       <ModalConfirm
         isOpen={isConfirmModalOpen}
         setIsOpen={setIsConfirmModalOpen}
@@ -218,11 +216,7 @@ const ModalFriendList: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) =>
         title="Confirm Unfriend"
         message={`Are you sure you want to unfriend ${selectedFriend?.name}?`}
       />
-      <ModalSuccess
-        isOpen={isSuccessModalOpen}
-        setIsOpen={setIsSuccessModalOpen}
-        message={successMessage}
-      />
+      <ModalSuccess isOpen={isSuccessModalOpen} setIsOpen={setIsSuccessModalOpen} message={successMessage} />
     </div>
   )
 }

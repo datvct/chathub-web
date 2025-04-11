@@ -3,8 +3,8 @@
 import React, { useState, useEffect } from "react"
 import Image from "next/image"
 import { Dialog, DialogPanel, DialogTitle, Transition, TransitionChild } from "@headlessui/react"
-import { Input } from "./ui/input"
-import { Images } from "../constants/images"
+import { Input } from "../ui/input"
+import { Images } from "../../constants/images"
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs"
 import { useSelector } from "react-redux"
 import { RootState } from "~/lib/reudx/store"
@@ -23,18 +23,14 @@ interface ProfileViewModalProps {
   friend: UserDTO | null
 }
 
-const ProfileViewModal: React.FC<ProfileViewModalProps> = ({
-  isOpen,
-  setIsOpen,
-  friend
-}) => {
-  const userId = useSelector((state: RootState) => state.auth.userId);
-  const token = useSelector((state: RootState) => state.auth.token);
+const ProfileViewModal: React.FC<ProfileViewModalProps> = ({ isOpen, setIsOpen, friend }) => {
+  const userId = useSelector((state: RootState) => state.auth.userId)
+  const token = useSelector((state: RootState) => state.auth.token)
 
   const [profileData, setProfileData] = useState<ProfileData>({
     displayName: friend?.name || "",
     dateOfBirth: friend?.dateOfBirth || new Date(),
-    gender: friend?.gender || "MALE"
+    gender: friend?.gender || "MALE",
   })
 
   const handleChange = (field: keyof ProfileData, value: string | Date | "MALE" | "FEMALE") => {
@@ -44,7 +40,7 @@ const ProfileViewModal: React.FC<ProfileViewModalProps> = ({
   const handleDateOfBirth = (newDate: dayjs.Dayjs | null) => {
     setProfileData(prev => ({
       ...prev,
-      dateOfBirth: friend?.dateOfBirth || new Date()
+      dateOfBirth: friend?.dateOfBirth || new Date(),
     }))
   }
 
@@ -52,9 +48,9 @@ const ProfileViewModal: React.FC<ProfileViewModalProps> = ({
     setProfileData({
       displayName: friend?.name || "",
       dateOfBirth: friend?.dateOfBirth || new Date(),
-      gender: friend?.gender || "MALE"
+      gender: friend?.gender || "MALE",
     })
-  }, [friend]);
+  }, [friend])
 
   return (
     <Transition appear show={isOpen} as={React.Fragment}>
@@ -130,7 +126,7 @@ const ProfileViewModal: React.FC<ProfileViewModalProps> = ({
                       <div className="mt-1">
                         <Input
                           type="text"
-                          value={dayjs(profileData.dateOfBirth).format('MMMM D, YYYY')}
+                          value={dayjs(profileData.dateOfBirth).format("MMMM D, YYYY")}
                           readOnly
                           className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400 focus:outline-none"
                         />
@@ -175,14 +171,13 @@ const ProfileViewModal: React.FC<ProfileViewModalProps> = ({
                       </div>
                     </div>
                   </div>
-
                 </div>
               </DialogPanel>
             </TransitionChild>
           </div>
         </div>
       </Dialog>
-    </Transition >
+    </Transition>
   )
 }
 
