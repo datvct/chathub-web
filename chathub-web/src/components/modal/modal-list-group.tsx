@@ -133,9 +133,8 @@ const ModalListGroup: React.FC<ModalListGroupProps> = ({ isOpen, setIsOpen, isAd
                     ref={el => {
                       groupRefs.current[index] = el
                     }}
-                    className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer mb-3 ${
-                      selectedGroup === index ? "bg-[#7a99b8]/90" : ""
-                    } bg-[#fff] hover:bg-[#93C1D2]`}
+                    className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer mb-3 ${selectedGroup === index ? "bg-[#7a99b8]/90" : ""
+                      } bg-[#fff] hover:bg-[#93C1D2]`}
                   >
                     <Image
                       src={group.groupAvatar ?? Images.AvatarDefault}

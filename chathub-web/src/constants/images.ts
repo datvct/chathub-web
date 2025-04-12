@@ -19,6 +19,8 @@ import IconAddFriend from "../../public/images/icon-add-friend.svg"
 import IconAddPerson from "../../public/images/icon-add-person.png"
 import IconContact from "../../public/images/icon-contact.svg"
 import IconGroup from "../../public/images/icon-group.svg"
+import IconUserSearch from "../../public/images/icon-user-search.png"
+import IconLogOut from "../../public/images/icon-log-out.png"
 import GuyHawkins from "../../public/images/GuyHawkins.png"
 import RonaldRichards from "../../public/images/RonaldRichards.png"
 import EstherHoward from "../../public/images/EstherHoward.png"
@@ -63,6 +65,8 @@ export const Images = {
   IconAddPerson,
   IconContact,
   IconGroup,
+  IconUserSearch,
+  IconLogOut,
   GuyHawkins,
   RonaldRichards,
   EstherHoward,

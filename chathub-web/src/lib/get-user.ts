@@ -67,7 +67,25 @@ export async function unblockUser(blockerId: number, blockedId: number, token: s
     })
     return response
   } catch (error) {
-    console.error("Error unblocking user:", error)
-    throw error
+    console.error("Error unblocking user:", error);
+    throw error;
+  }
+}
+
+export async function findUserByIdAPI(userId: number, token: string): Promise<UserDTO | null> {
+  try {
+    if (!userId) return null;
+    const response = await userInstance.findUserByUserId(
+      userId,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    return response.data || null;
+  } catch (error) {
+    console.error(`Error fetching user by ID ${userId}:`, error);
+    return null;
   }
 }
