@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { FriendshipRequest, UserDTO } from "~/codegen/data-contracts";
-import { getListFriends, rejectFriendRequest, unsentFriendRequest } from "~/lib/get-friend";
+import { FriendshipRequest, UserDTO, SuccessResponse } from "~/codegen/data-contracts";
+import { getListFriends, rejectFriendRequest, unsentFriendRequest, sendFriendRequest } from "~/lib/get-friend";
 import { getListFriendRequest, acceptFriendRequest } from "~/lib/get-friend";
 
 export function useFriends(userId: number, token: string) {
@@ -11,22 +11,28 @@ export function useFriends(userId: number, token: string) {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (!userId) return;
+    if (!userId || !token) {
+      setLoading(false);
+      return;
+    }
 
     const fetchFriends = async () => {
       setLoading(true);
+      setError(null);
       try {
         const data = await getListFriends(userId, token);
-        setFriends(data);
-      } catch {
+        setFriends(data || []);
+      } catch (err: any) {
+        console.error("Failed to fetch friends:", err);
         setError("Failed to fetch friends.");
+        setFriends([]);
       } finally {
         setLoading(false);
       }
     };
 
     fetchFriends();
-  }, [userId]);
+  }, [userId, token]);
 
   const getListFriendRequests = async () => {
     setLoading(true);
@@ -84,5 +90,31 @@ export function useFriends(userId: number, token: string) {
     }
   }
 
-  return { friends, loading, error, getListFriendRequests, acceptFriendRequestHook, rejectFriendRequestHook, unsentFriendRequestHook };
+  const sendFriendRequestHook = async (data: FriendshipRequest) => {
+    if (!token) {
+      return null;
+    }
+    try {
+      const response: SuccessResponse = await sendFriendRequest(data, token);
+      return response;
+    } catch (err: any) {
+      console.error("Failed to send friend request:", err);
+      const errorMessage = err?.response?.data?.message || err.message || "Failed to send friend request.";
+      console.error(errorMessage);
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return {
+    friends,
+    loading,
+    error,
+    getListFriendRequests,
+    acceptFriendRequestHook,
+    rejectFriendRequestHook,
+    unsentFriendRequestHook,
+    sendFriendRequestHook
+  };
 }

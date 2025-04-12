@@ -29,6 +29,10 @@ export const useConversation = (userId: number, token: string) => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  const [searchedGroups, setSearchedGroups] = useState<ConversationResponse[]>([])
+  const [searchGroupLoading, setSearchGroupLoading] = useState(false)
+  const [searchGroupError, setSearchGroupError] = useState<string | null>(null)
+
   useEffect(() => {
     if (!userId) return
 
@@ -277,16 +281,26 @@ export const useConversation = (userId: number, token: string) => {
   }
 
   const findGroups = async (userId: number, groupName: string, token: string) => {
-    setLoading(true)
-    setError(null)
+    if (!groupName.trim()) {
+      setSearchedGroups([])
+      setSearchGroupLoading(false)
+      setSearchGroupError(null)
+      return []
+    }
+
+    setSearchGroupLoading(true)
+    setSearchGroupError(null)
     try {
       const response = await findGroupsAPI(userId, groupName, token)
+      console.log("findGroups Response Hook:", response)
+      setSearchedGroups(response || [])
       return response || []
     } catch (err) {
-      setError("Failed to fetch groups")
+      setSearchGroupError("Failed to fetch groups")
+      setSearchedGroups([])
       return []
     } finally {
-      setLoading(false)
+      setSearchGroupLoading(false)
     }
   }
 

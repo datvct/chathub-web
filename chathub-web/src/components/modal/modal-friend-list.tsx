@@ -41,7 +41,13 @@ const ModalFriendList: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) =>
     setIsProfileViewModalOpen(true)
   }
 
-  const filteredFriends = fetchedFriends?.filter(friend => friend.name.toLowerCase().includes(searchTerm.toLowerCase()))
+  const filteredFriends = fetchedFriends?.filter(friend => {
+    if (!friend) return false;
+    const term = searchTerm.toLowerCase();
+    const nameMatch = friend.name?.toLowerCase().includes(term);
+    const phoneMatch = friend.phoneNumber?.includes(term);
+    return nameMatch || phoneMatch;
+  }) || [];
 
   const friendsToDisplay =
     activeTab === "recent" ? filteredFriends.filter(friend => friend.status === "ONLINE") : filteredFriends
@@ -124,7 +130,7 @@ const ModalFriendList: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) =>
                   <div className="relative mb-4 rounded-lg">
                     <Input
                       type="text"
-                      placeholder="Search by phoneNumber number or name"
+                      placeholder="Search by name or phone number"
                       value={searchTerm}
                       onChange={e => setSearchTerm(e.target.value)}
                       className="w-full py-[22px] pl-12 pr-4 bg-[#fff] border border-[#545454] rounded-lg text-gray-900 focus:outline-none placeholder-[#828282] focus:border-indigo-500 focus:ring-indigo-500"
@@ -151,16 +157,20 @@ const ModalFriendList: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) =>
 
                   <div className="max-h-[55vh] overflow-y-auto custom-scrollbar pr-2">
                     {loading ? (
-                      <div>Loading friends...</div>
+                      <div className="flex justify-center items-center h-full">
+                        <div className="loader"></div>
+                      </div>
                     ) : error ? (
-                      <div>Error loading friends: {error}</div>
-                    ) : !friendsToDisplay || friendsToDisplay.length === 0 ? (
-                      <div>No friends found.</div>
+                      <p className="text-red-400 text-center">{error}</p>
+                    ) : !filteredFriends || filteredFriends.length === 0 ? (
+                      <p className="text-center text-gray-400 mt-4">
+                        No friends found matching your search.
+                      </p>
                     ) : (
-                      friendsToDisplay.map((friend, index) => {
+                      filteredFriends.map((friend, index) => {
                         return (
                           <div
-                            key={index}
+                            key={friend.id || index}
                             className="flex items-center odd:bg-[#E4DEED] even:bg-[#AF9CC9] rounded-lg p-3 mb-3 space-x-3"
                           >
                             <Image

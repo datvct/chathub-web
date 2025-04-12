@@ -1,20 +1,24 @@
 "use client"
 
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState, useCallback, Fragment } from "react"
 import Image from "next/image"
-import { useSelector } from "react-redux"
-import { Menu, MenuButton, MenuItem, MenuItems } from "@headlessui/react"
+import { useSelector, useDispatch } from "react-redux"
+import { useRouter } from "next/navigation"
+import Cookies from "js-cookie"
+import { Menu, MenuButton, MenuItem, MenuItems, Transition } from "@headlessui/react"
 import { toast } from "react-toastify"
 
 import { RootState } from "~/lib/reudx/store"
+import { logout } from "~/lib/reudx/authSlice"
 import { useConversation } from "~/hooks/use-converstation"
 import { ConversationResponse, UserDTO } from "~/codegen/data-contracts"
 import formatLastMessageTime from "~/lib/utils"
 import { MessageType } from "~/types/types"
 import { useBlockUnblockUser } from "~/hooks/use-user"
-
 import { Images } from "../constants/images"
 import "../styles/custom-scroll.css"
+import { Search, X, AlertTriangle } from "lucide-react"
+
 import ModalCreateNewChat from "./modal/modal-create-new-chat"
 import ModalCreateNewGroupChat from "./modal/modal-create-new-group-chat"
 import ModalProfile from "./modal/modal-profile"
@@ -22,10 +26,13 @@ import ChangePasswordModal from "./modal/modal-change-password"
 import ModalFriendList from "./modal/modal-friend-list"
 import ModalFriendRequests from "./modal/modal-friend-requests"
 import ModalListGroup from "./modal/modal-list-group"
+import ModalConfirm from "./modal/modal-confirm"
+import ModalFindFriend from "./modal-find-friend"
 
 import { BsPinAngleFill } from "react-icons/bs"
 import { findUserById } from "~/lib/get-user"
 import { send } from "process"
+import { RiUnpinFill } from "react-icons/ri"
 
 interface ChatListProps {
   setSelectedChat: (id: number) => void
@@ -68,6 +75,10 @@ const ChatList = ({
   const [isFriendListModalOpen, setIsFriendListModalOpen] = useState(false)
   const [isFriendRequestModalOpen, setIsFriendRequestModalOpen] = useState(false)
   const [modalListGroup, setModalListGroup] = useState(false)
+  const [isConfirmLogoutOpen, setIsConfirmLogoutOpen] = useState(false)
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
+  const router = useRouter()
+  const dispatch = useDispatch()
 
   const dataProfile = useGetUserById(userId, token)
 
@@ -109,6 +120,34 @@ const ChatList = ({
       default:
         return truncate(`${sender} has sent a file`)
     }
+  }
+
+  const handleConfirmLogout = async () => {
+    setIsLoggingOut(true)
+    console.log("Logging out...")
+    try {
+      Cookies.remove("authToken", { path: "/" })
+      Cookies.remove("userId", { path: "/" })
+      console.log("Cookies removed")
+
+      dispatch(logout())
+      console.log("Redux state cleared")
+
+      setIsConfirmLogoutOpen(false)
+
+      toast.success("Logged out successfully!")
+
+      router.push("/sign-in")
+      console.log("Redirecting to /sign-in")
+    } catch (error) {
+      console.error("Logout failed:", error)
+      toast.error("Logout failed. Please try again.")
+      setIsLoggingOut(false)
+    }
+  }
+
+  const confirmLogoutCancel = () => {
+    setIsConfirmLogoutOpen(false)
   }
 
   return (
@@ -157,6 +196,16 @@ const ChatList = ({
             >
               <Image src={Images.IconGroup} alt="Group List" width={24} height={24} />
               <span className="ml-3 block font-medium truncate">Group List</span>
+            </button>
+          </MenuItem>
+
+          <MenuItem>
+            <button
+              className="w-full group rounded-lg px-4 py-2 flex items-center cursor-pointer hover:bg-gray-600"
+              onClick={() => setIsConfirmLogoutOpen(true)}
+            >
+              <Image src={Images.IconLogOut} alt="Group List" width={24} height={24} />
+              <span className="ml-3 block font-medium truncate">Log Out</span>
             </button>
           </MenuItem>
         </MenuItems>
@@ -302,8 +351,19 @@ const ChatList = ({
       <ModalFriendList isOpen={isFriendListModalOpen} setIsOpen={setIsFriendListModalOpen} />
       <ModalFriendRequests isOpen={isFriendRequestModalOpen} setIsOpen={setIsFriendRequestModalOpen} />
       <ModalListGroup isOpen={modalListGroup} setIsOpen={setModalListGroup} isAdmin={true} />
+      <ModalConfirm
+        isOpen={isConfirmLogoutOpen}
+        setIsOpen={setIsConfirmLogoutOpen}
+        onConfirm={handleConfirmLogout}
+        onCancel={confirmLogoutCancel}
+        title="Confirm Logout"
+        message={"Are you sure you want to log out of your account?"}
+      />
     </div>
   )
 }
 
 export default ChatList
+function dispatch(arg0: { payload: undefined; type: "auth/logout" }) {
+  throw new Error("Function not implemented.")
+}
