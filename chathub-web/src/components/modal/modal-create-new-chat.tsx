@@ -18,12 +18,11 @@ import { toast } from "react-toastify"
 interface ModalCreateNewChatProps {
   isOpen: boolean
   setIsOpen: (open: boolean) => void
+  userId: number
+  token: string
 }
 
-const ModalCreateNewChat: React.FC<ModalCreateNewChatProps> = ({ isOpen, setIsOpen }) => {
-  const userId = useSelector((state: RootState) => state.auth.userId)
-  const token = useSelector((state: RootState) => state.auth.token)
-
+const ModalCreateNewChat: React.FC<ModalCreateNewChatProps> = ({ isOpen, setIsOpen, token, userId }) => {
   const [selectedUser, setSelectedUser] = useState<number | null>(null)
   const [searchQuery, setSearchQuery] = useState<string>("")
   const { friends, loading: friendsLoading, error } = useFriends(userId, token)

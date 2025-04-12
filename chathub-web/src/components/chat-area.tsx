@@ -2,17 +2,17 @@
 
 import ChatHeader from "./chat-header"
 import ChatInput from "./chat-input"
-import { useSelector } from "react-redux"
-import { RootState } from "~/lib/reudx/store"
-import { ConversationResponse } from "~/codegen/data-contracts"
-import { useEffect, useRef } from "react"
-import ".././styles/css-message.css"
-import useWebSocket from "~/hooks/useWebSocket"
-import ChatMessage from "./chat-message"
+import { useEffect, useRef, useState, useCallback } from "react"
+import { ConversationResponse, MessageResponse } from "~/codegen/data-contracts"
 import { MessageType } from "../types/types"
+import { getMessageByConversationId } from "~/lib/get-message"
+import { TOPICS } from "~/constants/Topics"
+import WebSocketService from "~/lib/web-socket-service"
+import ChatMessage from "./chat-message"
+import "../styles/css-message.css"
 
 interface ChatScreenProps {
-  selectedChatId: number | null
+  conversationId: number | null
   setIsChatInfoOpen: (isOpen: boolean) => void
   isChatInfoOpen: boolean
   isGroupChat: boolean
@@ -21,10 +21,12 @@ interface ChatScreenProps {
   setIsChatSearchOpen?: (isOpen: boolean) => void
   highlightMessageId?: number
   onRefetchConversations: () => void
+  userId: number
+  token?: string
 }
 
 const ChatScreen = ({
-  selectedChatId,
+  conversationId,
   setIsChatInfoOpen,
   isChatInfoOpen,
   isGroupChat,
@@ -32,55 +34,95 @@ const ChatScreen = ({
   isChatSearchOpen,
   setIsChatSearchOpen,
   highlightMessageId,
+  userId,
+  token,
 }: ChatScreenProps) => {
-  const token = useSelector((state: RootState) => state.auth.token)
-  const userId = useSelector((state: RootState) => state.auth.userId)
-  const { messages, sendMessage, loading, isUserOnline } = useWebSocket(selectedChatId, userId, token)
+  const ws = WebSocketService.getInstance()
+  const [messages, setMessages] = useState<MessageResponse[]>([])
   const messagesEndRef = useRef<HTMLDivElement | null>(null)
+
   useEffect(() => {
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: "smooth" })
+    const fetchMessage = async () => {
+      if (conversationId) {
+        const response = await getMessageByConversationId(conversationId, userId, token)
+        if (response) {
+          setMessages(response)
+        }
+      }
     }
-  }, [messages])
+    fetchMessage()
+  }, [conversationId, userId, token])
+
+  useEffect(() => {
+    if (!conversationId) return
+    const messageTopic = TOPICS.MESSAGE(conversationId.toString())
+
+    const handleNewMessage = (message: MessageResponse) => {
+      setMessages(prev => [...prev, message])
+    }
+
+    ws.subscribe(messageTopic, handleNewMessage)
+    console.log("Subscribed to topic:", messageTopic)
+    return () => {
+      ws.unsubscribe(messageTopic, handleNewMessage)
+    }
+  }, [conversationId, ws])
+
+  const onSend = useCallback(
+    (content: string, messageType: MessageType) => {
+      if (!conversationId) return
+
+      const ws = WebSocketService.getInstance()
+      const stompClient = ws.getStompClient()
+      if (!stompClient) return
+      const messageSend = {
+        senderId: userId,
+        content,
+        messageType,
+        conversationId,
+      }
+
+      stompClient?.publish({
+        destination: `/app/sendMessage/${conversationId}`,
+        body: JSON.stringify(messageSend),
+      })
+    },
+    [conversationId, userId],
+  )
 
   useEffect(() => {
     if (highlightMessageId) {
       const messageElement = document.getElementById(`message-${highlightMessageId}`)
       if (messageElement) {
         messageElement.scrollIntoView({ behavior: "smooth", block: "center" })
-
         messageElement.classList.add("highlight")
-        setTimeout(() => {
-          messageElement.classList.remove("highlight")
-        }, 3000)
+        setTimeout(() => messageElement.classList.remove("highlight"), 3000)
       }
     }
   }, [highlightMessageId])
 
   const handleSendMessage = (content: string, messageType: MessageType) => {
-    sendMessage(content, messageType)
+    if (content.trim()) {
+      onSend(content, messageType)
+      setTimeout(() => {
+        messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+      }, 100)
+    }
   }
 
   return (
     <div className="flex-1 h-full w-full p-4 bg-[#3A3A3A] text-white flex flex-col relative transition-all">
       <ChatHeader
-        name={conversationData?.groupName ?? conversationData.senderName}
+        name={conversationData?.groupName ?? conversationData?.senderName}
         setIsChatInfoOpen={setIsChatInfoOpen}
         isChatInfoOpen={isChatInfoOpen}
         avatar={conversationData?.groupAvatar}
         isChatSearchOpen={isChatSearchOpen}
         setIsChatSearchOpen={setIsChatSearchOpen}
-        isUserOnline={isUserOnline}
       />
 
       <div className="flex flex-col-reverse overflow-y-auto h-[75vh] custom-scrollbar">
-        {loading ? (
-          <div className="flex items-center justify-center text-white">Đang tải...</div>
-        ) : messages?.length ? (
-          <ChatMessage messages={messages} userId={userId} isGroupChat={isGroupChat} messagesEndRef={messagesEndRef} />
-        ) : (
-          <div className="flex items-center justify-center text-white">No messages found</div>
-        )}
+        <ChatMessage messages={messages} userId={userId} isGroupChat={isGroupChat} messagesEndRef={messagesEndRef} />
       </div>
 
       <ChatInput onSendMessage={handleSendMessage} />

@@ -18,11 +18,11 @@ import { useConversation } from "~/hooks/use-converstation"
 interface ModalCreateGroupChatProps {
   isOpen: boolean
   setIsOpen: (open: boolean) => void
+  userId: number
+  token: string
 }
 
-const ModalCreateGroupChat: React.FC<ModalCreateGroupChatProps> = ({ isOpen, setIsOpen }) => {
-  const userId = useSelector((state: RootState) => state.auth.userId)
-  const token = useSelector((state: RootState) => state.auth.token)
+const ModalCreateGroupChat: React.FC<ModalCreateGroupChatProps> = ({ isOpen, setIsOpen, userId, token }) => {
   const [groupName, setGroupName] = useState<string>("")
   const [selectedUsers, setSelectedUsers] = useState<number[]>([])
   const [searchQuery, setSearchQuery] = useState<string>("")

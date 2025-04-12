@@ -23,7 +23,6 @@ const useWebSocket = (conversationId: number, userId: number, token?: string) =>
       setError(null)
       try {
         const data: MessageResponse[] = await getMessageByConversationId(conversationId, userId, token)
-        console.log("Fetched messages:", data)
         setMessages(data || [])
       } catch (err) {
         setError("Failed to fetch messages")
@@ -36,7 +35,7 @@ const useWebSocket = (conversationId: number, userId: number, token?: string) =>
     fetchMessages()
 
     const stompClient = new Client({
-      webSocketFactory: () => new SockJS("http://localhost:8080/ws"),
+      webSocketFactory: () => new SockJS(process.env.WS_URL),
       debug: str => console.log("[WebSocket Debug]", str),
       reconnectDelay: 5000,
       connectHeaders: {
