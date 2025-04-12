@@ -53,7 +53,6 @@ const SignInPage: React.FC = () => {
 
     try {
       const response = await submitSignUp(data)
-      console.log("Response:", response)
       if (response.status === 200) {
         dispatch(setUser({ userId: response?.response?.userId, token: response?.response?.token }))
         setCookie("authToken", response?.response?.token, { maxAge: 60 * 60 * 24 * 7 })

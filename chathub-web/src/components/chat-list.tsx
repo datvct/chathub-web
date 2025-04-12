@@ -24,14 +24,17 @@ import ModalFriendRequests from "./modal/modal-friend-requests"
 import ModalListGroup from "./modal/modal-list-group"
 
 import { BsPinAngleFill } from "react-icons/bs"
-import { RiUnpinFill } from "react-icons/ri"
 import { findUserById } from "~/lib/get-user"
+import { send } from "process"
 
 interface ChatListProps {
   setSelectedChat: (id: number) => void
   setIsGroupChat: (isGroup: boolean) => void
   setConversationData?: (data: ConversationResponse) => void
   onPinChange: () => void
+  conversations: ConversationResponse[]
+  userId: number
+  token?: string
 }
 
 const useGetUserById = (userId: number, token?: string) => {
@@ -48,10 +51,15 @@ const useGetUserById = (userId: number, token?: string) => {
   return data
 }
 
-const ChatList = ({ setSelectedChat, setIsGroupChat, setConversationData, onPinChange }: ChatListProps) => {
-  const userId = useSelector((state: RootState) => state.auth.userId)
-  const token = useSelector((state: RootState) => state.auth.token)
-
+const ChatList = ({
+  setSelectedChat,
+  setIsGroupChat,
+  setConversationData,
+  onPinChange,
+  conversations,
+  userId,
+  token,
+}: ChatListProps) => {
   const [modalCreateChatOpen, setModalCreateNewChatOpen] = useState(false)
   const [modalCreateGroupChatOpen, setModalCreateNewGroupChatOpen] = useState(false)
   const [modalProfileOpen, setModalProfileOpen] = useState(false)
@@ -60,41 +68,8 @@ const ChatList = ({ setSelectedChat, setIsGroupChat, setConversationData, onPinC
   const [isFriendListModalOpen, setIsFriendListModalOpen] = useState(false)
   const [isFriendRequestModalOpen, setIsFriendRequestModalOpen] = useState(false)
   const [modalListGroup, setModalListGroup] = useState(false)
-  const { getRecentConversation } = useConversation(userId, token)
-
-  const [dataConversation, setDataConversation] = useState<ConversationResponse[]>([])
 
   const dataProfile = useGetUserById(userId, token)
-
-  const fetchDataConversation = async () => {
-    if (userId) {
-      setDataConversation([])
-      const init = async () => {
-        const response = await getRecentConversation(userId, token)
-        if (response) {
-          setDataConversation(response)
-        }
-      }
-      init()
-    }
-  }
-
-  useEffect(() => {
-    fetchDataConversation()
-  }, [userId, modalCreateChatOpen, modalCreateGroupChatOpen])
-
-  useEffect(() => {
-    if (userId) {
-      setDataConversation([])
-      const init = async () => {
-        const response = await getRecentConversation(userId, token)
-        if (response) {
-          setDataConversation(response)
-        }
-      }
-      init()
-    }
-  }, [userId, modalCreateChatOpen, modalCreateGroupChatOpen])
 
   const handleOpenChangePassword = () => {
     setIsProfileModalOpen(false)
@@ -110,6 +85,30 @@ const ChatList = ({ setSelectedChat, setIsGroupChat, setConversationData, onPinC
     setSelectedChat(id)
     setConversationData(converstation)
     setIsGroupChat(isGroup || false)
+  }
+
+  const getDislayMessage = (item: ConversationResponse) => {
+    if (!item.lastMessage || !item.lastMessageType) return "No messages"
+    const sender = item.senderId == userId ? "You" : item.senderName.split(" ")[0]
+
+    const truncate = (text: string, maxLength = 38) => {
+      return text.length > maxLength ? text.slice(0, maxLength) + "..." : text
+    }
+
+    switch (item.lastMessageType) {
+      case MessageType.TEXT:
+        return truncate(`${sender}: ${item.lastMessage}`)
+      case MessageType.IMAGE:
+        return truncate(`${sender} has sent an image`)
+      case MessageType.VIDEO:
+        return truncate(`${sender} has sent a video`)
+      case MessageType.DOCUMENT:
+        return truncate(`${sender} has sent a document`)
+      case MessageType.LINK:
+        return truncate(`${sender} has sent a link`)
+      default:
+        return truncate(`${sender} has sent a file`)
+    }
   }
 
   return (
@@ -163,7 +162,6 @@ const ChatList = ({ setSelectedChat, setIsGroupChat, setConversationData, onPinC
         </MenuItems>
       </Menu>
 
-      {/* Search Bar */}
       <div className="relative mb-4">
         <input
           type="text"
@@ -174,12 +172,12 @@ const ChatList = ({ setSelectedChat, setIsGroupChat, setConversationData, onPinC
 
       {/* Chat List */}
       <ul className="space-y-3 overflow-y-auto custom-scrollbar h-[calc(100%-150px)]">
-        {dataConversation.length > 0 ? (
-          [...dataConversation]
+        {conversations.length > 0 &&
+          [...conversations]
             .sort((a, b) => {
               if (a.pinned && !b.pinned) return -1
               if (!a.pinned && b.pinned) return 1
-              return 0
+              return new Date(b.lastMessageAt).getTime() - new Date(a.lastMessageAt).getTime()
             })
             .map((chat, index) => (
               <li
@@ -208,22 +206,8 @@ const ChatList = ({ setSelectedChat, setIsGroupChat, setConversationData, onPinC
                       {chat.pinned && <BsPinAngleFill size={20} color="white" className="text-white" />}
                     </div>
                   </div>
-                  <div className="flex justify-between items-center w-[120px]">
-                    <p className="text-sm text-[#838383] truncate">
-                      {chat.lastMessage
-                        ? chat.lastMessageType === MessageType.IMAGE
-                          ? "Sent an image"
-                          : chat.lastMessageType === MessageType.VIDEO
-                            ? "Sent a video"
-                            : chat.lastMessageType === MessageType.DOCUMENT
-                              ? "Sent a document"
-                              : chat.lastMessageType === MessageType.TEXT
-                                ? "Sent a text"
-                                : chat.lastMessageType === MessageType.LINK
-                                  ? "Sent a link"
-                                  : chat.lastMessage
-                        : "No messages"}
-                    </p>
+                  <div className="flex justify-between items-center w-[50%]">
+                    <p className="text-sm text-[#838383] truncate">{getDislayMessage(chat)}</p>
                     {chat.isSeen && (
                       <span className="bg-[#0078D4] text-xs font-bold text-white rounded-[20px] px-1 flex items-center justify-center">
                         NEW
@@ -235,14 +219,9 @@ const ChatList = ({ setSelectedChat, setIsGroupChat, setConversationData, onPinC
                   </div>
                 </div>
               </li>
-            ))
-        ) : (
-          // <div className="loader"></div>
-          <></>
-        )}
+            ))}
       </ul>
 
-      {/* Floating Button */}
       <Menu>
         <MenuButton
           as="button"
@@ -290,8 +269,18 @@ const ChatList = ({ setSelectedChat, setIsGroupChat, setConversationData, onPinC
         </MenuItems>
       </Menu>
 
-      <ModalCreateNewChat isOpen={modalCreateChatOpen} setIsOpen={setModalCreateNewChatOpen} />
-      <ModalCreateNewGroupChat isOpen={modalCreateGroupChatOpen} setIsOpen={setModalCreateNewGroupChatOpen} />
+      <ModalCreateNewChat
+        isOpen={modalCreateChatOpen}
+        setIsOpen={setModalCreateNewChatOpen}
+        userId={userId}
+        token={token}
+      />
+      <ModalCreateNewGroupChat
+        isOpen={modalCreateGroupChatOpen}
+        setIsOpen={setModalCreateNewGroupChatOpen}
+        userId={userId}
+        token={token}
+      />
       <ModalProfile
         isOpen={modalProfileOpen}
         setIsOpen={setModalProfileOpen}

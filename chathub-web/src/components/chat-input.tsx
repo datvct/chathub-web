@@ -152,11 +152,10 @@ const ChatInput = ({ onSendMessage }: { onSendMessage: (msg: string, messageType
 
       <div className="flex items-center justify-between gap-2.5">
         <div className="bg-[#2e2e3e] p-3 rounded-xl flex items-center space-x-3 w-[97%]">
-          <button onClick={() => handleFileClick(MessageType.IMAGE, imageInputRef)} className="cursor-pointer">
+          <button onClick={() => handleFileClick(MessageType.IMAGE, imageInputRef)}>
             <FaImage className="text-[#8A8A8A] text-xl" />
           </button>
-
-          <button onClick={() => handleFileClick(MessageType.VIDEO, videoInputRef)} className="cursor-pointer">
+          <button onClick={() => handleFileClick(MessageType.VIDEO, videoInputRef)}>
             <LiaFileVideo className="text-[#8A8A8A] text-xl" />
           </button>
 

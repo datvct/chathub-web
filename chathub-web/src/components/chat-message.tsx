@@ -19,7 +19,7 @@ const ChatMessage = ({ messages, userId, isGroupChat, messagesEndRef }: ChatMess
   let lastMessageDate: string | null = null
 
   return (
-    <div className="flex flex-col space-y-3">
+    <div className="flex flex-col space-y-3" key={messages[0]?.id}>
       {messages
         .slice()
         .sort((a, b) => new Date(a.sentAt).getTime() - new Date(b.sentAt).getTime())

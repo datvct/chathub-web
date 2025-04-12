@@ -34,6 +34,7 @@ export async function getRecentConversationByUserID(userId: number, token: strin
 
 export async function createConversationAPI(data: ConversationRequest, token: string) {
   try {
+    console.log("Creating conversation with data:", data)
     if (!data || !data.chatType) {
       throw new Error("Chat type is required.")
     }
@@ -324,7 +325,6 @@ export const leaveGroupConversationAPI = async (conversationId: number, userId: 
 export async function findGroupsAPI(userId: number, groupName: string, token: string) {
   try {
     if (!userId) return []
-    console.log("Calling API findGroupsAPI with:", { userId, groupName })
     const response = await conversationInstance.findGroupConversations(
       { userId, groupName },
       {
@@ -333,7 +333,6 @@ export async function findGroupsAPI(userId: number, groupName: string, token: st
         },
       },
     )
-    console.log("API Response:", response)
     return response.data || []
   } catch (error) {
     console.error("Error fetching groups:", error)

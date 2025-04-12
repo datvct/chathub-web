@@ -5,9 +5,7 @@ const messageInstance = new Message({ baseUrl: process.env.API_URL })
 
 export const getMessageByConversationId = async (conversationId: number, userId: number, token: string) => {
   try {
-    console.log(token)
     if (!conversationId) return null
-    console.log("Fetching messages for conversationId:", conversationId, "userId:", userId, "token:", token)
     const response = (await messageInstance
       .getMessages(
         conversationId,
