@@ -1,5 +1,6 @@
 /* eslint-disable */
 /* tslint:disable */
+// @ts-nocheck
 /*
  * ---------------------------------------------------------------
  * ## THIS FILE WAS GENERATED VIA SWAGGER-TYPESCRIPT-API        ##
@@ -275,6 +276,30 @@ export class Conversation<SecurityDataType = unknown> extends HttpClient<Securit
   ) =>
     this.request<number[], ErrorResponse>({
       path: `/conversation/getConversationsByUserId`,
+      method: "GET",
+      query: query,
+      secure: true,
+      ...params,
+    })
+  /**
+   * No description
+   *
+   * @tags conversation-controller
+   * @name FindSingleChat
+   * @request GET:/conversation/find-single-chat
+   * @secure
+   */
+  findSingleChat = (
+    query: {
+      /** @format int64 */
+      userId: number
+      /** @format int64 */
+      friendId: number
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<ConversationResponse, ErrorResponse>({
+      path: `/conversation/find-single-chat`,
       method: "GET",
       query: query,
       secure: true,
