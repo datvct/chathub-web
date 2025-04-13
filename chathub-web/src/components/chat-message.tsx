@@ -80,9 +80,10 @@ const ChatMessage = ({ messages, userId, isGroupChat, messagesEndRef, token, ref
                         <CiMenuKebab />
                       </button>
                     </div>
+                    {msg.unsent === false &&
                     <button className="hover:bg-[#333334] p-2 rounded-full">
                       <TiArrowBackOutline />
-                    </button>
+                    </button>}
                     <button className="hover:bg-[#333334] p-2 rounded-full">
                       <CiFaceSmile />
                     </button>
@@ -168,9 +169,10 @@ const ChatMessage = ({ messages, userId, isGroupChat, messagesEndRef, token, ref
                     <button className="hover:bg-[#333334] p-2 rounded-full">
                       <CiFaceSmile />
                     </button>
+                    {msg.unsent === false &&
                     <button className="hover:bg-[#333334] p-2 rounded-full">
                       <TiArrowForwardOutline />
-                    </button>
+                    </button>}
                     <div className="flex items-center gap-2">
                       <button
                         className="hover:bg-[#333334] p-2 rounded-full realative"
