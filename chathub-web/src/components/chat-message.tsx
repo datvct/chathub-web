@@ -24,11 +24,10 @@ interface ChatMessageProps {
 const ChatMessage = ({ messages, userId, isGroupChat, messagesEndRef, token, refetchMessages }: ChatMessageProps) => {
   let lastMessageDate: string | null = null
   const [openMenuId, setOpenMenuId] = useState<number | null>(null)
-  const [isMenuOpen, setIsMenuOpen] = useState(false)
 
   const handleUnsend = async (messageId: number) => {
     const res = await unsendMessage(userId, messageId, token)
-    setIsMenuOpen(false)
+    setOpenMenuId(null)
   }
   
   const handleDelete = async (messageId: number) => {
@@ -66,7 +65,7 @@ const ChatMessage = ({ messages, userId, isGroupChat, messagesEndRef, token, ref
                   <div className="flex items-center gap-2">
                     <div className="flex items-center gap-2">
                       <div
-                        className={`bg-[#252728] pl-3 pr-5 py-3 rounded-lg shadow-md ${openMenuId === msg.id && isMenuOpen === true ? "block" : "hidden"}`}
+                        className={`bg-[#252728] pl-3 pr-5 py-3 rounded-lg shadow-md ${openMenuId === msg.id ? "block" : "hidden"}`}
                       >
                         <ul>
                           {msg.unsent === false && <li className="hover:bg-[#333334] p-2 pr-3 rounded cursor-pointer" onClick={() => handleUnsend(msg.id)}>Recall</li>}
@@ -76,7 +75,7 @@ const ChatMessage = ({ messages, userId, isGroupChat, messagesEndRef, token, ref
                       </div>
                       <button
                         className="hover:bg-[#333334] p-2 rounded-full realative"
-                        onClick={() => {setOpenMenuId(openMenuId === msg.id ? null : msg.id); setIsMenuOpen(!isMenuOpen)}}
+                        onClick={() => {setOpenMenuId(openMenuId === msg.id ? null : msg.id);}}
                       >
                         <CiMenuKebab />
                       </button>
@@ -175,12 +174,12 @@ const ChatMessage = ({ messages, userId, isGroupChat, messagesEndRef, token, ref
                     <div className="flex items-center gap-2">
                       <button
                         className="hover:bg-[#333334] p-2 rounded-full realative"
-                        onClick={() => {setOpenMenuId(openMenuId === msg.id ? null : msg.id); setIsMenuOpen(!isMenuOpen)}}
+                        onClick={() => {setOpenMenuId(openMenuId === msg.id ? null : msg.id)}}
                       >
                         <CiMenuKebab />
                       </button>
                       <div
-                        className={`bg-[#252728] pl-3 pr-5 py-3 rounded-lg shadow-md ${openMenuId === msg.id && isMenuOpen === true ? "block" : "hidden"}`}
+                        className={`bg-[#252728] pl-3 pr-5 py-3 rounded-lg shadow-md ${openMenuId === msg.id ? "block" : "hidden"}`}
                       >
                         <ul>
                           <li className="hover:bg-[#333334] p-2 pr-3 rounded cursor-pointer" onClick={() => handleDelete(msg.id)}>Delete Message</li>
