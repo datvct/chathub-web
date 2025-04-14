@@ -23,3 +23,78 @@ export const getMessageByConversationId = async (conversationId: number, userId:
     return null
   }
 }
+
+export const unsendMessage = async (
+  userId: number,
+  messageId: number,
+  token: string
+): Promise<string | null> => {
+  try {
+    const res = await fetch(
+      `${process.env.API_URL}/message/unsent?userId=${userId}&messageId=${messageId}`,
+      {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    )
+    const text = await res.text()
+    return text // "Message unsent successfully."
+  } catch (error) {
+    console.error("Unsend message error:", error)
+    return null
+  }
+}
+
+
+export const deleteMessage = async (
+  userId: number,
+  messageId: number,
+  token: string
+): Promise<string | null> => {
+  try {
+    const res = await fetch(
+      `${process.env.API_URL}/message/delete?userId=${userId}&messageId=${messageId}`,
+      {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    )
+    const text = await res.text()
+    return text // "Message deleted successfully."
+  } catch (error) {
+    console.error("Delete message error:", error)
+    return null
+  }
+}
+
+export const forwardMessage = async (
+  senderId: number,
+  originalMessageId: number,
+  conversationIds: number[],
+  token: string,
+  message: string | null = null
+): Promise<MessageResponse[] | null> => {
+  try {
+    const res = await fetch(
+      `${process.env.API_URL}/message/forward?senderId=${senderId}&originalMessageId=${originalMessageId}&` +
+        conversationIds.map((id) => `conversationIds=${id}`).join("&"),
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: message ? JSON.stringify(message) : null,
+      }
+    )
+
+    return await res.json()
+  } catch (error) {
+    console.error("Forward message error:", error)
+    return null
+  }
+}

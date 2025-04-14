@@ -40,6 +40,16 @@ const ChatScreen = ({
   const ws = WebSocketService.getInstance()
   const [messages, setMessages] = useState<MessageResponse[]>([])
   const messagesEndRef = useRef<HTMLDivElement | null>(null)
+  const refetchMessages = async () => {
+    if (conversationId) {
+      const response = await getMessageByConversationId(conversationId, userId, token)
+      if (response) {
+        const uniqueMessages = Array.from(new Map(response.map(m => [m.id, m])).values())
+        setMessages(response)
+      }
+    }
+  }
+  
 
   useEffect(() => {
     const fetchMessage = async () => {
@@ -58,7 +68,18 @@ const ChatScreen = ({
     const messageTopic = TOPICS.MESSAGE(conversationId.toString())
 
     const handleNewMessage = (message: MessageResponse) => {
-      setMessages(prev => [...prev, message])
+      setMessages(prev => {
+        const index = prev.findIndex(m => m.id === message.id)
+        if (index !== -1) {
+          // Nếu đã có, cập nhật message đó
+          const updated = [...prev]
+          updated[index] = message
+          return updated
+        } else {
+          // Nếu chưa có, thêm mới
+          return [...prev, message]
+        }
+      })
     }
 
     ws.subscribe(messageTopic, handleNewMessage)
@@ -122,7 +143,7 @@ const ChatScreen = ({
       />
 
       <div className="flex flex-col-reverse overflow-y-auto h-[75vh] custom-scrollbar">
-        <ChatMessage messages={messages} userId={userId} isGroupChat={isGroupChat} messagesEndRef={messagesEndRef} />
+        <ChatMessage messages={messages} userId={userId} isGroupChat={isGroupChat} messagesEndRef={messagesEndRef} token={token} refetchMessages={refetchMessages}/>
       </div>
 
       <ChatInput onSendMessage={handleSendMessage} />

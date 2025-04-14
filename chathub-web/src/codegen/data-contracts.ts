@@ -90,10 +90,11 @@ export interface MessageResponse {
   messageType?: "TEXT" | "IMAGE" | "VIDEO" | "DOCUMENT" | "LINK"
   /** @format date-time */
   sentAt?: string
+  userDeleted?: boolean
   forwardedMessage?: ForwardedMessageInfo
   reactions?: ReactionDTO[]
-  forwarded?: boolean
   unsent?: boolean
+  forwarded?: boolean
 }
 
 export interface ReactionDTO {

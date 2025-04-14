@@ -67,22 +67,22 @@ export class Message<SecurityDataType = unknown> extends HttpClient<SecurityData
    *
    * @tags message-controller
    * @name ForwardMessage
-   * @request POST:/message/forward/{conversationId}
+   * @request POST:/message/forward
    * @secure
    */
   forwardMessage = (
-    conversationId: number,
     query: {
       /** @format int64 */
       senderId: number
       /** @format int64 */
       originalMessageId: number
+      conversationIds: number[]
     },
     data: string,
     params: RequestParams = {},
   ) =>
-    this.request<MessageResponse, ErrorResponse>({
-      path: `/message/forward/${conversationId}`,
+    this.request<MessageResponse[], ErrorResponse>({
+      path: `/message/forward`,
       method: "POST",
       query: query,
       body: data,
