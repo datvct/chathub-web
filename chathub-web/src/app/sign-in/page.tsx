@@ -69,6 +69,13 @@ const SignInPage: React.FC = () => {
     setLoading(false)
   }
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault()
+      handleSubmit()
+    }
+  }
+
   return (
     <div className="h-screen w-full flex justify-center items-center bg-[#160430] relative">
       <Image src={Images.Background} alt="background-image" layout="fill" objectFit="cover" />
@@ -129,7 +136,7 @@ const SignInPage: React.FC = () => {
 
         <hr className="w-3/4 my-4 border-1 border-gray-500" />
 
-        <div className="text-white text-[14px] uppercase">
+        <div className="text-white text-[14px] uppercase" onClick={handleSubmit}>
           {`Don't have an account? `}
           <Link href="/sign-up" className="text-[#3E70A1] hover:underline font-bold">
             Sign Up
