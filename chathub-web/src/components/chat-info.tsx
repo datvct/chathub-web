@@ -27,6 +27,7 @@ import ModalConfirm from "./modal/modal-confirm"
 import ModalSuccess from "./modal/modal-success"
 import ModalDeleteConversation from "~/components/modal/modal-delete-conversation"
 import ModalUpdateNickname from "./modal/modal-update-nickname"
+import ProfileViewModal from "./modal/modal-profile-view"
 import { Button } from "./ui/button"
 import { Menu, MenuButton, MenuItem, MenuItems, Transition } from "@headlessui/react"
 
@@ -94,6 +95,8 @@ const ChatInfo = ({
   const [isOpenUpdateGroupInfo, setIsOpenUpdateGroupInfo] = useState(false)
   const [isOpenDeleteConversation, setIsOpenDeleteConversation] = useState(false)
   const [isNicknameModalOpen, setIsNicknameModalOpen] = useState(false)
+  const [isProfileViewModalOpen, setIsProfileViewModalOpen] = useState(false);
+  const [selectedFriendForView, setSelectedFriendForView] = useState<UserDTO | null>(null);
 
   const [memberToAction, setMemberToAction] = useState<MemberDTO | null>(null)
   const [actionType, setActionType] = useState<"remove" | "updateNickname" | null>(null)
@@ -202,6 +205,21 @@ const ChatInfo = ({
     })
   }
 
+  const handleOpenProfileView = (member: MemberDTO) => {
+    if (!member || !member.id) {
+      toast.error("Cannot view profile for this member.");
+      return;
+    }
+    const friendData: UserDTO = {
+      id: member.id,
+      name: member.name,
+      avatar: member.avatar,
+    };
+    setSelectedFriendForView(friendData);
+    setIsProfileViewModalOpen(true);
+    console.log("Opening profile view for:", friendData);
+  };
+
   const handleLeaveGroupAction = () => {
     openConfirmModal("Leave Group", "Are you sure you want to leave this group?", async () => {
       if (!selectedChat || !userId || !token) return
@@ -277,7 +295,11 @@ const ChatInfo = ({
 
   const renderMemberItem = (member: MemberDTO) => (
     <div key={member.id} className="flex items-center justify-between py-3 px-2 hover:bg-gray-700 rounded-lg">
-      <div className="flex items-center gap-3 flex-1 min-w-0">
+      <div
+        className="flex items-center gap-3 flex-1 min-w-0"
+        onClick={() => handleOpenProfileView(member)}
+        style={{ cursor: 'pointer' }}
+      >
         <Image
           src={member.avatar || Images.AvatarDefault}
           alt={member.name || "Member"}
@@ -315,9 +337,30 @@ const ChatInfo = ({
                 <MenuItem>
                   {({ active }) => (
                     <button
+                      onClick={() => handleOpenProfileView(member)}
+                      className={`
+                        ${active ? 'bg-gray-600' : ''}
+                        group flex w-full items-center rounded-md px-2 py-2 text-sm text-white
+                      `}
+                    >
+                      <Image
+                        src={Images.IconEye}
+                        alt="Icon Eye"
+                        width={28} height={28}
+                        className="mr-2 h-4 w-4"
+                      />
+                      View Profile
+                    </button>
+                  )}
+                </MenuItem>
+                <MenuItem>
+                  {({ active }) => (
+                    <button
                       onClick={() => handleOpenUpdateNicknameModal(member)}
-                      className={`${active ? "bg-gray-600" : ""
-                        } group flex w-full items-center rounded-md px-2 py-2 text-sm text-white`}
+                      className={`
+                        ${active ? "bg-gray-600" : ""}
+                        group flex w-full items-center rounded-md px-2 py-2 text-sm text-white
+                      `}
                     >
                       <GoPencil className="mr-2 h-4 w-4" aria-hidden="true" />
                       Update Nickname
@@ -590,6 +633,14 @@ const ChatInfo = ({
         setIsOpen={setIsSuccessModalOpen}
         message={successMessage}
       />
+
+      {isProfileViewModalOpen && selectedFriendForView && (
+        <ProfileViewModal
+          isOpen={isProfileViewModalOpen}
+          setIsOpen={setIsProfileViewModalOpen}
+          friend={selectedFriendForView}
+        />
+      )}
     </div>
   )
 }
