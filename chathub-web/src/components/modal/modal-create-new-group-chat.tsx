@@ -37,11 +37,8 @@ const ModalCreateGroupChat: React.FC<ModalCreateGroupChatProps> = ({ isOpen, set
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (file) {
-      console.log("Selected file:", file)
       setSelectedImage(URL.createObjectURL(file))
       setSelectedFile(file)
-    } else {
-      console.log("No file selected")
     }
   }
 
@@ -57,13 +54,6 @@ const ModalCreateGroupChat: React.FC<ModalCreateGroupChatProps> = ({ isOpen, set
 
     const participantIds = [userId, ...selectedUsers]
     const uniqueParticipantIds = Array.from(new Set(participantIds))
-
-    const data: ConversationRequest = {
-      chatType: "GROUP",
-      creatorId: userId,
-      participantIds: uniqueParticipantIds,
-      groupName,
-    }
 
     const formData = new FormData()
 
@@ -81,7 +71,6 @@ const ModalCreateGroupChat: React.FC<ModalCreateGroupChatProps> = ({ isOpen, set
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
-          // "content-type": "multipart/form-data",
         },
         body: formData,
       })
@@ -199,8 +188,6 @@ const ModalCreateGroupChat: React.FC<ModalCreateGroupChatProps> = ({ isOpen, set
                 <p className="text-red-400 text-center">{error}</p>
               ) : (
                 <ul className="max-h-full overflow-y-auto custom-scrollbar pr-1">
-                  {" "}
-                  {}
                   {filteredFriends.length > 0 ? (
                     filteredFriends.map(user => (
                       <li
@@ -219,7 +206,7 @@ const ModalCreateGroupChat: React.FC<ModalCreateGroupChatProps> = ({ isOpen, set
                         <div className="flex-grow min-w-0">
                           <p className="font-semibold text-black truncate">{user.name}</p>
                         </div>
-                        {}
+
                         {selectedUsers.includes(user.id!) && <Check className="ml-auto text-green-500 flex-shrink-0" />}
                         {!selectedUsers.includes(user.id!) && (
                           <EllipsisVertical className="ml-auto text-gray-500 flex-shrink-0 opacity-50" />

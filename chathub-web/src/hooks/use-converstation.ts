@@ -4,6 +4,7 @@ import {
   UpdateNickNameRequest,
   UpdateGroupInfoRequest,
   ConversationResponse,
+  SuccessResponse,
 } from "~/codegen/data-contracts"
 import {
   getRecentConversationByUserID,
@@ -249,22 +250,30 @@ export const useConversation = (userId: number, token: string) => {
 
   const removeParticipantFromGroup = async (
     conversationId: number,
-    userId: number,
+    adminUserId: number,
     participantId: number,
     token: string,
-  ) => {
-    setLoading(true)
-    setError(null)
+  ): Promise<SuccessResponse | null> => {
+    setLoading(true);
+    setError(null);
     try {
-      const response = await removeParticipantFromGroupConversationAPI(conversationId, userId, participantId, token)
-      return response
+
+      const response = await removeParticipantFromGroupConversationAPI(
+        conversationId,
+        adminUserId,
+        participantId,
+        token,
+      );
+
+      return response;
     } catch (err: any) {
-      setError(err.message || "Failed to remove participant from group")
-      return null
+      console.error("Error removing participant in hook:", err);
+      setError(err.message || "Failed to remove participant from group");
+      return null;
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const leaveGroupConversation = async (conversationId: number, userId: number, token: string) => {
     setLoading(true)

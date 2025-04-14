@@ -8,6 +8,7 @@ import IconPin from "../../public/images/icon-pin.svg"
 import IconPlus from "../../public/images/icon-plus.svg"
 import IconUser from "../../public/images/icon-user.svg"
 import IconPhone from "../../public/images/lineicons_phone.svg"
+import IconEye from "../../public/images/icon-eye.png"
 import Next from "../../public/images/next.svg"
 import Vercel from "../../public/images/vercel.svg"
 import Window from "../../public/images/window.svg"
@@ -51,6 +52,7 @@ export const Images = {
   Vercel,
   Background,
   IconPhone,
+  IconEye,
   IconCloseCircle,
   IconPassword,
   IconUser,

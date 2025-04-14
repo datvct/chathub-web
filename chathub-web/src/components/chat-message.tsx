@@ -7,23 +7,47 @@ import { MessageType } from "~/types/types"
 import Link from "next/link"
 import { IoIosDocument } from "react-icons/io"
 import moment from "moment"
+import { CiMenuKebab, CiFaceSmile } from "react-icons/ci"
+import { TiArrowBackOutline, TiArrowForwardOutline } from "react-icons/ti"
+import { useState } from "react"
+import { unsendMessage, deleteMessage, forwardMessage } from "~/lib/get-message"
+import ForwardMessageModal from "./modal/modal-forward-message"
+import { IoReturnUpForward } from "react-icons/io5";
 
 interface ChatMessageProps {
   messages: MessageResponse[]
   userId: number
   isGroupChat: boolean
   messagesEndRef: React.RefObject<HTMLDivElement>
+  token: string
+  refetchMessages: () => void
 }
 
-const ChatMessage = ({ messages, userId, isGroupChat, messagesEndRef }: ChatMessageProps) => {
+const ChatMessage = ({ messages, userId, isGroupChat, messagesEndRef, token, refetchMessages }: ChatMessageProps) => {
   let lastMessageDate: string | null = null
+  const [openMenuId, setOpenMenuId] = useState<number | null>(null)
+  const [forwardingMessage, setForwardingMessage] = useState<MessageResponse | null>(null)
+  const [isFriendListModalOpen, setIsFriendListModalOpen] = useState(false)
+
+  const handleUnsend = async (messageId: number) => {
+    const res = await unsendMessage(userId, messageId, token)
+    setOpenMenuId(null)
+  }
+
+  const handleDelete = async (messageId: number) => {
+    const res = await deleteMessage(userId, messageId, token)
+    if (res) {
+      refetchMessages()
+    }
+  }
 
   return (
-    <div className="flex flex-col space-y-3" key={messages[0]?.id}>
+    <div className="flex flex-col space-y-3 key={messages[0]?.id}">
       {messages
         .slice()
         .sort((a, b) => new Date(a.sentAt).getTime() - new Date(b.sentAt).getTime())
         .map(msg => {
+          console.log("Message content:", msg.content)
           const currentMessageDate = moment(msg.sentAt).format("YYYY-MM-DD")
           const isNewDate = currentMessageDate !== lastMessageDate
           lastMessageDate = currentMessageDate
@@ -34,8 +58,69 @@ const ChatMessage = ({ messages, userId, isGroupChat, messagesEndRef }: ChatMess
               )}
               <div
                 id={`message-${msg.id}`}
-                className={`message flex ${msg.senderId === userId ? "justify-end" : "justify-start"}`}
+                className={`message items-center gap-2 h-[141px] ${msg.senderId === userId ? "justify-end" : "justify-start"} ${msg.userDeleted == true ? "hidden" : "flex"}`}
               >
+                {msg.senderId === userId && (
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2">
+                      <div
+                        className={`bg-[#252728] pl-3 pr-5 py-3 rounded-lg shadow-md ${openMenuId === msg.id ? "block" : "hidden"}`}
+                      >
+                        <ul>
+                          {msg.unsent === false && (
+                            <li
+                              className="hover:bg-[#333334] p-2 pr-3 rounded cursor-pointer"
+                              onClick={() => handleUnsend(msg.id)}
+                            >
+                              Recall
+                            </li>
+                          )}
+                          <li
+                            className="hover:bg-[#333334] p-2 pr-3 rounded cursor-pointer"
+                            onClick={() => handleDelete(msg.id)}
+                          >
+                            Delete Message
+                          </li>
+                          {msg.unsent === false && (
+                            <li
+                              className="hover:bg-[#333334] p-2 pr-3 rounded cursor-pointer"
+                              onClick={() => {
+                                setForwardingMessage(msg)
+                                setIsFriendListModalOpen(true)
+                                setOpenMenuId(null)
+                              }}
+                            >
+                              Forward
+                            </li>
+                          )}
+                        </ul>
+                      </div>
+                      <button
+                        className="hover:bg-[#333334] p-2 rounded-full realative"
+                        onClick={() => {
+                          setOpenMenuId(openMenuId === msg.id ? null : msg.id)
+                        }}
+                      >
+                        <CiMenuKebab />
+                      </button>
+                    </div>
+                    {msg.unsent === false && (
+                      <button
+                        className="hover:bg-[#333334] p-2 rounded-full"
+                        onClick={() => {
+                          setForwardingMessage(msg)
+                          setIsFriendListModalOpen(true)
+                          setOpenMenuId(null)
+                        }}
+                      >
+                        <TiArrowBackOutline />
+                      </button>
+                    )}
+                    <button className="hover:bg-[#333334] p-2 rounded-full">
+                      <CiFaceSmile />
+                    </button>
+                  </div>
+                )}
                 {msg.senderId !== userId && (
                   <Image
                     src={Images.AvatarDefault}
@@ -87,23 +172,105 @@ const ChatMessage = ({ messages, userId, isGroupChat, messagesEndRef }: ChatMess
                       <source src={msg.content} type="video/mp4" />
                       Your browser does not support the video tag.
                     </video>
-                  ) : (
+                  ) : msg.unsent === true ? (
                     <p
                       className={`p-3 rounded-lg w-max max-w-xs break-words text-black whitespace-pre-wrap ${
                         msg.senderId === userId ? "bg-[#1566A3] text-white" : "bg-[#F0F0F0]"
                       } ${isOnlyEmoji(msg.content) ? "text-4xl p-2 bg-transparent" : ""}`}
                     >
-                      {msg.content}
+                      Message recalled
                       <span className={`text-xs block mt-1 ${msg.senderId === userId ? "text-white" : "text-black"}`}>
                         {formatTimeSendAt(msg.sentAt)}
                       </span>
                     </p>
+                  ) : (
+                    <div
+                      className={`p-3 rounded-lg w-max max-w-xs break-words text-black whitespace-pre-wrap ${
+                        msg.senderId === userId ? "bg-[#1566A3] text-white" : "bg-[#F0F0F0]"
+                      } ${isOnlyEmoji(msg.content) && msg.content?.trim() ? "text-4xl p-2 bg-transparent" : ""}`}
+                    >
+                      {msg.content?.trim() ? msg.content.replace(/^"(.*)"$/, "$1") : ""}
+                      {msg.forwarded===true && <div className={`flex flex-col mt-1 p-2 border-l-4 ${msg.senderId === userId ? "bg-[#0000004d] text-[#9facbc] border-[#66a6ff]":"bg-[#fff]"}`}>
+                        <div className="flex gap-1 items-center">
+                          <IoReturnUpForward />
+                          <img src={msg.avatar} alt="" className="rounded-full w-[20px]"/>
+                          <p>{msg.senderName}</p>
+                        </div>
+                        <p>{msg.forwardedMessage.originalContentSnapshot}</p>
+                      </div>}
+                      <span className={`text-xs block mt-1 ${msg.senderId === userId ? "text-white" : "text-black"}`}>
+                        {formatTimeSendAt(msg.sentAt)}
+                      </span>
+                    </div>
                   )}
                 </div>
+                {msg.senderId != userId && (
+                  <div className="flex items-center gap-2">
+                    <button className="hover:bg-[#333334] p-2 rounded-full">
+                      <CiFaceSmile />
+                    </button>
+                    {msg.unsent === false && (
+                      <button
+                        className="hover:bg-[#333334] p-2 rounded-full"
+                        onClick={() => {
+                          setForwardingMessage(msg)
+                          setIsFriendListModalOpen(true)
+                          setOpenMenuId(null)
+                        }}
+                      >
+                        <TiArrowForwardOutline />
+                      </button>
+                    )}
+                    <div className="flex items-center gap-2">
+                      <button
+                        className="hover:bg-[#333334] p-2 rounded-full realative"
+                        onClick={() => {
+                          setOpenMenuId(openMenuId === msg.id ? null : msg.id)
+                        }}
+                      >
+                        <CiMenuKebab />
+                      </button>
+                      <div
+                        className={`bg-[#252728] pl-3 pr-5 py-3 rounded-lg shadow-md ${openMenuId === msg.id ? "block" : "hidden"}`}
+                      >
+                        <ul>
+                          <li
+                            className="hover:bg-[#333334] p-2 pr-3 rounded cursor-pointer"
+                            onClick={() => handleDelete(msg.id)}
+                          >
+                            Delete Message
+                          </li>
+                          {msg.unsent === false && (
+                            <li
+                              className="hover:bg-[#333334] p-2 pr-3 rounded cursor-pointer"
+                              onClick={() => {
+                                setForwardingMessage(msg)
+                                setIsFriendListModalOpen(true)
+                                setOpenMenuId(null)
+                              }}
+                            >
+                              Forward
+                            </li>
+                          )}
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           )
         })}
+      <ForwardMessageModal
+        isOpen={isFriendListModalOpen}
+        onClose={() => {
+          setIsFriendListModalOpen(false)
+          setForwardingMessage(null)
+        }}
+        token={token}
+        message={forwardingMessage}
+        userId={userId}
+      />
       <div ref={messagesEndRef} />
     </div>
   )
