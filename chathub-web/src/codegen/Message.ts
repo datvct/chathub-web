@@ -10,10 +10,12 @@
  * ---------------------------------------------------------------
  */
 
-import { ErrorResponse, MessageResponse } from "./data-contracts"
-import { ContentType, HttpClient, RequestParams } from "./http-client"
+import { ErrorResponse, MessageResponse } from "./data-contracts";
+import { ContentType, HttpClient, RequestParams } from "./http-client";
 
-export class Message<SecurityDataType = unknown> extends HttpClient<SecurityDataType> {
+export class Message<
+  SecurityDataType = unknown,
+> extends HttpClient<SecurityDataType> {
   /**
    * No description
    *
@@ -25,19 +27,19 @@ export class Message<SecurityDataType = unknown> extends HttpClient<SecurityData
   unsendMessage = (
     query: {
       /** @format int64 */
-      userId: number
+      userId: number;
       /** @format int64 */
-      messageId: number
+      messageId: number;
     },
     params: RequestParams = {},
   ) =>
-    this.request<string, ErrorResponse>({
+    this.request<MessageResponse, ErrorResponse>({
       path: `/message/unsent`,
       method: "PUT",
       query: query,
       secure: true,
       ...params,
-    })
+    });
   /**
    * No description
    *
@@ -49,9 +51,9 @@ export class Message<SecurityDataType = unknown> extends HttpClient<SecurityData
   deleteMessage = (
     query: {
       /** @format int64 */
-      userId: number
+      userId: number;
       /** @format int64 */
-      messageId: number
+      messageId: number;
     },
     params: RequestParams = {},
   ) =>
@@ -61,7 +63,7 @@ export class Message<SecurityDataType = unknown> extends HttpClient<SecurityData
       query: query,
       secure: true,
       ...params,
-    })
+    });
   /**
    * No description
    *
@@ -73,10 +75,10 @@ export class Message<SecurityDataType = unknown> extends HttpClient<SecurityData
   forwardMessage = (
     query: {
       /** @format int64 */
-      senderId: number
+      senderId: number;
       /** @format int64 */
-      originalMessageId: number
-      conversationIds: number[]
+      originalMessageId: number;
+      conversationIds: number[];
     },
     data: string,
     params: RequestParams = {},
@@ -89,7 +91,7 @@ export class Message<SecurityDataType = unknown> extends HttpClient<SecurityData
       secure: true,
       type: ContentType.Json,
       ...params,
-    })
+    });
   /**
    * No description
    *
@@ -102,7 +104,7 @@ export class Message<SecurityDataType = unknown> extends HttpClient<SecurityData
     conversationId: number,
     query: {
       /** @format int64 */
-      userId: number
+      userId: number;
     },
     params: RequestParams = {},
   ) =>
@@ -112,5 +114,5 @@ export class Message<SecurityDataType = unknown> extends HttpClient<SecurityData
       query: query,
       secure: true,
       ...params,
-    })
+    });
 }

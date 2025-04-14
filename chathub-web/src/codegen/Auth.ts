@@ -10,10 +10,18 @@
  * ---------------------------------------------------------------
  */
 
-import { AuthRequest, AuthResponse, ErrorResponse, RegistrationRequest, SuccessResponse } from "./data-contracts"
-import { ContentType, HttpClient, RequestParams } from "./http-client"
+import {
+  AuthRequest,
+  AuthResponse,
+  ErrorResponse,
+  RegistrationRequest,
+  SuccessResponse,
+} from "./data-contracts";
+import { ContentType, HttpClient, RequestParams } from "./http-client";
 
-export class Auth<SecurityDataType = unknown> extends HttpClient<SecurityDataType> {
+export class Auth<
+  SecurityDataType = unknown,
+> extends HttpClient<SecurityDataType> {
   /**
    * No description
    *
@@ -30,7 +38,7 @@ export class Auth<SecurityDataType = unknown> extends HttpClient<SecurityDataTyp
       secure: true,
       type: ContentType.Json,
       ...params,
-    })
+    });
   /**
    * No description
    *
@@ -47,5 +55,5 @@ export class Auth<SecurityDataType = unknown> extends HttpClient<SecurityDataTyp
       secure: true,
       type: ContentType.Json,
       ...params,
-    })
+    });
 }
