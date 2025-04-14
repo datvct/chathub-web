@@ -29,8 +29,9 @@ const ModalListGroup: React.FC<ModalListGroupProps> = ({ isOpen, setIsOpen, isAd
   const [dataGroup, setDataGroup] = useState<ConversationResponse[]>([])
   const [groupName, setGroupName] = useState<string>("")
   const [activeTab, setActiveTab] = useState<string>("all")
+  const [searchTerm, setSearchTerm] = useState("")
 
-  const { groups: fetchedGroups, getGroupConversations, findGroups } = useConversation(userId, token)
+  const { groups: fetchedGroups,findGroups,getRecentConversation} = useConversation(userId, token)
 
   const groupRefs = useRef<(HTMLLIElement | null)[]>([])
 
@@ -41,7 +42,7 @@ const ModalListGroup: React.FC<ModalListGroupProps> = ({ isOpen, setIsOpen, isAd
   useEffect(() => {
     if (userId) {
       const init = async () => {
-        const response = await getGroupConversations(userId, token)
+        const response = await getRecentConversation(userId, token)
         if (response) {
           const groupConversations = response.filter(group => group.chatType === "GROUP")
           setDataGroup(groupConversations)
@@ -66,6 +67,12 @@ const ModalListGroup: React.FC<ModalListGroupProps> = ({ isOpen, setIsOpen, isAd
       }
     }
   }
+
+  const filteredGroups =
+    dataGroup?.filter(group => {
+      const term = searchTerm.toLowerCase()
+      return group.groupName?.toLowerCase().includes(term)
+    }) || []
 
   return (
     <Dialog
@@ -111,8 +118,8 @@ const ModalListGroup: React.FC<ModalListGroupProps> = ({ isOpen, setIsOpen, isAd
               <Input
                 type="text"
                 placeholder="Search by group name"
-                value={groupName}
-                onChange={e => setGroupName(e.target.value)}
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
                 className="w-full py-[22px] pl-12 pr-4 bg-[#fff] border border-[#545454] rounded-lg text-gray-900 focus:outline-none placeholder-[#828282]"
               />
               <Search className="absolute top-1/2 left-4 -translate-y-1/2 text-gray-500 pr-2" />
@@ -127,7 +134,7 @@ const ModalListGroup: React.FC<ModalListGroupProps> = ({ isOpen, setIsOpen, isAd
 
             <ul className="max-h-[55vh] overflow-auto custom-scrollbar">
               {dataGroup.length > 0 ? (
-                dataGroup.map((group, index) => (
+                filteredGroups.map((group, index) => (
                   <li
                     key={group.id}
                     ref={el => {

@@ -355,3 +355,20 @@ export const updateNicknameAPI = async (data: UpdateNickNameRequest, token: stri
     return null
   }
 }
+
+export const findSingleChat = async (userId: number, friendId: number, token: string) => {
+  try{
+    const response = (await conversationInstance.findSingleChat(
+      { userId, friendId },
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      },
+    ).then(res => res.json())) as ConversationResponse
+    return response 
+  } catch (error) {
+    console.error("Error finding single chat:", error)
+    return null
+  }
+}
