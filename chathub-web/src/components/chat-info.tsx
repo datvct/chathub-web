@@ -156,10 +156,6 @@ const ChatInfo = ({
     }
   }
 
-  const handleMuteConversation = () => {
-    toast.info("Mute functionality not yet implemented.")
-  }
-
   const handlePinToggle = async () => {
     if (!selectedChat || !userId || !token) return
     const newPinState = !isPinned
@@ -432,15 +428,6 @@ const ChatInfo = ({
             </div>
 
             <div className="grid grid-cols-3 gap-x-4 gap-y-5 justify-items-center mb-6 text-xs text-center">
-              <div className="flex flex-col items-center">
-                <button
-                  className="bg-[#484848] h-10 w-10 rounded-full flex items-center justify-center hover:bg-gray-600"
-                  onClick={handleMuteConversation}
-                >
-                  {false ? <GoBellSlash size={20} /> : <GoBell size={20} />}
-                </button>
-                <span>Mute</span>
-              </div>
               <div className="flex flex-col items-center">
                 <button
                   className="bg-[#484848] h-10 w-10 rounded-full flex items-center justify-center hover:bg-gray-600"
