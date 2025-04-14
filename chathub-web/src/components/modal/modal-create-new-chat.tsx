@@ -44,9 +44,23 @@ const ModalCreateNewChat: React.FC<ModalCreateNewChatProps> = ({ isOpen, setIsOp
       participantIds: [selectedUser, userId],
     }
 
+    const formData = new FormData()
+
+    formData.append("chatType", "SINGLE")
+    formData.append("creatorId", userId.toString())
+    formData.append("participantIds", userId.toString())
+    formData.append("participantIds", selectedUser.toString())
+
     try {
-      const response = await createConversation(data)
-      if (response) {
+      const response = await fetch("http://localhost:8080/conversation/create", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          // "content-type": "multipart/form-data",
+        },
+        body: formData,
+      })
+      if (response.status === 200) {
         toast.success("Chat created successfully!")
         setIsOpen(false)
 
@@ -71,7 +85,6 @@ const ModalCreateNewChat: React.FC<ModalCreateNewChatProps> = ({ isOpen, setIsOp
 
   return (
     <Dialog open={isOpen} onClose={() => setIsOpen(false)} className="relative z-50">
-      { }
       <TransitionChild
         as={React.Fragment}
         enter="ease-out duration-300"
@@ -95,7 +108,6 @@ const ModalCreateNewChat: React.FC<ModalCreateNewChatProps> = ({ isOpen, setIsOp
           leaveTo="opacity-0 scale-95"
         >
           <DialogPanel className="bg-[#385068] rounded-[5%] p-6 w-[80%] h-[95%] max-w-lg max-h-screen transition-all transform flex flex-col">
-            { }
             <DialogTitle className="text-xl font-bold mb-4 flex items-center justify-between text-white leading-6">
               <span className="text-[30px] font-bold">New Chat</span>
               <button onClick={() => setIsOpen(false)}>
@@ -105,7 +117,6 @@ const ModalCreateNewChat: React.FC<ModalCreateNewChatProps> = ({ isOpen, setIsOp
 
             <hr className="w-full my-4 border-1 border-gray-500 mb-6" />
 
-            { }
             <div className="relative mb-6">
               <Input
                 type="text"
@@ -114,13 +125,10 @@ const ModalCreateNewChat: React.FC<ModalCreateNewChatProps> = ({ isOpen, setIsOp
                 onChange={e => setSearchQuery(e.target.value)}
                 className="w-full py-[22px] pl-12 pr-4 bg-[#fff] border border-[#545454] rounded-lg text-gray-900 focus:outline-none placeholder-[#828282]"
               />
-              <Search className="absolute top-1/2 left-4 -translate-y-1/2 text-gray-500 pr-2 w-5 h-5" /> { }
+              <Search className="absolute top-1/2 left-4 -translate-y-1/2 text-gray-500 pr-2 w-5 h-5" />
             </div>
 
-            { }
             <div className="flex-grow overflow-hidden">
-              {" "}
-              { }
               {friendsLoading ? (
                 <div className="flex justify-center items-center h-full">
                   <div className="loader"></div>
@@ -129,8 +137,6 @@ const ModalCreateNewChat: React.FC<ModalCreateNewChatProps> = ({ isOpen, setIsOp
                 <p className="text-red-400 text-center">{error}</p>
               ) : (
                 <ul className="max-h-full overflow-y-auto custom-scrollbar pr-1">
-                  {" "}
-                  { }
                   {filteredFriends.length > 0 ? (
                     filteredFriends.map(user => (
                       <li
@@ -148,9 +154,7 @@ const ModalCreateNewChat: React.FC<ModalCreateNewChatProps> = ({ isOpen, setIsOp
                         />
                         <div className="flex-grow min-w-0">
                           {" "}
-                          { }
                           <p className="font-semibold text-black truncate">{user.name}</p>
-                          { } { }
                         </div>
                         <EllipsisVertical className="ml-auto text-gray-500 flex-shrink-0" />
                       </li>
@@ -162,7 +166,6 @@ const ModalCreateNewChat: React.FC<ModalCreateNewChatProps> = ({ isOpen, setIsOp
               )}
             </div>
 
-            { }
             <div className="mt-6 flex justify-end gap-5 flex-shrink-0">
               <Button
                 onClick={() => setIsOpen(false)}

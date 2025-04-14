@@ -88,7 +88,7 @@ export const useConversation = (userId: number, token: string) => {
     }
   }
 
-  const createGroupConversation = async (data: ConversationRequest) => {
+  const createGroupConversation = async (data: any) => {
     setLoading(true)
     setError(null)
     try {

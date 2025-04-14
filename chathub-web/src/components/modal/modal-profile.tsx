@@ -25,6 +25,8 @@ interface ProfileModalProps {
   setIsChangePasswordModalOpen?: any
   friend: UserDTO | null
   dataProfile: UserDTO | null
+  userId: number
+  token: string
 }
 
 const ProfileModal: React.FC<ProfileModalProps> = ({
@@ -33,9 +35,9 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
   setIsChangePasswordModalOpen,
   friend,
   dataProfile,
+  userId,
+  token,
 }) => {
-  const userId = useSelector((state: RootState) => state.auth.userId)
-  const token = useSelector((state: RootState) => state.auth.token)
   const { updateProfile, loading } = useUpdateProfile()
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
   const [profileData, setProfileData] = useState<UserDTO | null>(null)

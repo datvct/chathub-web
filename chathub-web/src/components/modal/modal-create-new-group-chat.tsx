@@ -55,18 +55,11 @@ const ModalCreateGroupChat: React.FC<ModalCreateGroupChatProps> = ({ isOpen, set
     const participantIds = [userId, ...selectedUsers]
     const uniqueParticipantIds = Array.from(new Set(participantIds))
 
-    const data: ConversationRequest = {
-      chatType: "GROUP",
-      creatorId: userId,
-      participantIds: uniqueParticipantIds,
-      groupName,
-    }
-
     const formData = new FormData()
 
     formData.append("chatType", "GROUP")
     formData.append("creatorId", userId.toString())
-    formData.append("participantIds", JSON.stringify(uniqueParticipantIds))
+    participantIds.forEach(id => formData.append("participantIds", id.toString()))
     formData.append("groupName", groupName)
 
     if (selectedFile) {
@@ -74,15 +67,14 @@ const ModalCreateGroupChat: React.FC<ModalCreateGroupChatProps> = ({ isOpen, set
     }
 
     try {
-      const response = await fetch(`http://localhost:8080/conversation/create`, {
+      const response = await fetch("http://localhost:8080/conversation/create", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
-          "content-type": "multipart/form-data",
         },
         body: formData,
       })
-      if (response.ok) {
+      if (response.status === 200) {
         toast.success("Group chat created successfully!")
         setIsOpen(false)
         setGroupName("")
@@ -196,8 +188,6 @@ const ModalCreateGroupChat: React.FC<ModalCreateGroupChatProps> = ({ isOpen, set
                 <p className="text-red-400 text-center">{error}</p>
               ) : (
                 <ul className="max-h-full overflow-y-auto custom-scrollbar pr-1">
-                  {" "}
-                  {}
                   {filteredFriends.length > 0 ? (
                     filteredFriends.map(user => (
                       <li
@@ -216,7 +206,7 @@ const ModalCreateGroupChat: React.FC<ModalCreateGroupChatProps> = ({ isOpen, set
                         <div className="flex-grow min-w-0">
                           <p className="font-semibold text-black truncate">{user.name}</p>
                         </div>
-                        {}
+
                         {selectedUsers.includes(user.id!) && <Check className="ml-auto text-green-500 flex-shrink-0" />}
                         {!selectedUsers.includes(user.id!) && (
                           <EllipsisVertical className="ml-auto text-gray-500 flex-shrink-0 opacity-50" />
