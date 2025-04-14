@@ -19,10 +19,12 @@ import {
   SuccessResponse,
   UpdateGroupInfoRequest,
   UpdateNickNameRequest,
-} from "./data-contracts"
-import { ContentType, HttpClient, RequestParams } from "./http-client"
+} from "./data-contracts";
+import { ContentType, HttpClient, RequestParams } from "./http-client";
 
-export class Conversation<SecurityDataType = unknown> extends HttpClient<SecurityDataType> {
+export class Conversation<
+  SecurityDataType = unknown,
+> extends HttpClient<SecurityDataType> {
   /**
    * No description
    *
@@ -34,7 +36,7 @@ export class Conversation<SecurityDataType = unknown> extends HttpClient<Securit
   updateGroupInfo = (
     conversationId: number,
     query: {
-      request: UpdateGroupInfoRequest
+      request: UpdateGroupInfoRequest;
     },
     params: RequestParams = {},
   ) =>
@@ -44,7 +46,7 @@ export class Conversation<SecurityDataType = unknown> extends HttpClient<Securit
       query: query,
       secure: true,
       ...params,
-    })
+    });
   /**
    * No description
    *
@@ -57,8 +59,8 @@ export class Conversation<SecurityDataType = unknown> extends HttpClient<Securit
     conversationId: number,
     query: {
       /** @format int64 */
-      userId: number
-      isPinned: boolean
+      userId: number;
+      isPinned: boolean;
     },
     params: RequestParams = {},
   ) =>
@@ -68,7 +70,7 @@ export class Conversation<SecurityDataType = unknown> extends HttpClient<Securit
       query: query,
       secure: true,
       ...params,
-    })
+    });
   /**
    * No description
    *
@@ -81,7 +83,7 @@ export class Conversation<SecurityDataType = unknown> extends HttpClient<Securit
     conversationId: number,
     query: {
       /** @format int64 */
-      userId: number
+      userId: number;
     },
     params: RequestParams = {},
   ) =>
@@ -91,7 +93,7 @@ export class Conversation<SecurityDataType = unknown> extends HttpClient<Securit
       query: query,
       secure: true,
       ...params,
-    })
+    });
   /**
    * No description
    *
@@ -104,7 +106,7 @@ export class Conversation<SecurityDataType = unknown> extends HttpClient<Securit
     conversationId: number,
     query: {
       /** @format int64 */
-      userId: number
+      userId: number;
     },
     params: RequestParams = {},
   ) =>
@@ -114,7 +116,7 @@ export class Conversation<SecurityDataType = unknown> extends HttpClient<Securit
       query: query,
       secure: true,
       ...params,
-    })
+    });
   /**
    * No description
    *
@@ -123,7 +125,11 @@ export class Conversation<SecurityDataType = unknown> extends HttpClient<Securit
    * @request POST:/conversation/{conversationId}/addMembers
    * @secure
    */
-  addMembersToConversation = (conversationId: number, data: number[], params: RequestParams = {}) =>
+  addMembersToConversation = (
+    conversationId: number,
+    data: number[],
+    params: RequestParams = {},
+  ) =>
     this.request<SuccessResponse, ErrorResponse>({
       path: `/conversation/${conversationId}/addMembers`,
       method: "POST",
@@ -131,7 +137,7 @@ export class Conversation<SecurityDataType = unknown> extends HttpClient<Securit
       secure: true,
       type: ContentType.Json,
       ...params,
-    })
+    });
   /**
    * No description
    *
@@ -142,7 +148,7 @@ export class Conversation<SecurityDataType = unknown> extends HttpClient<Securit
    */
   createConversation = (
     query: {
-      request: ConversationRequest
+      request: ConversationRequest;
     },
     params: RequestParams = {},
   ) =>
@@ -152,7 +158,7 @@ export class Conversation<SecurityDataType = unknown> extends HttpClient<Securit
       query: query,
       secure: true,
       ...params,
-    })
+    });
   /**
    * No description
    *
@@ -169,7 +175,7 @@ export class Conversation<SecurityDataType = unknown> extends HttpClient<Securit
       secure: true,
       type: ContentType.Json,
       ...params,
-    })
+    });
   /**
    * No description
    *
@@ -182,7 +188,7 @@ export class Conversation<SecurityDataType = unknown> extends HttpClient<Securit
     conversationId: number,
     query: {
       /** @format int64 */
-      userId: number
+      userId: number;
     },
     params: RequestParams = {},
   ) =>
@@ -192,7 +198,7 @@ export class Conversation<SecurityDataType = unknown> extends HttpClient<Securit
       query: query,
       secure: true,
       ...params,
-    })
+    });
   /**
    * No description
    *
@@ -204,7 +210,7 @@ export class Conversation<SecurityDataType = unknown> extends HttpClient<Securit
   findMessage = (
     conversationId: number,
     query: {
-      message: string
+      message: string;
     },
     params: RequestParams = {},
   ) =>
@@ -214,7 +220,7 @@ export class Conversation<SecurityDataType = unknown> extends HttpClient<Securit
       query: query,
       secure: true,
       ...params,
-    })
+    });
   /**
    * No description
    *
@@ -226,7 +232,7 @@ export class Conversation<SecurityDataType = unknown> extends HttpClient<Securit
   getRecentConversations = (
     query: {
       /** @format int64 */
-      userId: number
+      userId: number;
     },
     params: RequestParams = {},
   ) =>
@@ -236,7 +242,7 @@ export class Conversation<SecurityDataType = unknown> extends HttpClient<Securit
       query: query,
       secure: true,
       ...params,
-    })
+    });
   /**
    * No description
    *
@@ -248,7 +254,7 @@ export class Conversation<SecurityDataType = unknown> extends HttpClient<Securit
   getGroupConversations = (
     query: {
       /** @format int64 */
-      userId: number
+      userId: number;
     },
     params: RequestParams = {},
   ) =>
@@ -258,7 +264,7 @@ export class Conversation<SecurityDataType = unknown> extends HttpClient<Securit
       query: query,
       secure: true,
       ...params,
-    })
+    });
   /**
    * No description
    *
@@ -270,7 +276,7 @@ export class Conversation<SecurityDataType = unknown> extends HttpClient<Securit
   getConversationsId = (
     query: {
       /** @format int64 */
-      userId: number
+      userId: number;
     },
     params: RequestParams = {},
   ) =>
@@ -280,7 +286,7 @@ export class Conversation<SecurityDataType = unknown> extends HttpClient<Securit
       query: query,
       secure: true,
       ...params,
-    })
+    });
   /**
    * No description
    *
@@ -292,9 +298,9 @@ export class Conversation<SecurityDataType = unknown> extends HttpClient<Securit
   findSingleChat = (
     query: {
       /** @format int64 */
-      userId: number
+      userId: number;
       /** @format int64 */
-      friendId: number
+      friendId: number;
     },
     params: RequestParams = {},
   ) =>
@@ -304,7 +310,7 @@ export class Conversation<SecurityDataType = unknown> extends HttpClient<Securit
       query: query,
       secure: true,
       ...params,
-    })
+    });
   /**
    * No description
    *
@@ -316,8 +322,8 @@ export class Conversation<SecurityDataType = unknown> extends HttpClient<Securit
   findGroupConversations = (
     query: {
       /** @format int64 */
-      userId: number
-      groupName: string
+      userId: number;
+      groupName: string;
     },
     params: RequestParams = {},
   ) =>
@@ -327,7 +333,7 @@ export class Conversation<SecurityDataType = unknown> extends HttpClient<Securit
       query: query,
       secure: true,
       ...params,
-    })
+    });
   /**
    * No description
    *
@@ -340,9 +346,9 @@ export class Conversation<SecurityDataType = unknown> extends HttpClient<Securit
     conversationId: number,
     query: {
       /** @format int64 */
-      userId: number
+      userId: number;
       /** @format int64 */
-      participantId: number
+      participantId: number;
     },
     params: RequestParams = {},
   ) =>
@@ -352,7 +358,7 @@ export class Conversation<SecurityDataType = unknown> extends HttpClient<Securit
       query: query,
       secure: true,
       ...params,
-    })
+    });
   /**
    * No description
    *
@@ -365,7 +371,7 @@ export class Conversation<SecurityDataType = unknown> extends HttpClient<Securit
     conversationId: number,
     query: {
       /** @format int64 */
-      userId: number
+      userId: number;
     },
     params: RequestParams = {},
   ) =>
@@ -375,5 +381,5 @@ export class Conversation<SecurityDataType = unknown> extends HttpClient<Securit
       query: query,
       secure: true,
       ...params,
-    })
+    });
 }

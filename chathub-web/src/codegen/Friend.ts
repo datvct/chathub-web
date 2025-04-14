@@ -10,10 +10,18 @@
  * ---------------------------------------------------------------
  */
 
-import { ErrorResponse, FriendRequestResponse, FriendshipRequest, SuccessResponse, UserDTO } from "./data-contracts"
-import { ContentType, HttpClient, RequestParams } from "./http-client"
+import {
+  ErrorResponse,
+  FriendRequestResponse,
+  FriendshipRequest,
+  SuccessResponse,
+  UserDTO,
+} from "./data-contracts";
+import { ContentType, HttpClient, RequestParams } from "./http-client";
 
-export class Friend<SecurityDataType = unknown> extends HttpClient<SecurityDataType> {
+export class Friend<
+  SecurityDataType = unknown,
+> extends HttpClient<SecurityDataType> {
   /**
    * No description
    *
@@ -30,7 +38,7 @@ export class Friend<SecurityDataType = unknown> extends HttpClient<SecurityDataT
       secure: true,
       type: ContentType.Json,
       ...params,
-    })
+    });
   /**
    * No description
    *
@@ -47,7 +55,7 @@ export class Friend<SecurityDataType = unknown> extends HttpClient<SecurityDataT
       secure: true,
       type: ContentType.Json,
       ...params,
-    })
+    });
   /**
    * No description
    *
@@ -64,7 +72,7 @@ export class Friend<SecurityDataType = unknown> extends HttpClient<SecurityDataT
       secure: true,
       type: ContentType.Json,
       ...params,
-    })
+    });
   /**
    * No description
    *
@@ -76,7 +84,7 @@ export class Friend<SecurityDataType = unknown> extends HttpClient<SecurityDataT
   getListFriend = (
     query: {
       /** @format int64 */
-      userId: number
+      userId: number;
     },
     params: RequestParams = {},
   ) =>
@@ -86,7 +94,7 @@ export class Friend<SecurityDataType = unknown> extends HttpClient<SecurityDataT
       query: query,
       secure: true,
       ...params,
-    })
+    });
   /**
    * No description
    *
@@ -98,7 +106,7 @@ export class Friend<SecurityDataType = unknown> extends HttpClient<SecurityDataT
   getListFriendRequest = (
     query: {
       /** @format int64 */
-      userId: number
+      userId: number;
     },
     params: RequestParams = {},
   ) =>
@@ -108,7 +116,7 @@ export class Friend<SecurityDataType = unknown> extends HttpClient<SecurityDataT
       query: query,
       secure: true,
       ...params,
-    })
+    });
   /**
    * No description
    *
@@ -120,9 +128,9 @@ export class Friend<SecurityDataType = unknown> extends HttpClient<SecurityDataT
   unsentFriendRequest = (
     query: {
       /** @format int64 */
-      userId: number
+      userId: number;
       /** @format int64 */
-      friendId: number
+      friendId: number;
     },
     params: RequestParams = {},
   ) =>
@@ -132,7 +140,7 @@ export class Friend<SecurityDataType = unknown> extends HttpClient<SecurityDataT
       query: query,
       secure: true,
       ...params,
-    })
+    });
   /**
    * No description
    *
@@ -144,9 +152,9 @@ export class Friend<SecurityDataType = unknown> extends HttpClient<SecurityDataT
   deleteFriend = (
     query: {
       /** @format int64 */
-      userId: number
+      userId: number;
       /** @format int64 */
-      friendId: number
+      friendId: number;
     },
     params: RequestParams = {},
   ) =>
@@ -156,5 +164,5 @@ export class Friend<SecurityDataType = unknown> extends HttpClient<SecurityDataT
       query: query,
       secure: true,
       ...params,
-    })
+    });
 }

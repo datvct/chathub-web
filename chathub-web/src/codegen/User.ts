@@ -17,10 +17,12 @@ import {
   ErrorResponse,
   SuccessResponse,
   UserDTO,
-} from "./data-contracts"
-import { ContentType, HttpClient, RequestParams } from "./http-client"
+} from "./data-contracts";
+import { ContentType, HttpClient, RequestParams } from "./http-client";
 
-export class User<SecurityDataType = unknown> extends HttpClient<SecurityDataType> {
+export class User<
+  SecurityDataType = unknown,
+> extends HttpClient<SecurityDataType> {
   /**
    * No description
    *
@@ -37,7 +39,7 @@ export class User<SecurityDataType = unknown> extends HttpClient<SecurityDataTyp
       secure: true,
       type: ContentType.FormData,
       ...params,
-    })
+    });
   /**
    * No description
    *
@@ -54,7 +56,7 @@ export class User<SecurityDataType = unknown> extends HttpClient<SecurityDataTyp
       secure: true,
       type: ContentType.Json,
       ...params,
-    })
+    });
   /**
    * No description
    *
@@ -71,7 +73,7 @@ export class User<SecurityDataType = unknown> extends HttpClient<SecurityDataTyp
       secure: true,
       type: ContentType.Json,
       ...params,
-    })
+    });
   /**
    * No description
    *
@@ -83,8 +85,8 @@ export class User<SecurityDataType = unknown> extends HttpClient<SecurityDataTyp
   search = (
     query: {
       /** @format int64 */
-      userId: number
-      query: string
+      userId: number;
+      query: string;
     },
     params: RequestParams = {},
   ) =>
@@ -94,7 +96,7 @@ export class User<SecurityDataType = unknown> extends HttpClient<SecurityDataTyp
       query: query,
       secure: true,
       ...params,
-    })
+    });
   /**
    * No description
    *
@@ -105,7 +107,7 @@ export class User<SecurityDataType = unknown> extends HttpClient<SecurityDataTyp
    */
   findUserByPhoneNumber = (
     query: {
-      phoneNumber: string
+      phoneNumber: string;
     },
     params: RequestParams = {},
   ) =>
@@ -115,7 +117,7 @@ export class User<SecurityDataType = unknown> extends HttpClient<SecurityDataTyp
       query: query,
       secure: true,
       ...params,
-    })
+    });
   /**
    * No description
    *
@@ -130,7 +132,7 @@ export class User<SecurityDataType = unknown> extends HttpClient<SecurityDataTyp
       method: "GET",
       secure: true,
       ...params,
-    })
+    });
   /**
    * No description
    *
@@ -147,5 +149,5 @@ export class User<SecurityDataType = unknown> extends HttpClient<SecurityDataTyp
       secure: true,
       type: ContentType.Json,
       ...params,
-    })
+    });
 }

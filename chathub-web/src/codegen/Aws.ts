@@ -10,10 +10,12 @@
  * ---------------------------------------------------------------
  */
 
-import { ErrorResponse } from "./data-contracts"
-import { HttpClient, RequestParams } from "./http-client"
+import { ErrorResponse } from "./data-contracts";
+import { HttpClient, RequestParams } from "./http-client";
 
-export class Aws<SecurityDataType = unknown> extends HttpClient<SecurityDataType> {
+export class Aws<
+  SecurityDataType = unknown,
+> extends HttpClient<SecurityDataType> {
   /**
    * No description
    *
@@ -24,8 +26,8 @@ export class Aws<SecurityDataType = unknown> extends HttpClient<SecurityDataType
    */
   getPreSignedUrl = (
     query: {
-      fileName: string
-      contentType: string
+      fileName: string;
+      contentType: string;
     },
     params: RequestParams = {},
   ) =>
@@ -35,5 +37,5 @@ export class Aws<SecurityDataType = unknown> extends HttpClient<SecurityDataType
       query: query,
       secure: true,
       ...params,
-    })
+    });
 }
