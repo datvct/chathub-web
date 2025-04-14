@@ -12,7 +12,7 @@ import { TiArrowBackOutline, TiArrowForwardOutline } from "react-icons/ti"
 import { useState } from "react"
 import { unsendMessage, deleteMessage, forwardMessage } from "~/lib/get-message"
 import ForwardMessageModal from "./modal/modal-forward-message"
-import { IoReturnUpForward } from "react-icons/io5";
+import { IoReturnUpForward } from "react-icons/io5"
 
 interface ChatMessageProps {
   messages: MessageResponse[]
@@ -47,7 +47,6 @@ const ChatMessage = ({ messages, userId, isGroupChat, messagesEndRef, token, ref
         .slice()
         .sort((a, b) => new Date(a.sentAt).getTime() - new Date(b.sentAt).getTime())
         .map(msg => {
-          console.log("Message content:", msg.content)
           const currentMessageDate = moment(msg.sentAt).format("YYYY-MM-DD")
           const isNewDate = currentMessageDate !== lastMessageDate
           lastMessageDate = currentMessageDate
@@ -190,14 +189,18 @@ const ChatMessage = ({ messages, userId, isGroupChat, messagesEndRef, token, ref
                       } ${isOnlyEmoji(msg.content) && msg.content?.trim() ? "text-4xl p-2 bg-transparent" : ""}`}
                     >
                       {msg.content?.trim() ? msg.content.replace(/^"(.*)"$/, "$1") : ""}
-                      {msg.forwarded===true && <div className={`flex flex-col mt-1 p-2 border-l-4 ${msg.senderId === userId ? "bg-[#0000004d] text-[#9facbc] border-[#66a6ff]":"bg-[#fff]"}`}>
-                        <div className="flex gap-1 items-center">
-                          <IoReturnUpForward />
-                          <img src={msg.avatar} alt="" className="rounded-full w-[20px]"/>
-                          <p>{msg.senderName}</p>
+                      {msg.forwarded === true && (
+                        <div
+                          className={`flex flex-col mt-1 p-2 border-l-4 ${msg.senderId === userId ? "bg-[#0000004d] text-[#9facbc] border-[#66a6ff]" : "bg-[#fff]"}`}
+                        >
+                          <div className="flex gap-1 items-center">
+                            <IoReturnUpForward />
+                            <img src={msg.avatar} alt="" className="rounded-full w-[20px]" />
+                            <p>{msg.senderName}</p>
+                          </div>
+                          <p>{msg.forwardedMessage.originalContentSnapshot}</p>
                         </div>
-                        <p>{msg.forwardedMessage.originalContentSnapshot}</p>
-                      </div>}
+                      )}
                       <span className={`text-xs block mt-1 ${msg.senderId === userId ? "text-white" : "text-black"}`}>
                         {formatTimeSendAt(msg.sentAt)}
                       </span>

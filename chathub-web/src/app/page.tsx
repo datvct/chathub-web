@@ -44,8 +44,8 @@ export default function Home() {
   }, [])
 
   const handleChatInfoUpdate = useCallback(() => {
-    setNeedRefetchConversations(prev => !prev);
-  }, []);
+    setNeedRefetchConversations(prev => !prev)
+  }, [])
 
   useEffect(() => {
     if (selectedChat) {
@@ -89,19 +89,39 @@ export default function Home() {
               WebSocketService.getInstance().subscribe(TOPICS.MESSAGE(id.toString()), message => {
                 const newMessage = message
                 setConversations(prev => {
-                  return prev
-                    .map(c =>
-                      c.id === id
-                        ? {
+                  return (
+                    prev
+                      // .map(c =>
+                      //   c.id === id
+                      //     ? {
+                      //         ...c,
+                      //         lastMessage: newMessage.content,
+                      //         lastMessageAt: newMessage.sentAt,
+                      //         senderId: newMessage.senderId,
+                      //         lastMessageType: newMessage.messageType,
+                      //         unsent: newMessage.unsent,
+
+                      //       }
+                      //     : c,
+                      // )
+                      // .sort((a, b) => new Date(b.lastMessageAt).getTime() - new Date(a.lastMessageAt).getTime())
+                      .map(c => {
+                        if (c.id !== id) return c
+
+                        const isNew = !c.lastMessageAt || new Date(newMessage.sentAt) > new Date(c.lastMessageAt)
+
+                        const shouldUpdateTime = isNew && !newMessage.unsent && !newMessage.userDeleted
+
+                        return {
                           ...c,
                           lastMessage: newMessage.content,
-                          lastMessageAt: newMessage.sentAt,
-                          senderId: newMessage.senderId,
                           lastMessageType: newMessage.messageType,
+                          userDeleted: newMessage.userDeleted,
+                          unsent: newMessage.unsent,
+                          lastMessageAt: shouldUpdateTime ? newMessage.sentAt : c.lastMessageAt,
                         }
-                        : c,
-                    )
-                    .sort((a, b) => new Date(b.lastMessageAt).getTime() - new Date(a.lastMessageAt).getTime())
+                      })
+                  )
                 })
               })
 
@@ -127,11 +147,11 @@ export default function Home() {
                   prev.map(c =>
                     c.id === id
                       ? {
-                        ...c,
-                        messages: c.messages.map((m: any) =>
-                          m.id === messageId ? { ...m, reactions: [...m.reactions, { userId, reactionEmoji }] } : m,
-                        ),
-                      }
+                          ...c,
+                          messages: c.messages.map((m: any) =>
+                            m.id === messageId ? { ...m, reactions: [...m.reactions, { userId, reactionEmoji }] } : m,
+                          ),
+                        }
                       : c,
                   ),
                 )
@@ -152,11 +172,11 @@ export default function Home() {
         const websocket = WebSocketService.getInstance()
         console.log("Unsubscribing from topics")
         conversations.forEach(c => {
-          websocket.unsubscribe(TOPICS.CONVERSATION(c.id.toString()), () => { })
-          websocket.unsubscribe(TOPICS.MESSAGE(c.id.toString()), () => { })
-          websocket.unsubscribe(TOPICS.TYPING_STATUS(c.id.toString()), () => { })
-          websocket.unsubscribe(TOPICS.SEEN_MESSAGE(c.id.toString()), () => { })
-          websocket.unsubscribe(TOPICS.REACT_MESSAGE(c.id.toString()), () => { })
+          websocket.unsubscribe(TOPICS.CONVERSATION(c.id.toString()), () => {})
+          websocket.unsubscribe(TOPICS.MESSAGE(c.id.toString()), () => {})
+          websocket.unsubscribe(TOPICS.TYPING_STATUS(c.id.toString()), () => {})
+          websocket.unsubscribe(TOPICS.SEEN_MESSAGE(c.id.toString()), () => {})
+          websocket.unsubscribe(TOPICS.REACT_MESSAGE(c.id.toString()), () => {})
         })
       }
     }

@@ -82,7 +82,6 @@ const ForwardMessageModal: React.FC<ForwardMessageModalProps> = ({ isOpen, onClo
     const response = await forwardMessage(userId, message.id, allSelectedIds, token, note)
 
     if (response) {
-      // Xử lý phản hồi nếu cần
       console.log("Message forwarded successfully:", response)
       const ws = WebSocketService.getInstance()
       const stompClient = ws.getStompClient()

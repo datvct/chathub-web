@@ -40,16 +40,17 @@ const ChatScreen = ({
   const ws = WebSocketService.getInstance()
   const [messages, setMessages] = useState<MessageResponse[]>([])
   const messagesEndRef = useRef<HTMLDivElement | null>(null)
-  const refetchMessages = async () => {
-    if (conversationId) {
-      const response = await getMessageByConversationId(conversationId, userId, token)
-      if (response) {
-        const uniqueMessages = Array.from(new Map(response.map(m => [m.id, m])).values())
-        setMessages(response)
-      }
-    }
-  }
-  
+  const [reloadTrigger, setReloadTrigger] = useState(false)
+
+  // const refetchMessages = async () => {
+  //   if (conversationId) {
+  //     const response = await getMessageByConversationId(conversationId, userId, token)
+  //     if (response) {
+  //       const uniqueMessages = Array.from(new Map(response.map(m => [m.id, m])).values())
+  //       setMessages(response)
+  //     }
+  //   }
+  // }
 
   useEffect(() => {
     const fetchMessage = async () => {
@@ -61,7 +62,7 @@ const ChatScreen = ({
       }
     }
     fetchMessage()
-  }, [conversationId, userId, token])
+  }, [conversationId, userId, token, reloadTrigger])
 
   useEffect(() => {
     if (!conversationId) return
@@ -71,12 +72,10 @@ const ChatScreen = ({
       setMessages(prev => {
         const index = prev.findIndex(m => m.id === message.id)
         if (index !== -1) {
-          // Nếu đã có, cập nhật message đó
           const updated = [...prev]
           updated[index] = message
           return updated
         } else {
-          // Nếu chưa có, thêm mới
           return [...prev, message]
         }
       })
@@ -131,6 +130,10 @@ const ChatScreen = ({
     }
   }
 
+  const handleRefreshMessage = () => {
+    setReloadTrigger(prev => !prev)
+  }
+
   return (
     <div className="flex-1 h-full w-full p-4 bg-[#3A3A3A] text-white flex flex-col relative transition-all">
       <ChatHeader
@@ -143,7 +146,14 @@ const ChatScreen = ({
       />
 
       <div className="flex flex-col-reverse overflow-y-auto h-[75vh] custom-scrollbar">
-        <ChatMessage messages={messages} userId={userId} isGroupChat={isGroupChat} messagesEndRef={messagesEndRef} token={token} refetchMessages={refetchMessages}/>
+        <ChatMessage
+          messages={messages}
+          userId={userId}
+          isGroupChat={isGroupChat}
+          messagesEndRef={messagesEndRef}
+          token={token}
+          refetchMessages={handleRefreshMessage}
+        />
       </div>
 
       <ChatInput onSendMessage={handleSendMessage} />

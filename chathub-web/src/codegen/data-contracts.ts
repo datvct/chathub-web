@@ -35,6 +35,38 @@ export interface SuccessResponse {
   message?: string
 }
 
+export interface ForwardedMessageInfo {
+  originalSenderAvatar?: string
+  originalSenderName?: string
+  messageType?: string
+  originalContentSnapshot?: string
+}
+
+export interface MessageResponse {
+  /** @format int64 */
+  id?: number
+  /** @format int64 */
+  conversationId?: number
+  /** @format int64 */
+  senderId?: number
+  senderName?: string
+  content?: string
+  avatar?: string
+  messageType?: "TEXT" | "IMAGE" | "VIDEO" | "DOCUMENT" | "LINK"
+  /** @format date-time */
+  sentAt?: string
+  userDeleted?: boolean
+  forwardedMessage?: ForwardedMessageInfo
+  reactions?: ReactionDTO[]
+  unsent?: boolean
+  forwarded?: boolean
+}
+
+export interface ReactionDTO {
+  senderName?: string
+  reactionEmoji?: string
+}
+
 export interface UpdateGroupInfoRequest {
   /** @format int64 */
   userId?: number
@@ -67,38 +99,6 @@ export interface ReactionRequest {
   messageId?: number
   /** @format int64 */
   userId?: number
-  reactionEmoji?: string
-}
-
-export interface ForwardedMessageInfo {
-  originalSenderAvatar?: string
-  originalSenderName?: string
-  messageType?: string
-  originalContentSnapshot?: string
-}
-
-export interface MessageResponse {
-  /** @format int64 */
-  id?: number
-  /** @format int64 */
-  conversationId?: number
-  /** @format int64 */
-  senderId?: number
-  senderName?: string
-  content?: string
-  avatar?: string
-  messageType?: "TEXT" | "IMAGE" | "VIDEO" | "DOCUMENT" | "LINK"
-  /** @format date-time */
-  sentAt?: string
-  userDeleted?: boolean
-  forwardedMessage?: ForwardedMessageInfo
-  reactions?: ReactionDTO[]
-  unsent?: boolean
-  forwarded?: boolean
-}
-
-export interface ReactionDTO {
-  senderName?: string
   reactionEmoji?: string
 }
 
@@ -136,11 +136,13 @@ export interface ConversationResponse {
   lastMessageType?: "TEXT" | "IMAGE" | "VIDEO" | "DOCUMENT" | "LINK"
   /** @format date-time */
   lastMessageAt?: string
+  userDeleted?: boolean
   isSeen?: boolean
   /** @format date-time */
   createAt?: string
   participants?: ParticipantDTO[]
   pinned?: boolean
+  unsent?: boolean
   dissolved?: boolean
 }
 
