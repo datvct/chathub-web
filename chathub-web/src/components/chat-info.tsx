@@ -98,7 +98,7 @@ const ChatInfo = ({
   const [memberToAction, setMemberToAction] = useState<MemberDTO | null>(null)
   const [actionType, setActionType] = useState<"remove" | "updateNickname" | null>(null)
 
-  const isCurrentUserAdmin = chatDetail?.members?.find(m => m.id === userId)?.is_admin ?? false
+  const isCurrentUserAdmin = chatDetail?.members?.find(m => m.id === userId)?.is_admin ?? true
   const otherMember = chatDetail?.members?.find(m => m.id !== userId)
 
   const fetchChatDetails = async () => {
@@ -126,6 +126,8 @@ const ChatInfo = ({
       setChatDetail(null)
       setIsPinned(false)
       setIsBlocked(false)
+      setMemberToAction(null)
+      setActionType(null)
     }
   }, [isOpen, selectedChat, userId, token])
 
@@ -147,6 +149,7 @@ const ChatInfo = ({
       setIsNicknameModalOpen(true)
     } else {
       console.error("Invalid member data for updating nickname")
+      toast.error("Could not open nickname editor for this member.")
     }
   }
 
@@ -163,6 +166,7 @@ const ChatInfo = ({
         setIsPinned(newPinState)
         onPinChange(newPinState)
         toast.success(`Conversation ${newPinState ? "pinned" : "unpinned"} successfully!`)
+        onChatInfoUpdated()
       } else {
         toast.error("Failed to update pin status.")
       }
@@ -327,8 +331,10 @@ const ChatInfo = ({
                     {({ active }) => (
                       <button
                         onClick={() => handleRemoveMemberAction(member)}
-                        className={`${active ? "bg-red-700" : "text-red-400"
-                          } group flex w-full items-center rounded-md px-2 py-2 text-sm`}
+                        className={`
+                          ${active ? "bg-red-700 text-white" : "text-red-400"}
+                          group flex w-full items-center rounded-md px-2 py-2 text-sm
+                        `}
                       >
                         <MdGroupRemove className="mr-2 h-4 w-4" aria-hidden="true" />
                         Remove Member
