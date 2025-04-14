@@ -31,6 +31,7 @@ export default function Home() {
   const [conversations, setConversations] = useState([])
   const [typingStatus, setTypingStatus] = useState({})
   const [seenMessages, setSeenMessages] = useState({})
+
   const handlePinChangeSuccess = useCallback(() => {
     setNeedRefetchConversations(prevState => !prevState)
     return true
@@ -38,7 +39,13 @@ export default function Home() {
 
   const handleHistoryDeletedSuccess = useCallback(() => {
     setSelectedChat(null)
+    setConversationData(null)
+    setNeedRefetchConversations(prev => !prev)
   }, [])
+
+  const handleChatInfoUpdate = useCallback(() => {
+    setNeedRefetchConversations(prev => !prev);
+  }, []);
 
   useEffect(() => {
     if (selectedChat) {
@@ -86,12 +93,12 @@ export default function Home() {
                     .map(c =>
                       c.id === id
                         ? {
-                            ...c,
-                            lastMessage: newMessage.content,
-                            lastMessageAt: newMessage.sentAt,
-                            senderId: newMessage.senderId,
-                            lastMessageType: newMessage.messageType,
-                          }
+                          ...c,
+                          lastMessage: newMessage.content,
+                          lastMessageAt: newMessage.sentAt,
+                          senderId: newMessage.senderId,
+                          lastMessageType: newMessage.messageType,
+                        }
                         : c,
                     )
                     .sort((a, b) => new Date(b.lastMessageAt).getTime() - new Date(a.lastMessageAt).getTime())
@@ -120,11 +127,11 @@ export default function Home() {
                   prev.map(c =>
                     c.id === id
                       ? {
-                          ...c,
-                          messages: c.messages.map((m: any) =>
-                            m.id === messageId ? { ...m, reactions: [...m.reactions, { userId, reactionEmoji }] } : m,
-                          ),
-                        }
+                        ...c,
+                        messages: c.messages.map((m: any) =>
+                          m.id === messageId ? { ...m, reactions: [...m.reactions, { userId, reactionEmoji }] } : m,
+                        ),
+                      }
                       : c,
                   ),
                 )
@@ -145,11 +152,11 @@ export default function Home() {
         const websocket = WebSocketService.getInstance()
         console.log("Unsubscribing from topics")
         conversations.forEach(c => {
-          websocket.unsubscribe(TOPICS.CONVERSATION(c.id.toString()), () => {})
-          websocket.unsubscribe(TOPICS.MESSAGE(c.id.toString()), () => {})
-          websocket.unsubscribe(TOPICS.TYPING_STATUS(c.id.toString()), () => {})
-          websocket.unsubscribe(TOPICS.SEEN_MESSAGE(c.id.toString()), () => {})
-          websocket.unsubscribe(TOPICS.REACT_MESSAGE(c.id.toString()), () => {})
+          websocket.unsubscribe(TOPICS.CONVERSATION(c.id.toString()), () => { })
+          websocket.unsubscribe(TOPICS.MESSAGE(c.id.toString()), () => { })
+          websocket.unsubscribe(TOPICS.TYPING_STATUS(c.id.toString()), () => { })
+          websocket.unsubscribe(TOPICS.SEEN_MESSAGE(c.id.toString()), () => { })
+          websocket.unsubscribe(TOPICS.REACT_MESSAGE(c.id.toString()), () => { })
         })
       }
     }
@@ -196,6 +203,7 @@ export default function Home() {
             <div className="absolute inset-0 bg-black opacity-30" />
           </>
         )}
+
         {isChatSearchOpen && (
           <ChatSearch
             setIsOpen={setIsChatSearchOpen}
@@ -203,7 +211,8 @@ export default function Home() {
             setHighlightMessageId={setHighlightMessageId}
           />
         )}
-        {isChatInfoOpen && (
+
+        {isChatInfoOpen && selectedChat && (
           <ChatInfo
             isOpen={isChatInfoOpen}
             isGroupChat={isGroupChat}
@@ -211,6 +220,7 @@ export default function Home() {
             setIsChatInfoOpen={setIsChatInfoOpen}
             onPinChange={handlePinChangeSuccess}
             onHistoryDeleted={handleHistoryDeletedSuccess}
+            onChatInfoUpdated={handleChatInfoUpdate}
           />
         )}
       </div>
