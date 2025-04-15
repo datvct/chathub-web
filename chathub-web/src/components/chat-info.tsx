@@ -42,11 +42,12 @@ import { FaUserSlash } from "react-icons/fa6"
 import { MdBlock, MdLockOpen, MdGroupRemove } from "react-icons/md"
 import { CgTrashEmpty } from "react-icons/cg"
 import { AiOutlineUsergroupAdd, AiOutlineEdit } from "react-icons/ai"
-import { IoSettingsOutline, IoEllipsisVertical } from "react-icons/io5"
 import { HiOutlineArrowRightEndOnRectangle } from "react-icons/hi2"
 import { FaChevronLeft } from "react-icons/fa6"
 import { LuUserRoundPlus, LuShieldCheck } from "react-icons/lu"
 import { TbUserEdit } from "react-icons/tb"
+import { IoSettingsOutline, IoEllipsisVertical, IoClose } from "react-icons/io5"
+import { cn } from "~/lib/utils"
 
 interface ChatInfoProps {
   isOpen?: boolean
@@ -416,7 +417,13 @@ const ChatInfo = ({
         <h2 className="text-lg font-semibold text-center flex-grow">
           {view === "main" ? "Conversation Info" : "Members"}
         </h2>
-        <button onClick={() => setIsChatInfoOpen(false)} className="p-1 rounded-full hover:bg-gray-700">
+        <button
+          onClick={() => setIsChatInfoOpen(false)}
+          className="p-2 rounded-full bg-[#484848] hover:bg-gray-700 transition-colors duration-150 -mr-0.5
+          text-gray-300 hover:text-white"
+          title="Close Conversation Information"
+        >
+          <IoClose size={20} />
         </button>
       </div>
 
