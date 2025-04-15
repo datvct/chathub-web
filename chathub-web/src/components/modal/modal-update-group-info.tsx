@@ -125,13 +125,14 @@ const ModalUpdateGroupInfo: React.FC<ModalUpdateGroupInfoProps> = ({
                   <div className="relative flex justify-center mb-6">
                     <label htmlFor="group-avatar-upload" className="relative cursor-pointer">
                       <Image
-                        src={groupAvatar || currentGroupAvatar || Images.ProfileImage}
+                        src={groupAvatar || currentGroupAvatar || Images.AvatarDefault}
                         alt="group avatar"
                         width={100}
                         height={100}
-                        className="cursor-pointer mx-auto w-24 h-24 rounded-[50px] border border-white transition duration-150 transform hover:scale-105 shadow-2xl hover:shadow-cyan"
+                        className="cursor-pointer mx-auto w-24 h-24 rounded-[50px] border border-white transition duration-150 transform hover:scale-105 shadow-2xl hover:shadow-cyan object-cover"
                       />
-                      <span className="absolute bottom-[-10px] left-[55%] rounded-[50px] bg-[#F1F1F1] hover:bg-slate-300 w-[37px] h-[37px] flex items-center justify-center">
+                      <span className="absolute bottom-[-10px] left-[55%] rounded-[50px] bg-[#F1F1F1] hover:bg-slate-300
+                      w-[37px] h-[37px] flex items-center justify-center">
                         <Camera className="text-[#797979] w-5 h-5" strokeWidth={1.5} />
                       </span>
                       <input

@@ -123,10 +123,10 @@ const ChatMessage = ({ messages, userId, isGroupChat, messagesEndRef, token, ref
                 )}
                 {msg.senderId !== userId && (
                   <Image
-                    src={Images.AvatarDefault}
+                    src={msg.avatar || Images.AvatarDefault}
                     width={32}
                     height={32}
-                    alt="avatar"
+                    alt={msg.senderName || "Avatar"}
                     className="w-8 h-8 mr-2 rounded-[20px] mt-4"
                   />
                 )}
@@ -174,9 +174,8 @@ const ChatMessage = ({ messages, userId, isGroupChat, messagesEndRef, token, ref
                     </video>
                   ) : msg.unsent === true ? (
                     <p
-                      className={`p-3 rounded-lg w-max max-w-xs break-words text-black whitespace-pre-wrap ${
-                        msg.senderId === userId ? "bg-[#1566A3] text-white" : "bg-[#F0F0F0]"
-                      } ${isOnlyEmoji(msg.content) ? "text-4xl p-2 bg-transparent" : ""}`}
+                      className={`p-3 rounded-lg w-max max-w-xs break-words text-black whitespace-pre-wrap ${msg.senderId === userId ? "bg-[#1566A3] text-white" : "bg-[#F0F0F0]"
+                        } ${isOnlyEmoji(msg.content) ? "text-4xl p-2 bg-transparent" : ""}`}
                     >
                       Message recalled
                       <span className={`text-xs block mt-1 ${msg.senderId === userId ? "text-white" : "text-black"}`}>
@@ -185,15 +184,14 @@ const ChatMessage = ({ messages, userId, isGroupChat, messagesEndRef, token, ref
                     </p>
                   ) : (
                     <div
-                      className={`p-3 rounded-lg w-max max-w-xs break-words text-black whitespace-pre-wrap ${
-                        msg.senderId === userId ? "bg-[#1566A3] text-white" : "bg-[#F0F0F0]"
-                      } ${isOnlyEmoji(msg.content) && msg.content?.trim() ? "text-4xl p-2 bg-transparent" : ""}`}
+                      className={`p-3 rounded-lg w-max max-w-xs break-words text-black whitespace-pre-wrap ${msg.senderId === userId ? "bg-[#1566A3] text-white" : "bg-[#F0F0F0]"
+                        } ${isOnlyEmoji(msg.content) && msg.content?.trim() ? "text-4xl p-2 bg-transparent" : ""}`}
                     >
                       {msg.content?.trim() ? msg.content.replace(/^"(.*)"$/, "$1") : ""}
-                      {msg.forwarded===true && <div className={`flex flex-col mt-1 p-2 border-l-4 ${msg.senderId === userId ? "bg-[#0000004d] text-[#9facbc] border-[#66a6ff]":"bg-[#fff]"}`}>
+                      {msg.forwarded === true && <div className={`flex flex-col mt-1 p-2 border-l-4 ${msg.senderId === userId ? "bg-[#0000004d] text-[#9facbc] border-[#66a6ff]" : "bg-[#fff]"}`}>
                         <div className="flex gap-1 items-center">
                           <IoReturnUpForward />
-                          <img src={msg.avatar} alt="" className="rounded-full w-[20px]"/>
+                          <img src={msg.avatar} alt="" className="rounded-full w-[20px]" />
                           <p>{msg.senderName}</p>
                         </div>
                         <p>{msg.forwardedMessage.originalContentSnapshot}</p>

@@ -301,7 +301,7 @@ const ChatInfo = ({
           alt={member.name || "Member"}
           width={40}
           height={40}
-          className="rounded-full w-10 h-10 flex-shrink-0"
+          className="rounded-full w-10 h-10 flex-shrink-0 object-cover"
         />
         <div className="flex-1 min-w-0">
           <p className="text-sm font-medium text-white truncate flex items-center">
@@ -413,13 +413,13 @@ const ChatInfo = ({
               <Image
                 src={
                   chatDetail?.avatar ||
-                  (isGroupChat ? Images.AvatarDefault : otherMember?.avatar) ||
+                  (!isGroupChat ? otherMember?.avatar : null) ||
                   Images.AvatarDefault
                 }
                 alt={chatDetail?.name || (isGroupChat ? "Group" : otherMember?.name) || "Avatar"}
                 width={80}
                 height={80}
-                className="w-20 h-20 rounded-full mb-3 border-2 border-gray-600"
+                className="w-20 h-20 rounded-full mb-3 border-2 border-gray-600 object-cover"
               />
               <p className="text-lg font-semibold truncate max-w-full px-4">
                 {chatDetail?.name || (isGroupChat ? "Group Chat" : otherMember?.name) || "Conversation"}

@@ -93,11 +93,11 @@ const ProfileViewModal: React.FC<ProfileViewModalProps> = ({ isOpen, setIsOpen, 
                   <div className="relative">
                     <label htmlFor="profile-upload" className="relative cursor-pointer">
                       <Image
-                        src={friend?.avatar ?? Images.ProfileImage}
+                        src={friend?.avatar ?? Images.AvatarDefault}
                         alt="profile default"
                         width={100}
                         height={100}
-                        className="mx-auto cursor-pointer w-24 h-24 rounded-[50px] border border-white transition duration-150 transform hover:scale-105 shadow-2xl hover:shadow-cyan"
+                        className="mx-auto cursor-pointer w-24 h-24 rounded-[50px] border border-white transition duration-150 transform hover:scale-105 shadow-2xl hover:shadow-cyan object-cover"
                       />
                     </label>
                   </div>

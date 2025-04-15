@@ -49,7 +49,7 @@ const ChatScreen = ({
       }
     }
   }
-  
+
 
   useEffect(() => {
     const fetchMessage = async () => {
@@ -137,13 +137,17 @@ const ChatScreen = ({
         name={conversationData?.groupName ?? conversationData?.senderName}
         setIsChatInfoOpen={setIsChatInfoOpen}
         isChatInfoOpen={isChatInfoOpen}
-        avatar={conversationData?.groupAvatar}
+        avatar={
+          conversationData?.chatType === "GROUP"
+            ? conversationData?.groupAvatar
+            : conversationData?.senderAvatar
+        }
         isChatSearchOpen={isChatSearchOpen}
         setIsChatSearchOpen={setIsChatSearchOpen}
       />
 
       <div className="flex flex-col-reverse overflow-y-auto h-[75vh] custom-scrollbar">
-        <ChatMessage messages={messages} userId={userId} isGroupChat={isGroupChat} messagesEndRef={messagesEndRef} token={token} refetchMessages={refetchMessages}/>
+        <ChatMessage messages={messages} userId={userId} isGroupChat={isGroupChat} messagesEndRef={messagesEndRef} token={token} refetchMessages={refetchMessages} />
       </div>
 
       <ChatInput onSendMessage={handleSendMessage} />
