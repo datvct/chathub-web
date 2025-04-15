@@ -2,7 +2,7 @@
 
 import ChatHeader from "./chat-header"
 import ChatInput from "./chat-input"
-import ModalViewImage from "./modal/modal-image-viewer"
+import ModalImageViewer from "./modal/modal-image-viewer"
 import { useEffect, useRef, useState, useCallback } from "react"
 import { ConversationResponse, MessageResponse } from "~/codegen/data-contracts"
 import { MessageType } from "../types/types"
@@ -174,7 +174,7 @@ const ChatScreen = ({
       <ChatInput onSendMessage={handleSendMessage} />
 
       {isImageViewerOpen && selectedImageUrl && (
-        <ModalViewImage
+        <ModalImageViewer
           isOpen={isImageViewerOpen}
           setIsOpen={setIsImageViewerOpen}
           imageUrl={selectedImageUrl}

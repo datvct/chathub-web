@@ -28,7 +28,7 @@ import ModalSuccess from "./modal/modal-success"
 import ModalDeleteConversation from "~/components/modal/modal-delete-conversation"
 import ModalUpdateNickname from "./modal/modal-update-nickname"
 import ProfileViewModal from "./modal/modal-profile-view"
-import ModalViewImage from "./modal/modal-image-viewer"
+import ModalImageViewer from "./modal/modal-image-viewer"
 
 import { Button } from "./ui/button"
 import { Menu, MenuButton, MenuItem, MenuItems, Transition } from "@headlessui/react"
@@ -648,7 +648,7 @@ const ChatInfo = ({
       )}
 
       {isImageViewerOpen && selectedImageUrlForInfo && (
-        <ModalViewImage
+        <ModalImageViewer
           isOpen={isImageViewerOpen}
           setIsOpen={setIsImageViewerOpen}
           imageUrl={selectedImageUrlForInfo}

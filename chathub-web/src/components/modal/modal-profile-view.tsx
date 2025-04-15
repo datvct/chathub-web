@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, Fragment } from "react"
 import Image from "next/image"
 import { Dialog, DialogPanel, DialogTitle, Transition, TransitionChild } from "@headlessui/react"
 import { Input } from "../ui/input"
@@ -11,6 +11,8 @@ import { useSelector } from "react-redux"
 import { RootState } from "~/lib/reudx/store"
 import dayjs from "dayjs"
 import { UserDTO } from "~/codegen/data-contracts"
+import ModalViewImage from "./modal-image-viewer"
+import { toast } from "react-toastify"
 
 interface ProfileData {
   displayName: string

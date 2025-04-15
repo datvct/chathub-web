@@ -145,7 +145,6 @@ const ChatMessage = ({
                   {isGroupChat && msg.senderId !== userId && (
                     <span className="text-xs text-white">{msg.senderName}</span>
                   )}
-                  { }
                   {msg.messageType === MessageType.IMAGE ? (
                     <button
                       onClick={() => msg.content && onImageClick(msg.content)}
@@ -159,7 +158,6 @@ const ChatMessage = ({
                         width={160}
                         height={160}
                       />
-                      { }
                       <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity duration-200"></div>
                       <span className="text-[10px] text-white block mt-1 absolute bottom-1 right-1 bg-black bg-opacity-50 px-1 rounded">
                         {" "}

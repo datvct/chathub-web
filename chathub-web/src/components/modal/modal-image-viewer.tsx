@@ -5,14 +5,14 @@ import Image from "next/image"
 import { Images } from "../../constants/images"
 import { Dialog, DialogPanel, Transition, TransitionChild } from "@headlessui/react"
 
-interface ModalViewImageProps {
+interface ModalImageViewerProps {
   isOpen: boolean
   setIsOpen: (open: boolean) => void
   imageUrl: string | null
   imageAlt?: string
 }
 
-const ModalViewImage: React.FC<ModalViewImageProps> = ({ isOpen, setIsOpen, imageUrl, imageAlt }) => {
+const ModalImageViewer: React.FC<ModalImageViewerProps> = ({ isOpen, setIsOpen, imageUrl, imageAlt }) => {
   if (!imageUrl) return null
 
   const handleClose = () => setIsOpen(false)
@@ -68,4 +68,4 @@ const ModalViewImage: React.FC<ModalViewImageProps> = ({ isOpen, setIsOpen, imag
   )
 }
 
-export default ModalViewImage
+export default ModalImageViewer
