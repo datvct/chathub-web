@@ -30,7 +30,7 @@ const ForwardMessageModal: React.FC<ForwardMessageModalProps> = ({ isOpen, onClo
   const { friends: fetchedFriends } = useFriends(userId, token)
   const { getRecentConversation } = useConversation(userId, token)
   const [conversationIds, setConversationIds] = useState<number[]>([])
-  const [pendingUserIds, setPendingUserIds] = useState<number[]>([]);
+  const [pendingUserIds, setPendingUserIds] = useState<number[]>([])
 
   useEffect(() => {
     if (!isOpen) {
@@ -177,7 +177,7 @@ const ForwardMessageModal: React.FC<ForwardMessageModalProps> = ({ isOpen, onClo
     setNote("")
     setConversationIds([])
     setPendingUserIds([])
-  }  
+  }
 
   if (!message) return null
 

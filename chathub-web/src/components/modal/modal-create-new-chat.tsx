@@ -11,18 +11,31 @@ import "../../styles/custom-scroll.css"
 import { useSelector } from "react-redux"
 import { RootState } from "~/lib/reudx/store"
 import { useFriends } from "~/hooks/use-friends"
-import { ConversationRequest } from "~/codegen/data-contracts"
+import { ConversationRequest, ConversationResponse } from "~/codegen/data-contracts"
 import { useConversation } from "~/hooks/use-converstation"
 import { toast } from "react-toastify"
+import { createConversationAPI, findSingleChat } from "~/lib/get-conversation"
+import { useRouter } from "next/router"
+import WebSocketService from "~/lib/web-socket-service"
+import { TOPICS } from "~/constants/Topics"
 
 interface ModalCreateNewChatProps {
   isOpen: boolean
   setIsOpen: (open: boolean) => void
   userId: number
   token: string
+  handleSelectChat?: (chatId: number, converstation: ConversationResponse) => void
+  onCreated?: (conversationId: number) => void
 }
 
-const ModalCreateNewChat: React.FC<ModalCreateNewChatProps> = ({ isOpen, setIsOpen, token, userId }) => {
+const ModalCreateNewChat: React.FC<ModalCreateNewChatProps> = ({
+  isOpen,
+  setIsOpen,
+  token,
+  userId,
+  handleSelectChat,
+  onCreated,
+}) => {
   const [selectedUser, setSelectedUser] = useState<number | null>(null)
   const [searchQuery, setSearchQuery] = useState<string>("")
   const { friends, loading: friendsLoading, error } = useFriends(userId, token)
@@ -59,16 +72,33 @@ const ModalCreateNewChat: React.FC<ModalCreateNewChatProps> = ({ isOpen, setIsOp
         },
         body: formData,
       })
+
       if (response.status === 200) {
+        const data = await response.json()
+        onCreated(data.id)
         toast.success("Chat created successfully!")
         setIsOpen(false)
-
         setSelectedUser(null)
         setSearchQuery("")
       } else {
-        toast.error(error || "Failed to create chat.")
+        const conversation = await findSingleChat(userId, selectedUser, token)
+        if (conversation) {
+          handleSelectChat(conversation.id, conversation)
+          setIsOpen(false)
+          setSelectedUser(null)
+          setSearchQuery("")
+          return
+        }
       }
     } catch (catchError: any) {
+      // const conversation = await findSingleChat(userId, selectedUser, token)
+      // if (conversation) {
+      //   handleSelectChat(conversation.id, conversation)
+      //   setIsOpen(false)
+      //   setSelectedUser(null)
+      //   setSearchQuery("")
+      //   return
+      // }
       toast.error(catchError.message || "Failed to create chat.")
     }
   }

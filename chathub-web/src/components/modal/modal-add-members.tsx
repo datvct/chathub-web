@@ -92,7 +92,7 @@ const ModalAddMembers: React.FC<ModalAddMembersProps> = ({ isOpen, setIsOpen, co
         <div className="fixed inset-0 bg-black bg-opacity-25" aria-hidden="true" />
         <div className="fixed inset-0 overflow-y-auto">
           <div className="flex min-h-full items-center justify-center p-4 text-center">
-            <DialogPanel className="bg-[#385068] rounded-[5%] w-[80%] h-[95%] max-w-md max-h-screen transform overflow-hidden p-6 text-left align-middle shadow-xl transition-all">
+            <DialogPanel className="bg-white rounded-[5%] w-[80%] h-[95%] max-w-md max-h-screen transform overflow-hidden p-6 text-left align-middle shadow-xl transition-all">
               <DialogTitle as="h3" className="text-xl text-white text-left font-bold leading-6 mb-4 relative">
                 <span className="text-[25px] font-bold">Add member</span>
               </DialogTitle>

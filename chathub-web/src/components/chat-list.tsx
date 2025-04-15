@@ -42,6 +42,7 @@ interface ChatListProps {
   conversations: ConversationResponse[]
   userId: number
   token?: string
+  handleReloadTrigger: () => void
 }
 
 const useGetUserById = (userId: number, token?: string) => {
@@ -66,12 +67,13 @@ const ChatList = ({
   conversations,
   userId,
   token,
+  handleReloadTrigger,
 }: ChatListProps) => {
   const [modalCreateChatOpen, setModalCreateNewChatOpen] = useState(false)
   const [modalCreateGroupChatOpen, setModalCreateNewGroupChatOpen] = useState(false)
   const [modalProfileOpen, setModalProfileOpen] = useState(false)
   const [isModalProfileOpen, setIsProfileModalOpen] = useState(false)
-  const [isFindFriendModalOpen, setIsFindFriendModalOpen] = useState(false);
+  const [isFindFriendModalOpen, setIsFindFriendModalOpen] = useState(false)
   const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false)
   const [isFriendListModalOpen, setIsFriendListModalOpen] = useState(false)
   const [isFriendRequestModalOpen, setIsFriendRequestModalOpen] = useState(false)
@@ -340,6 +342,10 @@ const ChatList = ({
         setIsOpen={setModalCreateNewChatOpen}
         userId={userId}
         token={token}
+        onCreated={(newConversationId: number) => {
+          console.log("New conversation created:", newConversationId)
+          handleReloadTrigger?.()
+        }}
       />
       <ModalCreateNewGroupChat
         isOpen={modalCreateGroupChatOpen}
@@ -380,10 +386,7 @@ const ChatList = ({
         title="Confirm Logout"
         message={"Are you sure you want to log out of your account?"}
       />
-      <ModalFindFriend
-        isOpen={isFindFriendModalOpen}
-        setIsOpen={setIsFindFriendModalOpen}
-      />
+      <ModalFindFriend isOpen={isFindFriendModalOpen} setIsOpen={setIsFindFriendModalOpen} />
     </div>
   )
 }
