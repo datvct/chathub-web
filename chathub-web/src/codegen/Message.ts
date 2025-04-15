@@ -57,7 +57,7 @@ export class Message<
     },
     params: RequestParams = {},
   ) =>
-    this.request<string, ErrorResponse>({
+    this.request<MessageResponse, ErrorResponse>({
       path: `/message/delete`,
       method: "PUT",
       query: query,

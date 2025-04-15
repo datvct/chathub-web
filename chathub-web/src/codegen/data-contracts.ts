@@ -141,9 +141,9 @@ export interface ConversationResponse {
   /** @format date-time */
   createAt?: string;
   participants?: ParticipantDTO[];
+  pinned?: boolean;
   dissolved?: boolean;
   unsent?: boolean;
-  pinned?: boolean;
 }
 
 export interface ParticipantDTO {
