@@ -453,7 +453,7 @@ const ChatInfo = ({
                 >
                   {isPinned ? <RiUnpinFill size={20} /> : <BsPinAngleFill size={20} />}
                 </button>
-                <span>{isPinned ? "Unpin" : "Pin"}</span>
+                <span className="mt-1.5 whitespace-nowrap">{isPinned ? "Unpin" : "Pin"}</span>
               </div>
               {isGroupChat && (
                 <div className="flex flex-col items-center">
@@ -463,7 +463,7 @@ const ChatInfo = ({
                   >
                     <AiOutlineUsergroupAdd size={22} />
                   </button>
-                  <span className="whitespace-nowrap">Add Member</span>
+                  <span className="mt-1.5 whitespace-nowrap">Add Member</span>
                 </div>
               )}
               {isGroupChat && isCurrentUserAdmin && (
@@ -471,10 +471,11 @@ const ChatInfo = ({
                   <button
                     className="bg-[#484848] h-10 w-10 rounded-full flex items-center justify-center hover:bg-gray-600"
                     onClick={() => setIsOpenUpdateGroupInfo(true)}
+                    title="Update group name/avatar"
                   >
                     <IoSettingsOutline size={20} />
                   </button>
-                  <span className="whitespace-nowrap">Group Settings</span>
+                  <span className="mt-1.5 whitespace-nowrap">Group Settings</span>
                 </div>
               )}
             </div>
@@ -485,7 +486,8 @@ const ChatInfo = ({
                 <h3 className="text-sm font-semibold text-gray-300 mb-2 px-2">Members ({chatDetail.members.length})</h3>
                 <button
                   onClick={() => setView("members")}
-                  className="flex items-center justify-between w-full py-2 px-2 rounded-lg hover:bg-gray-700 text-white"
+                  className="flex items-center justify-between w-full py-2 px-2 mt-1 rounded-lg hover:bg-gray-700
+                  text-sm text-white transition-colors duration-150"
                 >
                   <span>View all members</span>
                   <FaChevronLeft size={12} className="transform rotate-180" />
