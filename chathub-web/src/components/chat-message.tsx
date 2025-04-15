@@ -72,7 +72,7 @@ const ChatMessage = ({
               >
                 {msg.senderId === userId && (
                   <div className="flex items-center gap-2">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 relative">
                       <div
                         className={`bg-[#252728] pl-3 pr-5 py-3 rounded-lg shadow-md ${
                           openMenuId === msg.id ? "block" : "hidden"
@@ -84,14 +84,14 @@ const ChatMessage = ({
                               className="hover:bg-[#333334] p-2 pr-3 rounded cursor-pointer"
                               onClick={() => handleUnsend(msg.id)}
                             >
-                              Recall
+                              Unsend
                             </li>
                           )}
                           <li
                             className="hover:bg-[#333334] p-2 pr-3 rounded cursor-pointer"
                             onClick={() => handleDelete(msg.id)}
                           >
-                            Delete Message
+                            Delete For Me Only
                           </li>
                           {msg.unsent === false && (
                             <li
@@ -128,9 +128,11 @@ const ChatMessage = ({
                         <TiArrowBackOutline />
                       </button>
                     )}
-                    <button className="hover:bg-[#333334] p-2 rounded-full">
-                      <CiFaceSmile />
-                    </button>
+                    {msg.unsent === false && (
+                      <button className="hover:bg-[#333334] p-2 rounded-full">
+                        <CiFaceSmile />
+                      </button>
+                    )}
                   </div>
                 )}
                 {msg.senderId !== userId && (
@@ -146,26 +148,40 @@ const ChatMessage = ({
                   {isGroupChat && msg.senderId !== userId && (
                     <span className="text-xs text-white">{msg.senderName}</span>
                   )}
-                  {msg.messageType === MessageType.IMAGE ? (
-                    <button
-                      onClick={() => msg.content && onImageClick(msg.content)}
-                      className="block relative overflow-hidden rounded-lg cursor-pointer max-w-xs group"
-                      disabled={!msg.content}
+
+                  {msg.unsent === true ? (
+                    <p
+                      className={`p-3 rounded-lg w-max max-w-xs break-words text-black whitespace-pre-wrap ${
+                        msg.senderId === userId ? "bg-[#1566A3] text-white" : "bg-[#F0F0F0]"
+                      } ${isOnlyEmoji(msg.content) ? "text-4xl p-2 bg-transparent" : ""}`}
                     >
-                      <Image
-                        src={msg.content || Images.ImageDefault}
-                        alt="Sent image"
-                        className="rounded-lg object-cover transition-transform duration-200 group-hover:scale-105"
-                        width={160}
-                        height={160}
-                      />
-                      <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity duration-200"></div>
-                      <span className="text-[10px] text-white block mt-1 absolute bottom-1 right-1 bg-black bg-opacity-50 px-1 rounded">
-                        {" "}
-                        {}
+                      You unsent a message
+                      <span className={`text-xs block mt-1 ${msg.senderId === userId ? "text-white" : "text-black"}`}>
                         {formatTimeSendAt(msg.sentAt)}
                       </span>
-                    </button>
+                    </p>
+                  ) : msg.messageType === MessageType.IMAGE ? (
+                    <>
+                      <button
+                        onClick={() => msg.content && onImageClick(msg.content)}
+                        className="block relative overflow-hidden rounded-lg cursor-pointer max-w-xs group"
+                        disabled={!msg.content}
+                      >
+                        <Image
+                          src={msg.content || Images.ImageDefault}
+                          alt="Sent image"
+                          className="rounded-lg object-cover transition-transform duration-200 group-hover:scale-105"
+                          width={160}
+                          height={160}
+                        />
+                        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity duration-200"></div>
+                        <span className="text-[10px] text-white block mt-1 absolute bottom-1 right-1 bg-black bg-opacity-50 px-1 rounded">
+                          {" "}
+                          {}
+                          {formatTimeSendAt(msg.sentAt)}
+                        </span>
+                      </button>
+                    </>
                   ) : msg.messageType === MessageType.LINK ? (
                     <>
                       <Link href={msg.content} target="_blank" rel="noopener noreferrer" className="text-[#1566A3]">
@@ -193,17 +209,6 @@ const ChatMessage = ({
                       <source src={msg.content} type="video/mp4" />
                       Your browser does not support the video tag.
                     </video>
-                  ) : msg.unsent === true ? (
-                    <p
-                      className={`p-3 rounded-lg w-max max-w-xs break-words text-black whitespace-pre-wrap ${
-                        msg.senderId === userId ? "bg-[#1566A3] text-white" : "bg-[#F0F0F0]"
-                      } ${isOnlyEmoji(msg.content) ? "text-4xl p-2 bg-transparent" : ""}`}
-                    >
-                      Message recalled
-                      <span className={`text-xs block mt-1 ${msg.senderId === userId ? "text-white" : "text-black"}`}>
-                        {formatTimeSendAt(msg.sentAt)}
-                      </span>
-                    </p>
                   ) : (
                     <div
                       className={`p-3 rounded-lg w-max max-w-xs break-words text-black whitespace-pre-wrap ${
@@ -263,11 +268,19 @@ const ChatMessage = ({
                         }`}
                       >
                         <ul>
+                          {msg.unsent === false && (
+                            <li
+                              className="hover:bg-[#333334] p-2 pr-3 rounded cursor-pointer"
+                              onClick={() => handleUnsend(msg.id)}
+                            >
+                              Unsend
+                            </li>
+                          )}
                           <li
                             className="hover:bg-[#333334] p-2 pr-3 rounded cursor-pointer"
                             onClick={() => handleDelete(msg.id)}
                           >
-                            Delete Message
+                            Delete For Me Only
                           </li>
                           {msg.unsent === false && (
                             <li
