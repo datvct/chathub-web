@@ -123,7 +123,6 @@ const ChatInput = ({ onSendMessage }: { onSendMessage: (msg: string, messageType
         setFile(null)
         setPreviewFile(null)
       } catch (error) {
-        console.error("File upload error:", error)
         alert("Failed to upload file. Please try again.")
       }
     } else if (message.trim()) {

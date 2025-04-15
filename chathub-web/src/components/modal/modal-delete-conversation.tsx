@@ -34,7 +34,6 @@ const ModalDeleteConversation = ({ isOpen, setIsOpen, chatId, onHistoryDeleted }
       }
     } catch (error) {
       toast.error("Failed to delete chat history")
-      console.error("Error deleting chat history:", error)
     }
   }
 

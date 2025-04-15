@@ -68,12 +68,6 @@ const ModalAddMembers: React.FC<ModalAddMembersProps> = ({ isOpen, setIsOpen, co
         return
       }
 
-      console.log("Calling addMembersToConversation API with:", {
-        conversationId,
-        memberIdsToAdd,
-        token,
-      })
-
       const success = await addMembersToConversation(conversationId, memberIdsToAdd, token)
 
       if (success) {
@@ -84,7 +78,6 @@ const ModalAddMembers: React.FC<ModalAddMembersProps> = ({ isOpen, setIsOpen, co
         toast.error("Failed to add members to group.")
       }
     } catch (error) {
-      console.error("Error adding members to conversation:", error)
       toast.error("Failed to add members to group.")
     } finally {
       setLoading(false)

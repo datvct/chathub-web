@@ -12,7 +12,7 @@ import {
   UpdateNickNameRequest,
   UserDTO,
   MemberDTO,
-  SuccessResponse
+  SuccessResponse,
 } from "~/codegen/data-contracts"
 import { getRecentConversationByUserID } from "~/lib/get-conversation"
 import { Images } from "~/constants/images"
@@ -42,11 +42,12 @@ import { FaUserSlash } from "react-icons/fa6"
 import { MdBlock, MdLockOpen, MdGroupRemove } from "react-icons/md"
 import { CgTrashEmpty } from "react-icons/cg"
 import { AiOutlineUsergroupAdd, AiOutlineEdit } from "react-icons/ai"
-import { IoSettingsOutline, IoEllipsisVertical } from "react-icons/io5"
 import { HiOutlineArrowRightEndOnRectangle } from "react-icons/hi2"
 import { FaChevronLeft } from "react-icons/fa6"
 import { LuUserRoundPlus, LuShieldCheck } from "react-icons/lu"
 import { TbUserEdit } from "react-icons/tb"
+import { IoSettingsOutline, IoEllipsisVertical, IoClose } from "react-icons/io5"
+import { cn } from "~/lib/utils"
 
 interface ChatInfoProps {
   isOpen?: boolean
@@ -90,7 +91,7 @@ const ChatInfo = ({
   const [isBlocked, setIsBlocked] = useState(false)
 
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false)
-  const [confirmModalProps, setConfirmModalProps] = useState({ title: "", message: "", onConfirm: () => { } })
+  const [confirmModalProps, setConfirmModalProps] = useState({ title: "", message: "", onConfirm: () => {} })
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false)
   const [successMessage, setSuccessMessage] = useState<string>("")
   const [isOpenAddMembers, setIsOpenAddMembers] = useState(false)
@@ -110,11 +111,10 @@ const ChatInfo = ({
 
   const handleAvatarClickInInfo = (imageUrl: string | undefined | null) => {
     if (imageUrl) {
-      setSelectedImageUrlForInfo(imageUrl);
-      setIsImageViewerOpen(true);
-      console.log("Opening image viewer for ChatInfo avatar:", imageUrl);
+      setSelectedImageUrlForInfo(imageUrl)
+      setIsImageViewerOpen(true)
     } else {
-      toast.info("No avatar available to view.");
+      toast.info("No avatar available to view.")
     }
   }
 
@@ -127,9 +127,7 @@ const ChatInfo = ({
         const convos = await getRecentConversationByUserID(userId, token)
         const currentConvo = convos.find(c => c.id === selectedChat)
         setIsPinned(currentConvo?.pinned ?? false)
-      } catch (e) {
-        console.error("Error fetching pin status:", e)
-      }
+      } catch (e) {}
 
       setIsBlocked(details?.type === "SINGLE" && details.members?.length === 2 ? false : false)
     }
@@ -165,7 +163,6 @@ const ChatInfo = ({
       setActionType("updateNickname")
       setIsNicknameModalOpen(true)
     } else {
-      console.error("Invalid member data for updating nickname")
       toast.error("Could not open nickname editor for this member.")
     }
   }
@@ -184,7 +181,6 @@ const ChatInfo = ({
         toast.error("Failed to update pin status.")
       }
     } catch (error) {
-      console.error("Error pinning/unpinning conversation:", error)
       toast.error("Failed to update pin status.")
     }
   }
@@ -209,7 +205,6 @@ const ChatInfo = ({
           toast.error(response?.message || "Failed to remove member.")
         }
       } catch (error) {
-        console.error("Error removing member:", error)
         toast.error("Failed to remove member. Please try again.")
       }
     })
@@ -217,18 +212,17 @@ const ChatInfo = ({
 
   const handleOpenProfileView = (member: MemberDTO) => {
     if (!member || !member.id) {
-      toast.error("Cannot view profile for this member.");
-      return;
+      toast.error("Cannot view profile for this member.")
+      return
     }
     const friendData: UserDTO = {
       id: member.id,
       name: member.name,
       avatar: member.avatar,
-    };
-    setSelectedFriendForView(friendData);
-    setIsProfileViewModalOpen(true);
-    console.log("Opening profile view for:", friendData);
-  };
+    }
+    setSelectedFriendForView(friendData)
+    setIsProfileViewModalOpen(true)
+  }
 
   const handleLeaveGroupAction = () => {
     openConfirmModal("Leave Group", "Are you sure you want to leave this group?", async () => {
@@ -244,7 +238,6 @@ const ChatInfo = ({
           toast.error(response?.message || "Failed to leave group.")
         }
       } catch (error: any) {
-        console.error("Error leaving group:", error)
         toast.error("Failed to leave group.")
       }
     })
@@ -267,7 +260,6 @@ const ChatInfo = ({
             toast.error(response?.message || "Failed to dissolve group.")
           }
         } catch (error) {
-          console.error("Error dissolving group:", error)
           toast.error("An error occurred while dissolving the group.")
         }
       },
@@ -298,7 +290,6 @@ const ChatInfo = ({
         toast.error(apiError)
       }
     } catch (error) {
-      console.error(`${actionName} error:`, error)
       toast.error(errorMessage)
     }
   }
@@ -308,7 +299,7 @@ const ChatInfo = ({
       <div
         className="flex items-center gap-3 flex-1 min-w-0"
         onClick={() => handleOpenProfileView(member)}
-        style={{ cursor: 'pointer' }}
+        style={{ cursor: "pointer" }}
       >
         <Image
           src={member.avatar || Images.AvatarDefault}
@@ -349,16 +340,11 @@ const ChatInfo = ({
                     <button
                       onClick={() => handleOpenProfileView(member)}
                       className={`
-                        ${active ? 'bg-gray-600' : ''}
+                        ${active ? "bg-gray-600" : ""}
                         group flex w-full items-center rounded-md px-2 py-2 text-sm text-white
                       `}
                     >
-                      <Image
-                        src={Images.IconEye}
-                        alt="Icon Eye"
-                        width={28} height={28}
-                        className="mr-2 h-4 w-4"
-                      />
+                      <Image src={Images.IconEye} alt="Icon Eye" width={28} height={28} className="mr-2 h-4 w-4" />
                       View Profile
                     </button>
                   )}
@@ -416,7 +402,13 @@ const ChatInfo = ({
         <h2 className="text-lg font-semibold text-center flex-grow">
           {view === "main" ? "Conversation Info" : "Members"}
         </h2>
-        <button onClick={() => setIsChatInfoOpen(false)} className="p-1 rounded-full hover:bg-gray-700">
+        <button
+          onClick={() => setIsChatInfoOpen(false)}
+          className="p-2 rounded-full bg-[#484848] hover:bg-gray-700 transition-colors duration-150 -mr-0.5
+          text-gray-300 hover:text-white"
+          title="Close Conversation Information"
+        >
+          <IoClose size={20} />
         </button>
       </div>
 
@@ -425,24 +417,19 @@ const ChatInfo = ({
           <>
             <div className="flex flex-col items-center text-center mb-6">
               <Image
-                src={
-                  chatDetail?.avatar ||
-                  (!isGroupChat ? otherMember?.avatar : null) ||
-                  Images.AvatarDefault
-                }
+                src={chatDetail?.avatar || (!isGroupChat ? otherMember?.avatar : null) || Images.AvatarDefault}
                 alt={chatDetail?.name || (isGroupChat ? "Group" : otherMember?.name) || "Avatar"}
                 width={80}
                 height={80}
                 className="w-20 h-20 rounded-full mb-3 border-2 object-cover cursor-pointer"
-                onClick={() => handleAvatarClickInInfo(
-                  chatDetail?.avatar ||
-                  (!isGroupChat ? otherMember?.avatar : null)
-                )}
+                onClick={() =>
+                  handleAvatarClickInInfo(chatDetail?.avatar || (!isGroupChat ? otherMember?.avatar : null))
+                }
               />
               <p className="text-lg font-semibold truncate max-w-full px-4">
                 {chatDetail?.name || (isGroupChat ? "Group Chat" : otherMember?.name) || "Conversation"}
               </p>
-              {!isGroupChat && <p className="text-xs text-gray-400">{ }</p>}
+              {!isGroupChat && <p className="text-xs text-gray-400">{}</p>}
             </div>
 
             <div className="grid grid-cols-3 gap-x-4 gap-y-5 justify-items-center mb-6 text-xs text-center">
@@ -529,8 +516,9 @@ const ChatInfo = ({
                 </>
               ) : (
                 <button
-                  className={`flex items-center gap-3 w-full py-2 px-2 rounded-lg hover:bg-gray-700 ${isBlocked ? "text-green-400 hover:text-green-300" : "text-yellow-400 hover:text-yellow-300"
-                    }`}
+                  className={`flex items-center gap-3 w-full py-2 px-2 rounded-lg hover:bg-gray-700 ${
+                    isBlocked ? "text-green-400 hover:text-green-300" : "text-yellow-400 hover:text-yellow-300"
+                  }`}
                   onClick={handleBlockToggle}
                   disabled={blockUnblockLoading}
                 >
@@ -558,7 +546,7 @@ const ChatInfo = ({
           </>
         ) : (
           <>
-            { }
+            {}
             {isGroupChat && (
               <Button
                 className="w-full mb-4 bg-gray-700 hover:bg-gray-600 text-white"
@@ -635,11 +623,7 @@ const ChatInfo = ({
         onCancel={() => setIsConfirmModalOpen(false)}
       />
 
-      <ModalSuccess
-        isOpen={isSuccessModalOpen}
-        setIsOpen={setIsSuccessModalOpen}
-        message={successMessage}
-      />
+      <ModalSuccess isOpen={isSuccessModalOpen} setIsOpen={setIsSuccessModalOpen} message={successMessage} />
 
       {isProfileViewModalOpen && selectedFriendForView && (
         <ProfileViewModal

@@ -47,6 +47,7 @@ const ChatMessage = ({
     const res = await deleteMessage(userId, messageId, token)
     if (res) {
       refetchMessages()
+      setForwardingMessage(null)
     }
   }
 
@@ -174,8 +175,6 @@ const ChatMessage = ({
                         />
                         <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity duration-200"></div>
                         <span className="text-[10px] text-white block mt-1 absolute bottom-1 right-1 bg-black bg-opacity-50 px-1 rounded">
-                          {" "}
-                          {}
                           {formatTimeSendAt(msg.sentAt)}
                         </span>
                       </button>
@@ -213,7 +212,10 @@ const ChatMessage = ({
                         msg.senderId === userId ? "bg-[#1566A3] text-white" : "bg-[#F0F0F0]"
                       } ${isOnlyEmoji(msg.content) && msg.content?.trim() && msg.unsent === false ? "text-4xl p-2 bg-transparent" : ""}`}
                     >
-                      {(msg.content?.trim() && msg.forwarded===false) || (msg.content!="\" have forward this message\"" && msg.forwarded===true )? msg.content.replace(/^"(.*)"$/, "$1") : ""}
+                      {(msg.content?.trim() && msg.forwarded === false) ||
+                      (msg.content != '" have forward this message"' && msg.forwarded === true)
+                        ? msg.content.replace(/^"(.*)"$/, "$1")
+                        : ""}
                       {msg.forwarded === true && (
                         <div
                           className={`flex flex-col mt-1 p-2 border-l-4 ${

@@ -96,97 +96,76 @@ const ForwardMessageModal: React.FC<ForwardMessageModalProps> = ({ isOpen, onClo
     const response = await forwardMessage(userId, message.id, allSelectedIds, token, note)
 
     if (response) {
-      console.log("Message forwarded successfully:", response)
-      const ws = WebSocketService.getInstance()
-      const stompClient = ws.getStompClient()
-
-      // Gửi từng message đã forward vào đúng topic WebSocket
-      response.forEach((msg: MessageResponse) => {
-        const topic = `/topic/message/${msg.conversationId}`
-
-        stompClient?.publish({
-          destination: topic,
-          body: JSON.stringify(msg),
-        })
-      })
-
-      response.forEach((msg: MessageResponse) => {
-        const topic = `/topic/conversation/${msg.conversationId}`
-
-        stompClient?.publish({
-          destination: topic,
-          body: JSON.stringify(msg),
-        })
-      })
+      toast.success("Message forwarded successfully!")
+    } else {
+      toast.error("Failed to forward message.")
     }
-    resetState()
-    onClose() // Đóng modal sau khi hoàn thành
+
+    onClose()
+    setSelectedUsers([])
   }
 
   const toggleUser = async (friendId: number) => {
-    const isSelected = selectedUsers.includes(friendId);
-  
+    const isSelected = selectedUsers.includes(friendId)
+
     if (isSelected) {
-      setSelectedUsers(prev => prev.filter(uid => uid !== friendId));
-  
-      const conversation = await findSingleChat(userId, friendId, token);
-      const conversationId = conversation?.id;
-  
+      setSelectedUsers(prev => prev.filter(uid => uid !== friendId))
+
+      const conversation = await findSingleChat(userId, friendId, token)
+      const conversationId = conversation?.id
+
       if (conversationId) {
-        setConversationIds(prev => prev.filter(id => id !== conversationId));
+        setConversationIds(prev => prev.filter(id => id !== conversationId))
       } else {
-        setPendingUserIds(prev => prev.filter(id => id !== friendId));
+        setPendingUserIds(prev => prev.filter(id => id !== friendId))
       }
     } else {
-      setSelectedUsers(prev => [...prev, friendId]);
-  
-      const conversation = await findSingleChat(userId, friendId, token);
+      setSelectedUsers(prev => [...prev, friendId])
+
+      const conversation = await findSingleChat(userId, friendId, token)
       const conversationId = conversation?.id
-      console.log("conversationId", conversationId)
-  
+
       if (conversationId) {
-        setConversationIds(prev => [...prev, conversationId]);
+        setConversationIds(prev => [...prev, conversationId])
       } else {
-        console.warn("Không tìm thấy conversation cho friendId:", friendId);
-        setPendingUserIds(prev => [...prev, friendId]);
-  
+        console.warn("Không tìm thấy conversation cho friendId:", friendId)
+        setPendingUserIds(prev => [...prev, friendId])
+
         // 👉 Gọi API tạo conversation tại đây
-        await createSingleConversation(userId, friendId);
+        await createSingleConversation(userId, friendId)
       }
     }
-  };
-  
+  }
+
   const createSingleConversation = async (currentUserId: number, friendId: number) => {
-    const formData = new FormData();
-    formData.append("userIds", currentUserId.toString());
-    formData.append("userIds", friendId.toString());
-  
+    const formData = new FormData()
+    formData.append("chatType", "SINGLE")
+    formData.append("creatorId", userId.toString())
+    formData.append("participantIds", userId.toString())
+    formData.append("participantIds", friendId.toString())
     try {
       const response = await fetch("http://localhost:8080/conversation/create", {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
-          // Không set Content-Type vì đang dùng FormData
         },
         body: formData,
-      });
-  
+      })
+
       if (response.ok) {
-        const data = await response.json();
-        console.log("✅ Created conversation:", data);
-  
-        setConversationIds(prev => [...prev, data.id]);
-        setPendingUserIds(prev => prev.filter(id => id !== friendId)); // đã tạo -> gỡ khỏi pending
+        const data = await response.json()
+
+        setConversationIds(prev => [...prev, data.id])
+        setPendingUserIds(prev => prev.filter(id => id !== friendId)) // đã tạo -> gỡ khỏi pending
       } else {
-        const err = await response.json();
-        console.error("❌ Failed to create conversation:", err);
-        toast.error(err.message || "Failed to create conversation.");
+        const err = await response.json()
+
+        toast.error(err.message || "Failed to create conversation.")
       }
     } catch (err: any) {
-      console.error("❌ Error creating conversation:", err);
-      toast.error(err.message || "Failed to create conversation.");
+      toast.error(err.message || "Failed to create conversation.")
     }
-  };
+  }
   const toggleGroup = (id: number) => {
     setSelectedGroups(prev => (prev.includes(id) ? prev.filter(gid => gid !== id) : [...prev, id]))
   }

@@ -8,7 +8,6 @@ export async function signUp(data: RegistrationRequest) {
     const response = (await authInstance.register(data).then(res => res.json())) as SuccessResponse
     return response
   } catch (error) {
-    console.error("Registration error:", error)
     throw error
   }
 }
