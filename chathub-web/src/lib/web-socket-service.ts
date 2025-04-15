@@ -91,7 +91,6 @@ class WebSocketService {
       this.subscriptions.forEach(sub => sub.unsubscribe())
       this.subscriptions = []
     } else {
-      console.error("WebSocket is not connected.")
     }
   }
 

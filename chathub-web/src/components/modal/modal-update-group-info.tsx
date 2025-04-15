@@ -41,22 +41,22 @@ const ModalUpdateGroupInfo: React.FC<ModalUpdateGroupInfoProps> = ({
 
   useEffect(() => {
     if (isOpen) {
-      setGroupName(currentGroupName || "");
-      setGroupAvatarPreview(currentGroupAvatar || null);
-      setSelectedAvatarFile(null);
+      setGroupName(currentGroupName || "")
+      setGroupAvatarPreview(currentGroupAvatar || null)
+      setSelectedAvatarFile(null)
     }
-  }, [isOpen, currentGroupName, currentGroupAvatar]);
+  }, [isOpen, currentGroupName, currentGroupAvatar])
 
   const handleAvatarChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (file) {
       if (file.size > 2 * 1024 * 1024) {
-        toast.error("Avatar image must be smaller than 2MB.");
-        return;
+        toast.error("Avatar image must be smaller than 2MB.")
+        return
       }
-      if (!file.type.startsWith('image/')) {
-        toast.error("Please select a valid image file (PNG, JPG, GIF).");
-        return;
+      if (!file.type.startsWith("image/")) {
+        toast.error("Please select a valid image file (PNG, JPG, GIF).")
+        return
       }
 
       setSelectedAvatarFile(file)
@@ -66,25 +66,24 @@ const ModalUpdateGroupInfo: React.FC<ModalUpdateGroupInfoProps> = ({
 
   const handleSubmit = async () => {
     if (!conversationId || !userId || !token) {
-      toast.error("Missing required information to update group.");
-      return;
+      toast.error("Missing required information to update group.")
+      return
     }
     if (!groupName.trim()) {
-      toast.warn("Group name cannot be empty.");
-      return;
+      toast.warn("Group name cannot be empty.")
+      return
     }
 
     try {
-      const response = await updateGroupInfo(conversationId, groupName, selectedAvatarFile);
+      const response = await updateGroupInfo(conversationId, groupName, selectedAvatarFile)
 
       if (response) {
-        toast.success("Group info updated successfully!");
-        setIsOpen(false);
-        onGroupInfoUpdated();
+        toast.success("Group info updated successfully!")
+        setIsOpen(false)
+        onGroupInfoUpdated()
       }
     } catch (updateError: any) {
-      console.error("Error updating group info:", updateError);
-      toast.error(error || updateError.message || "Failed to update group info. Please try again.");
+      toast.error(error || updateError.message || "Failed to update group info. Please try again.")
     }
   }
 
@@ -181,13 +180,31 @@ const ModalUpdateGroupInfo: React.FC<ModalUpdateGroupInfoProps> = ({
                     >
                       {loading ? (
                         <div className="flex items-center justify-center">
-                          <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          <svg
+                            className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+                            xmlns="http://www.w3.org/2000/svg"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                          >
+                            <circle
+                              className="opacity-25"
+                              cx="12"
+                              cy="12"
+                              r="10"
+                              stroke="currentColor"
+                              strokeWidth="4"
+                            ></circle>
+                            <path
+                              className="opacity-75"
+                              fill="currentColor"
+                              d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                            ></path>
                           </svg>
                           Updating...
                         </div>
-                      ) : "Update"}
+                      ) : (
+                        "Update"
+                      )}
                     </Button>
                   </div>
                 </div>

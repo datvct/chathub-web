@@ -36,7 +36,6 @@ const ModalFriendRequests: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean
 
       try {
         const response = await getListFriendRequests()
-        console.log(response)
 
         // Phân loại lời mời theo type
         const received = response.filter(req => req.type === "RECEIVED")
@@ -45,7 +44,6 @@ const ModalFriendRequests: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean
         setReceivedRequests(received)
         setSentRequests(sent)
       } catch (err) {
-        console.error("Error fetching friend requests:", err)
         setError("Failed to load friend requests.")
       } finally {
         setLoading(false)

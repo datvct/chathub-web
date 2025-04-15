@@ -30,7 +30,6 @@ const ModalLeaveGroup = ({ isOpen, setIsOpen, chatId, setSelectedChatId }: Modal
       setIsOpen(false)
     } catch (error) {
       toast.error("Failed to leave group")
-      console.error("Error leaving group:", error)
     } finally {
       setTimeout(() => {
         window.location.reload()

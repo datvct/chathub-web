@@ -167,23 +167,22 @@ export const useConversation = (userId: number, token: string) => {
   const updateGroupInfo = async (
     conversationId: number,
     groupName: string,
-    avatarFile: File | null
+    avatarFile: File | null,
   ): Promise<SuccessResponse | null> => {
     if (!userId || !token) {
-      setError("User ID or Token is missing.");
-      return null;
-    };
-    setLoading(true);
-    setError(null);
+      setError("User ID or Token is missing.")
+      return null
+    }
+    setLoading(true)
+    setError(null)
     try {
-      const response = await updateGroupInfoAPI(conversationId, userId, groupName, avatarFile, token);
-      return response;
+      const response = await updateGroupInfoAPI(conversationId, userId, groupName, avatarFile, token)
+      return response
     } catch (err: any) {
-      console.error("Failed to update group info in hook:", err);
-      setError(err.message || "Failed to update group info.");
-      throw err;
+      setError(err.message || "Failed to update group info.")
+      throw err
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
   }
 
@@ -263,26 +262,24 @@ export const useConversation = (userId: number, token: string) => {
     participantId: number,
     token: string,
   ): Promise<SuccessResponse | null> => {
-    setLoading(true);
-    setError(null);
+    setLoading(true)
+    setError(null)
     try {
-
       const response = await removeParticipantFromGroupConversationAPI(
         conversationId,
         adminUserId,
         participantId,
         token,
-      );
+      )
 
-      return response;
+      return response
     } catch (err: any) {
-      console.error("Error removing participant in hook:", err);
-      setError(err.message || "Failed to remove participant from group");
-      return null;
+      setError(err.message || "Failed to remove participant from group")
+      return null
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const leaveGroupConversation = async (conversationId: number, userId: number, token: string) => {
     setLoading(true)
@@ -310,7 +307,6 @@ export const useConversation = (userId: number, token: string) => {
     setSearchGroupError(null)
     try {
       const response = await findGroupsAPI(userId, groupName, token)
-      console.log("findGroups Response Hook:", response)
       setSearchedGroups(response || [])
       return response || []
     } catch (err) {

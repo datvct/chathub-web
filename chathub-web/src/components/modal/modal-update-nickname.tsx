@@ -57,11 +57,8 @@ const ModalUpdateNickname: React.FC<ModalUpdateNicknameProps> = ({
       nickName: newNickname,
     }
 
-    console.log("Updating nickname with data:", data)
-
     try {
       const response = await updateNickname(data, token)
-      console.log("API Response:", response)
 
       if (response?.statusCode === 200) {
         toast.success("Nickname updated successfully!")
@@ -73,7 +70,6 @@ const ModalUpdateNickname: React.FC<ModalUpdateNicknameProps> = ({
         toast.error(apiError)
       }
     } catch (catchError: any) {
-      console.error("Error updating nickname:", catchError)
       const message = catchError?.message || "An unexpected error occurred."
       setErrorMessage(message)
       toast.error(message)

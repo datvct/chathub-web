@@ -159,7 +159,6 @@ export default function Home() {
             })
           }
         } catch (error) {
-          console.error("Error fetching conversations:", error)
         } finally {
           if (isMounted) {
             setNeedRefetchConversations(false)
@@ -170,7 +169,6 @@ export default function Home() {
       return () => {
         isMounted = false
         const websocket = WebSocketService.getInstance()
-        console.log("Unsubscribing from topics")
         conversations.forEach(c => {
           websocket.unsubscribe(TOPICS.CONVERSATION(c.id.toString()), () => {})
           websocket.unsubscribe(TOPICS.MESSAGE(c.id.toString()), () => {})

@@ -19,7 +19,6 @@ export function ReduxProvider({ children }: { children: React.ReactNode }) {
           }
         }
       } catch (error) {
-        console.error("Error fetching auth data:", error)
       } finally {
         setLoading(false)
       }
