@@ -40,10 +40,8 @@ const ModalDissolveGroup = ({ isOpen, setIsOpen, chatId, isAdmin }: ModalLeaveGr
         }, 1000)
       } else {
         toast.error("Failed to dissolve group")
-        console.error("Failed to dissolve group: ", response?.message || "Unknown error")
       }
     } catch (error) {
-      console.error("Error dissolving group:", error)
       toast.error("An error occurred while dissolving the group.")
     }
   }

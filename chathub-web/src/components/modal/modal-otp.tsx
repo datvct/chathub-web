@@ -72,7 +72,6 @@ const ModalOTP = ({ isOpen, setIsOpen, numberPhone, confirmationResult, onResend
       }, 3000)
     } catch (error) {
       toast.error("Invalid OTP! Please try again.")
-      console.error("Invalid OTP:", error)
     }
   }
 

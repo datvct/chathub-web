@@ -84,7 +84,6 @@ const ModalCreateGroupChat: React.FC<ModalCreateGroupChatProps> = ({ isOpen, set
         toast.error(error || "Failed to create group chat.")
       }
     } catch (catchError: any) {
-      console.error("Error creating group chat:", catchError)
       toast.error(catchError.message || "Failed to create group chat.")
     }
   }

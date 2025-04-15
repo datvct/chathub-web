@@ -62,7 +62,6 @@ const SignInPage: React.FC = () => {
         setErrorMessage("Invalid phone number or password.")
       }
     } catch (error) {
-      console.error("Login error:", error)
       setErrorMessage("Something went wrong. Please try again.")
     }
 

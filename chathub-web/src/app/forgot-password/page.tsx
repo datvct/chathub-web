@@ -53,7 +53,6 @@ const ForgotPasswordPage: React.FC = () => {
 
   const handleSubmit = async () => {
     if (!recaptchaVerifier) {
-      console.error("RecaptchaVerifier is not initialized")
       return
     }
 
@@ -67,14 +66,11 @@ const ForgotPasswordPage: React.FC = () => {
       const confirmation = await signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier)
       setOpenModal(true)
       setConfirmationResult(confirmation)
-    } catch (error) {
-      console.error("Error sending OTP:", error)
-    }
+    } catch (error) {}
   }
 
   const handleResendOTP = async () => {
     if (!recaptchaVerifier) {
-      console.error("RecaptchaVerifier is not initialized")
       return
     }
 
@@ -84,7 +80,6 @@ const ForgotPasswordPage: React.FC = () => {
       toast.success("OTP sent successfully!")
     } catch (error) {
       toast.success("Error resending OTP! Please try again.")
-      console.error("Error resending OTP:", error)
     }
   }
 
