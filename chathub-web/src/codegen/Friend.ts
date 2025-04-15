@@ -10,18 +10,10 @@
  * ---------------------------------------------------------------
  */
 
-import {
-  ErrorResponse,
-  FriendRequestResponse,
-  FriendshipRequest,
-  SuccessResponse,
-  UserDTO,
-} from "./data-contracts";
-import { ContentType, HttpClient, RequestParams } from "./http-client";
+import { ErrorResponse, FriendRequestResponse, FriendshipRequest, SuccessResponse, UserDTO } from "./data-contracts"
+import { ContentType, HttpClient, RequestParams } from "./http-client"
 
-export class Friend<
-  SecurityDataType = unknown,
-> extends HttpClient<SecurityDataType> {
+export class Friend<SecurityDataType = unknown> extends HttpClient<SecurityDataType> {
   /**
    * No description
    *
@@ -38,7 +30,7 @@ export class Friend<
       secure: true,
       type: ContentType.Json,
       ...params,
-    });
+    })
   /**
    * No description
    *
@@ -55,7 +47,7 @@ export class Friend<
       secure: true,
       type: ContentType.Json,
       ...params,
-    });
+    })
   /**
    * No description
    *
@@ -72,7 +64,7 @@ export class Friend<
       secure: true,
       type: ContentType.Json,
       ...params,
-    });
+    })
   /**
    * No description
    *
@@ -84,7 +76,7 @@ export class Friend<
   getListFriend = (
     query: {
       /** @format int64 */
-      userId: number;
+      userId: number
     },
     params: RequestParams = {},
   ) =>
@@ -94,7 +86,7 @@ export class Friend<
       query: query,
       secure: true,
       ...params,
-    });
+    })
   /**
    * No description
    *
@@ -106,7 +98,7 @@ export class Friend<
   getListFriendRequest = (
     query: {
       /** @format int64 */
-      userId: number;
+      userId: number
     },
     params: RequestParams = {},
   ) =>
@@ -116,7 +108,7 @@ export class Friend<
       query: query,
       secure: true,
       ...params,
-    });
+    })
   /**
    * No description
    *
@@ -128,9 +120,9 @@ export class Friend<
   unsentFriendRequest = (
     query: {
       /** @format int64 */
-      userId: number;
+      userId: number
       /** @format int64 */
-      friendId: number;
+      friendId: number
     },
     params: RequestParams = {},
   ) =>
@@ -140,7 +132,7 @@ export class Friend<
       query: query,
       secure: true,
       ...params,
-    });
+    })
   /**
    * No description
    *
@@ -152,9 +144,9 @@ export class Friend<
   deleteFriend = (
     query: {
       /** @format int64 */
-      userId: number;
+      userId: number
       /** @format int64 */
-      friendId: number;
+      friendId: number
     },
     params: RequestParams = {},
   ) =>
@@ -164,5 +156,5 @@ export class Friend<
       query: query,
       secure: true,
       ...params,
-    });
+    })
 }

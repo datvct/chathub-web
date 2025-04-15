@@ -17,12 +17,10 @@ import {
   ErrorResponse,
   SuccessResponse,
   UserDTO,
-} from "./data-contracts";
-import { ContentType, HttpClient, RequestParams } from "./http-client";
+} from "./data-contracts"
+import { ContentType, HttpClient, RequestParams } from "./http-client"
 
-export class User<
-  SecurityDataType = unknown,
-> extends HttpClient<SecurityDataType> {
+export class User<SecurityDataType = unknown> extends HttpClient<SecurityDataType> {
   /**
    * No description
    *
@@ -39,7 +37,7 @@ export class User<
       secure: true,
       type: ContentType.FormData,
       ...params,
-    });
+    })
   /**
    * No description
    *
@@ -56,7 +54,7 @@ export class User<
       secure: true,
       type: ContentType.Json,
       ...params,
-    });
+    })
   /**
    * No description
    *
@@ -73,7 +71,7 @@ export class User<
       secure: true,
       type: ContentType.Json,
       ...params,
-    });
+    })
   /**
    * No description
    *
@@ -85,8 +83,8 @@ export class User<
   search = (
     query: {
       /** @format int64 */
-      userId: number;
-      query: string;
+      userId: number
+      query: string
     },
     params: RequestParams = {},
   ) =>
@@ -96,7 +94,7 @@ export class User<
       query: query,
       secure: true,
       ...params,
-    });
+    })
   /**
    * No description
    *
@@ -107,7 +105,7 @@ export class User<
    */
   findUserByPhoneNumber = (
     query: {
-      phoneNumber: string;
+      phoneNumber: string
     },
     params: RequestParams = {},
   ) =>
@@ -117,7 +115,7 @@ export class User<
       query: query,
       secure: true,
       ...params,
-    });
+    })
   /**
    * No description
    *
@@ -132,7 +130,7 @@ export class User<
       method: "GET",
       secure: true,
       ...params,
-    });
+    })
   /**
    * No description
    *
@@ -149,5 +147,5 @@ export class User<
       secure: true,
       type: ContentType.Json,
       ...params,
-    });
+    })
 }

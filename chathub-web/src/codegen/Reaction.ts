@@ -10,12 +10,10 @@
  * ---------------------------------------------------------------
  */
 
-import { ErrorResponse, ReactionRequest } from "./data-contracts";
-import { ContentType, HttpClient, RequestParams } from "./http-client";
+import { ErrorResponse, ReactionRequest } from "./data-contracts"
+import { ContentType, HttpClient, RequestParams } from "./http-client"
 
-export class Reaction<
-  SecurityDataType = unknown,
-> extends HttpClient<SecurityDataType> {
+export class Reaction<SecurityDataType = unknown> extends HttpClient<SecurityDataType> {
   /**
    * No description
    *
@@ -32,5 +30,5 @@ export class Reaction<
       secure: true,
       type: ContentType.Json,
       ...params,
-    });
+    })
 }

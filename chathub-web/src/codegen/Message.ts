@@ -10,12 +10,10 @@
  * ---------------------------------------------------------------
  */
 
-import { ErrorResponse, MessageResponse } from "./data-contracts";
-import { ContentType, HttpClient, RequestParams } from "./http-client";
+import { ErrorResponse, MessageResponse } from "./data-contracts"
+import { ContentType, HttpClient, RequestParams } from "./http-client"
 
-export class Message<
-  SecurityDataType = unknown,
-> extends HttpClient<SecurityDataType> {
+export class Message<SecurityDataType = unknown> extends HttpClient<SecurityDataType> {
   /**
    * No description
    *
@@ -27,9 +25,9 @@ export class Message<
   unsendMessage = (
     query: {
       /** @format int64 */
-      userId: number;
+      userId: number
       /** @format int64 */
-      messageId: number;
+      messageId: number
     },
     params: RequestParams = {},
   ) =>
@@ -39,7 +37,7 @@ export class Message<
       query: query,
       secure: true,
       ...params,
-    });
+    })
   /**
    * No description
    *
@@ -51,9 +49,9 @@ export class Message<
   deleteMessage = (
     query: {
       /** @format int64 */
-      userId: number;
+      userId: number
       /** @format int64 */
-      messageId: number;
+      messageId: number
     },
     params: RequestParams = {},
   ) =>
@@ -63,7 +61,7 @@ export class Message<
       query: query,
       secure: true,
       ...params,
-    });
+    })
   /**
    * No description
    *
@@ -75,10 +73,10 @@ export class Message<
   forwardMessage = (
     query: {
       /** @format int64 */
-      senderId: number;
+      senderId: number
       /** @format int64 */
-      originalMessageId: number;
-      conversationIds: number[];
+      originalMessageId: number
+      conversationIds: number[]
     },
     data: string,
     params: RequestParams = {},
@@ -91,7 +89,7 @@ export class Message<
       secure: true,
       type: ContentType.Json,
       ...params,
-    });
+    })
   /**
    * No description
    *
@@ -104,7 +102,7 @@ export class Message<
     conversationId: number,
     query: {
       /** @format int64 */
-      userId: number;
+      userId: number
     },
     params: RequestParams = {},
   ) =>
@@ -114,5 +112,5 @@ export class Message<
       query: query,
       secure: true,
       ...params,
-    });
+    })
 }
