@@ -58,8 +58,8 @@ export interface MessageResponse {
   userDeleted?: boolean
   forwardedMessage?: ForwardedMessageInfo
   reactions?: ReactionDTO[]
-  forwarded?: boolean
   unsent?: boolean
+  forwarded?: boolean
 }
 
 export interface ReactionDTO {
@@ -142,6 +142,7 @@ export interface ConversationResponse {
   createAt?: string
   participants?: ParticipantDTO[]
   pinned?: boolean
+  unsent?: boolean
   dissolved?: boolean
   unsent?: boolean
 }

@@ -101,7 +101,14 @@ const ChatList = ({
   const getDislayMessage = (item: ConversationResponse) => {
     if (!item.lastMessage || !item.lastMessageType) return "No messages"
     const sender = item.senderId == userId ? "You" : item.senderName.split(" ")[0]
+    if (item.unsent) {
+      const sender = item.senderId == userId ? "You" : item.senderName.split(" ")[0]
+      return `${sender} unsent a message`
+    }
 
+    if (item.userDeleted) {
+      return "This message has been deleted"
+    }
     const truncate = (text: string, maxLength = 38) => {
       return text.length > maxLength ? text.slice(0, maxLength) + "..." : text
     }

@@ -56,7 +56,6 @@ const ChatMessage = ({
         .slice()
         .sort((a, b) => new Date(a.sentAt).getTime() - new Date(b.sentAt).getTime())
         .map(msg => {
-          console.log("Message content:", msg.content)
           const currentMessageDate = moment(msg.sentAt).format("YYYY-MM-DD")
           const isNewDate = currentMessageDate !== lastMessageDate
           lastMessageDate = currentMessageDate
@@ -67,15 +66,17 @@ const ChatMessage = ({
               )}
               <div
                 id={`message-${msg.id}`}
-                className={`message items-center gap-2 h-[141px] ${msg.senderId === userId ? "justify-end" : "justify-start"
-                  } ${msg.userDeleted == true ? "hidden" : "flex"}`}
+                className={`message items-center gap-2 h-[141px] ${
+                  msg.senderId === userId ? "justify-end" : "justify-start"
+                } ${msg.userDeleted == true ? "hidden" : "flex"}`}
               >
                 {msg.senderId === userId && (
                   <div className="flex items-center gap-2">
                     <div className="flex items-center gap-2">
                       <div
-                        className={`bg-[#252728] pl-3 pr-5 py-3 rounded-lg shadow-md ${openMenuId === msg.id ? "block" : "hidden"
-                          }`}
+                        className={`bg-[#252728] pl-3 pr-5 py-3 rounded-lg shadow-md ${
+                          openMenuId === msg.id ? "block" : "hidden"
+                        }`}
                       >
                         <ul>
                           {msg.unsent === false && (
@@ -161,7 +162,7 @@ const ChatMessage = ({
                       <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity duration-200"></div>
                       <span className="text-[10px] text-white block mt-1 absolute bottom-1 right-1 bg-black bg-opacity-50 px-1 rounded">
                         {" "}
-                        { }
+                        {}
                         {formatTimeSendAt(msg.sentAt)}
                       </span>
                     </button>
@@ -194,8 +195,9 @@ const ChatMessage = ({
                     </video>
                   ) : msg.unsent === true ? (
                     <p
-                      className={`p-3 rounded-lg w-max max-w-xs break-words text-black whitespace-pre-wrap ${msg.senderId === userId ? "bg-[#1566A3] text-white" : "bg-[#F0F0F0]"
-                        } ${isOnlyEmoji(msg.content) ? "text-4xl p-2 bg-transparent" : ""}`}
+                      className={`p-3 rounded-lg w-max max-w-xs break-words text-black whitespace-pre-wrap ${
+                        msg.senderId === userId ? "bg-[#1566A3] text-white" : "bg-[#F0F0F0]"
+                      } ${isOnlyEmoji(msg.content) ? "text-4xl p-2 bg-transparent" : ""}`}
                     >
                       Message recalled
                       <span className={`text-xs block mt-1 ${msg.senderId === userId ? "text-white" : "text-black"}`}>
@@ -204,14 +206,16 @@ const ChatMessage = ({
                     </p>
                   ) : (
                     <div
-                      className={`p-3 rounded-lg w-max max-w-xs break-words text-black whitespace-pre-wrap ${msg.senderId === userId ? "bg-[#1566A3] text-white" : "bg-[#F0F0F0]"
-                        } ${isOnlyEmoji(msg.content) && msg.content?.trim() ? "text-4xl p-2 bg-transparent" : ""}`}
+                      className={`p-3 rounded-lg w-max max-w-xs break-words text-black whitespace-pre-wrap ${
+                        msg.senderId === userId ? "bg-[#1566A3] text-white" : "bg-[#F0F0F0]"
+                      } ${isOnlyEmoji(msg.content) && msg.content?.trim() ? "text-4xl p-2 bg-transparent" : ""}`}
                     >
                       {msg.content?.trim() ? msg.content.replace(/^"(.*)"$/, "$1") : ""}
                       {msg.forwarded === true && (
                         <div
-                          className={`flex flex-col mt-1 p-2 border-l-4 ${msg.senderId === userId ? "bg-[#0000004d] text-[#9facbc] border-[#66a6ff]" : "bg-[#fff]"
-                            }`}
+                          className={`flex flex-col mt-1 p-2 border-l-4 ${
+                            msg.senderId === userId ? "bg-[#0000004d] text-[#9facbc] border-[#66a6ff]" : "bg-[#fff]"
+                          }`}
                         >
                           <div className="flex gap-1 items-center">
                             <IoReturnUpForward />
@@ -254,8 +258,9 @@ const ChatMessage = ({
                         <CiMenuKebab />
                       </button>
                       <div
-                        className={`bg-[#252728] pl-3 pr-5 py-3 rounded-lg shadow-md ${openMenuId === msg.id ? "block" : "hidden"
-                          }`}
+                        className={`bg-[#252728] pl-3 pr-5 py-3 rounded-lg shadow-md ${
+                          openMenuId === msg.id ? "block" : "hidden"
+                        }`}
                       >
                         <ul>
                           <li

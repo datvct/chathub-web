@@ -120,93 +120,95 @@ const ChatInput = ({ onSendMessage }: { onSendMessage: (msg: string, messageType
           <EmojiPicker onEmojiClick={handleEmojiClick} />
         </div>
       )}
-      {previewFile && (
-        <div className="flex items-center space-x-2 bg-[#2e2e3e] p-2 rounded-lg">
-          {fileType === MessageType.IMAGE && (
-            <Image
-              src={previewFile}
-              alt="Preview"
-              width={56}
-              height={56}
-              className="w-14 h-14 rounded-lg object-cover"
-            />
-          )}
-          {fileType === MessageType.VIDEO && (
-            <video controls className="w-20 h-20 rounded-lg">
-              <source src={previewFile} type={file?.type} />
-              Your browser does not support the video tag.
-            </video>
-          )}
-          {fileType === MessageType.DOCUMENT && <div className="text-white">📄 {file?.name}</div>}
-          <button
-            onClick={() => {
-              setFile(null)
-              setPreviewFile(null)
-            }}
-            className="text-red-500 text-lg"
-          >
-            ✖
-          </button>
-        </div>
-      )}
+      <div className="bg-[#2e2e3e] p-4 rounded-lg shadow-md flex flex-col space-y-2 mx-5">
+        {previewFile && (
+          <div className="flex items-center space-x-2 bg-[#2e2e3e] p-2 rounded-lg">
+            {fileType === MessageType.IMAGE && (
+              <Image
+                src={previewFile}
+                alt="Preview"
+                width={56}
+                height={56}
+                className="w-14 h-14 rounded-lg object-cover"
+              />
+            )}
+            {fileType === MessageType.VIDEO && (
+              <video controls className="w-20 h-20 rounded-lg">
+                <source src={previewFile} type={file?.type} />
+                Your browser does not support the video tag.
+              </video>
+            )}
+            {fileType === MessageType.DOCUMENT && <div className="text-white">📄 {file?.name}</div>}
+            <button
+              onClick={() => {
+                setFile(null)
+                setPreviewFile(null)
+              }}
+              className="text-red-500 text-lg"
+            >
+              ✖
+            </button>
+          </div>
+        )}
 
-      <div className="flex items-center justify-between gap-2.5">
-        <div className="bg-[#2e2e3e] p-3 rounded-xl flex items-center space-x-3 w-[97%]">
-          <button onClick={() => handleFileClick(MessageType.IMAGE, imageInputRef)}>
-            <FaImage className="text-[#8A8A8A] text-xl" />
-          </button>
-          <button onClick={() => handleFileClick(MessageType.VIDEO, videoInputRef)}>
-            <LiaFileVideo className="text-[#8A8A8A] text-xl" />
-          </button>
+        <div className="flex items-center justify-between gap-2.5">
+          <div className="flex items-center space-x-3 w-full">
+            <button onClick={() => handleFileClick(MessageType.IMAGE, imageInputRef)}>
+              <FaImage className="text-[#8A8A8A] text-xl" />
+            </button>
+            <button onClick={() => handleFileClick(MessageType.VIDEO, videoInputRef)}>
+              <LiaFileVideo className="text-[#8A8A8A] text-xl" />
+            </button>
 
-          <button onClick={() => handleFileClick(MessageType.DOCUMENT, documentInputRef)} className="cursor-pointer">
-            <FaPaperclip className="text-[#8A8A8A] text-xl" />
-          </button>
+            <button onClick={() => handleFileClick(MessageType.DOCUMENT, documentInputRef)} className="cursor-pointer">
+              <FaPaperclip className="text-[#8A8A8A] text-xl" />
+            </button>
 
-          <input
-            type="file"
-            ref={imageInputRef}
-            className="
+            <input
+              type="file"
+              ref={imageInputRef}
+              className="
           hidden"
-            accept="image/*"
-            onChange={handleFileChange}
-          />
-          <input type="file" ref={videoInputRef} className="hidden" accept="video/*" onChange={handleFileChange} />
-          <input
-            type="file"
-            ref={documentInputRef}
-            className="hidden"
-            accept="application/*,text/*"
-            onChange={handleFileChange}
-          />
+              accept="image/*"
+              onChange={handleFileChange}
+            />
+            <input type="file" ref={videoInputRef} className="hidden" accept="video/*" onChange={handleFileChange} />
+            <input
+              type="file"
+              ref={documentInputRef}
+              className="hidden"
+              accept="application/*,text/*"
+              onChange={handleFileChange}
+            />
 
-          <input
-            type="text"
-            value={message}
-            onChange={e => setMessage(e.target.value)}
-            onKeyDown={handleKeyDown}
-            placeholder="Type a message..."
-            className="flex-1 bg-transparent outline-none text-white placeholder-gray-400"
-          />
+            <input
+              type="text"
+              value={message}
+              onChange={e => setMessage(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="Type a message..."
+              className="flex-1 bg-transparent outline-none text-white placeholder-gray-400"
+            />
 
-          <button onClick={() => setShowEmojiPicker(prev => !prev)} className="cursor-pointer">
-            <FaSmile className="text-[#8A8A8A] text-xl" />
-          </button>
-
-          {message.trim() || previewFile ? (
-            <button onClick={handleSendMessage} className="cursor-pointer">
-              <IoSend className="text-blue-500 text-xl" />
+            <button onClick={() => setShowEmojiPicker(prev => !prev)} className="cursor-pointer">
+              <FaSmile className="text-[#8A8A8A] text-xl" />
             </button>
-          ) : (
-            <button className="cursor-pointer">
-              <AiOutlineLike className="text-[#8A8A8A] text-xl" onClick={handleLikeClick} />
-            </button>
-          )}
-        </div>
 
-        <button className="cursor-pointer bg-blue-500 p-3 rounded-xl">
+            {message.trim() || previewFile ? (
+              <button onClick={handleSendMessage} className="cursor-pointer">
+                <IoSend className="text-blue-500 text-xl" />
+              </button>
+            ) : (
+              <button className="cursor-pointer">
+                <AiOutlineLike className="text-[#8A8A8A] text-xl" onClick={handleLikeClick} />
+              </button>
+            )}
+          </div>
+
+          {/* <button className="cursor-pointer bg-blue-500 p-3 rounded-xl">
           <FaMicrophone className="text-white text-xl" />
-        </button>
+        </button> */}
+        </div>
       </div>
     </div>
   )
