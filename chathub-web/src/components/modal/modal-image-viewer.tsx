@@ -43,7 +43,7 @@ const ModalImageViewer: React.FC<ModalImageViewerProps> = ({ isOpen, setIsOpen, 
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <DialogPanel className="relative w-full max-w-4xl max-h-[90vh] transform overflow-hidden rounded-lg bg-transparent text-left align-middle shadow-xl transition-all">
+              <DialogPanel className="relative w-full max-w-4xl max-h-[90vh] transform overflow-hidden rounded-lg bg-transparent text-right align-middle shadow-xl transition-all">
                 <button onClick={() => setIsOpen(false)}>
                   <Image src={Images.IconClosePurple} alt="close modal" width={40} height={40} />
                 </button>
