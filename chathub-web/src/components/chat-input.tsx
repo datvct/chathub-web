@@ -23,6 +23,32 @@ const ChatInput = ({ onSendMessage }: { onSendMessage: (msg: string, messageType
   const token = useSelector((state: RootState) => state.auth.token)
   const [previewFile, setPreviewFile] = useState<string | null>(null)
 
+  useEffect(() => {
+    const handlePaste = (e: ClipboardEvent) => {
+      if (!e.clipboardData) return
+  
+      const items = e.clipboardData.items
+      for (let i = 0; i < items.length; i++) {
+        const item = items[i]
+        if (item.type.startsWith("image/")) {
+          const pastedFile = item.getAsFile()
+          if (pastedFile) {
+            setFile(pastedFile)
+            setFileType(MessageType.IMAGE)
+            setPreviewFile(URL.createObjectURL(pastedFile))
+          }
+        }
+      }
+    }
+  
+    // Gắn sự kiện lên toàn bộ document hoặc 1 input cụ thể
+    document.addEventListener("paste", handlePaste)
+  
+    return () => {
+      document.removeEventListener("paste", handlePaste)
+    }
+  }, [])  
+
   const handleLikeClick = () => {
     onSendMessage("👍", MessageType.TEXT)
   }
@@ -48,7 +74,7 @@ const ChatInput = ({ onSendMessage }: { onSendMessage: (msg: string, messageType
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files) return
     const selectedFile = e.target.files[0]
-
+    e.target.value = "" 
     if (
       (fileType === MessageType.IMAGE && selectedFile.type.startsWith("image/")) ||
       (fileType === MessageType.VIDEO && selectedFile.type.startsWith("video/")) ||
@@ -142,6 +168,9 @@ const ChatInput = ({ onSendMessage }: { onSendMessage: (msg: string, messageType
               onClick={() => {
                 setFile(null)
                 setPreviewFile(null)
+                if (imageInputRef.current) imageInputRef.current.value = ""
+                if (videoInputRef.current) videoInputRef.current.value = ""
+                if (documentInputRef.current) documentInputRef.current.value = ""
               }}
               className="text-red-500 text-lg"
             >
