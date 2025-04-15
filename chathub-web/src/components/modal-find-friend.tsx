@@ -10,7 +10,7 @@ import { RootState } from "~/lib/reudx/store"
 import { Input } from "./ui/input"
 import { Button } from "./ui/button"
 import { Images } from "../constants/images"
-import { getListFriends } from "~/lib/get-friend"
+
 import { useFindUserByPhoneNumber } from "~/hooks/use-find-user-by-phone-number"
 import { useFriends } from "~/hooks/use-friends"
 import { UserDTO, FriendshipRequest, FriendRequestResponse } from "~/codegen/data-contracts"
@@ -49,21 +49,26 @@ const ModalFindFriend: React.FC<ModalFindFriendProps> = ({ isOpen, setIsOpen }) 
 
 	const {
 		friends: currentFriends,
-		loading: friendsLoading,
-		error: friendsError,
+		loading: friendsApiLoading,
+		error: friendsApiError,
 		getListFriendRequests,
 		sendFriendRequestHook,
+		friendRequests,
 	} = useFriends(currentUserId!, token!)
 
 	const [friendshipStatus, setFriendshipStatus] = useState<FriendshipStatus>("idle")
 	const [apiError, setApiError] = useState<string | null>(null)
+	const [isSendingRequest, setIsSendingRequest] = useState(false)
+
+	useEffect(() => {
+		if (isOpen && currentUserId && token) {
+			getListFriendRequests()
+		}
+	}, [isOpen, currentUserId, token, getListFriendRequests])
 
 	const checkFriendship = useCallback(
-		async (targetUser: UserDTO) => {
-			setFriendshipStatus("loading")
-			setApiError(null)
-
-			if (!currentUserId || !token || !targetUser || !targetUser.id) {
+		(targetUser: UserDTO) => {
+			if (!currentUserId || !targetUser || !targetUser.id) {
 				setFriendshipStatus("idle")
 				return
 			}
@@ -73,53 +78,57 @@ const ModalFindFriend: React.FC<ModalFindFriendProps> = ({ isOpen, setIsOpen }) 
 				return
 			}
 
-			try {
-				const friendsList = await getListFriends(currentUserId, token)
-				if (friendsList?.some(friend => friend.id === targetUser.id)) {
-					setFriendshipStatus("already_friend")
+			if (currentFriends?.some(friend => friend.id === targetUser.id)) {
+				setFriendshipStatus("already_friend")
+				return
+			}
+
+			if (friendRequests) {
+				const sentRequest = friendRequests.find(req => req.type === "SENT" && req.userId === targetUser.id)
+				if (sentRequest) {
+					setFriendshipStatus("request_sent")
 					return
 				}
-				const requests = await getListFriendRequests()
-				if (requests) {
-					const sentRequest = requests.find(req => req.type === "SENT" && req.userId === targetUser.id)
-					if (sentRequest) {
-						setFriendshipStatus("request_sent")
-						return
-					}
-					const receivedRequest = requests.find(req => req.type === "RECEIVED" && req.userId === targetUser.id)
-					if (receivedRequest) {
-						setFriendshipStatus("request_received")
-						setFriendshipStatus("not_friend")
-						return
-					}
+				const receivedRequest = friendRequests.find(req => req.type === "RECEIVED" && req.userId === targetUser.id)
+
+				if (receivedRequest) {
+					setFriendshipStatus("not_friend")
+					return
 				}
-				setFriendshipStatus("not_friend")
-			} catch (error: any) {
-				console.error("Error checking friendship:", error)
-				setApiError("Could not determine relationship status.")
-				setFriendshipStatus("idle")
 			}
+
+			setFriendshipStatus("not_friend")
 		},
-		[currentUserId, token, getListFriendRequests],
+		[currentUserId, currentFriends, friendRequests],
 	)
 
 	useEffect(() => {
+		setApiError(null)
+
 		if (foundUser) {
 			checkFriendship(foundUser)
+
+			if (findUserError) setApiError(null)
 		} else {
-			setFriendshipStatus(findUserError ? "not_found" : "idle")
-			setApiError(findUserError)
+			if (findUserError && searchTriggered) {
+				setFriendshipStatus("not_found")
+				setApiError(findUserError)
+			} else if (!searchTriggered) {
+				setFriendshipStatus("idle")
+				setApiError(null)
+			} else {
+				setFriendshipStatus("not_found")
+				setApiError(null)
+			}
 		}
-		if (!foundUser && !findUserError) {
-			setApiError(null)
-		}
-	}, [foundUser, checkFriendship, findUserError])
+	}, [foundUser, checkFriendship, findUserError, searchTriggered])
 
 	const handleClose = () => {
 		setIsOpen(false)
 		setPhoneNumber("")
 		setSearchTriggered(false)
 		setApiError(null)
+		setFriendshipStatus("idle")
 	}
 
 	const handleSearch = async () => {
@@ -128,58 +137,70 @@ const ModalFindFriend: React.FC<ModalFindFriendProps> = ({ isOpen, setIsOpen }) 
 			setApiError("Please enter a valid phone number (at least 10 digits).")
 			setFriendshipStatus("idle")
 			setSearchTriggered(true)
+
 			return
 		}
 		setApiError(null)
-		setSearchTriggered(true)
 		setFriendshipStatus("loading")
+		setSearchTriggered(true)
 		const result = await checkPhoneNumber(phoneToSearch)
 		if (!result.isSuccess) {
-			setFriendshipStatus("not_found")
 		}
 	}
 
 	const handleAddFriend = async () => {
-		if (!foundUser || !foundUser.id || !currentUserId || !token) return
-		if (friendshipStatus !== "not_friend") return
+		if (!foundUser || !foundUser.id || !currentUserId || !token) {
+			toast.error("Cannot send request. User information is missing.")
+			return
+		}
+		if (friendshipStatus !== "not_friend") {
+			console.warn("Cannot send request, current status:", friendshipStatus)
+			return
+		}
+
+		setIsSendingRequest(true)
 		setApiError(null)
+
 		const requestData: FriendshipRequest = {
 			senderId: currentUserId,
 			receiverId: foundUser.id,
 			message: `Hi, I'd like to add you on ChatHub!`,
 		}
-		try {
-			const response = await sendFriendRequestHook(requestData)
-			if (response?.statusCode === 200) {
-				toast.success(`Friend request sent to ${foundUser.name}!`)
-				setFriendshipStatus("request_sent")
-			} else {
-				toast.error("Failed to send friend request.")
-				setApiError("Failed to send friend request.")
-			}
-		} catch (error) {
-			toast.error("An unexpected error occurred.")
-			setApiError("An unexpected error occurred.")
+
+		const response = await sendFriendRequestHook(requestData)
+
+		setIsSendingRequest(false)
+
+		if (response?.statusCode === 200) {
+			setFriendshipStatus("request_sent")
+		} else {
+			setApiError(response?.message || "Failed to send friend request.")
 		}
 	}
 
 	const renderFriendStatusButton = () => {
-		const isLoading = findUserLoading || friendshipStatus === "loading"
+		const isLoading = findUserLoading || friendsApiLoading || isSendingRequest || friendshipStatus === "loading"
+
+		if (apiError && friendshipStatus !== "loading") {
+			return null
+		}
+
 		switch (friendshipStatus) {
 			case "is_self":
-				return <p className="text-sm text-gray-500 italic">You cannot add yourself.</p>
+				return <p className="text-sm text-gray-500 italic whitespace-nowrap">This is you.</p>
 			case "not_friend":
 				return (
 					<Button
 						onClick={handleAddFriend}
 						disabled={isLoading}
-						className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-1 rounded-md text-sm"
+						size="sm"
+						className="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded-md text-sm flex items-center gap-1 disabled:opacity-60"
 					>
 						{isLoading ? (
 							"Processing..."
 						) : (
 							<>
-								<UserPlus size={16} className="mr-1" /> Add
+								<UserPlus size={16} /> Add
 							</>
 						)}
 					</Button>
@@ -189,29 +210,27 @@ const ModalFindFriend: React.FC<ModalFindFriendProps> = ({ isOpen, setIsOpen }) 
 					<Button
 						disabled
 						variant="outline"
-						className="border-gray-400 text-gray-600 px-4 py-1 rounded-md text-sm cursor-not-allowed"
+						size="sm"
+						className="border-gray-400 text-gray-600 px-3 py-1 rounded-md text-sm cursor-not-allowed flex items-center gap-1 bg-gray-100"
 					>
-						<Clock size={16} className="mr-1" /> Sent
+						<Clock size={16} /> Sent
 					</Button>
 				)
 			case "request_received":
-				return (
-					<Button
-						variant="outline"
-						disabled
-						className="border-yellow-500 text-yellow-700 px-4 py-1 rounded-md text-sm"
-					>
-						Accept Request?
-					</Button>
-				)
+				return <p className="text-sm text-yellow-600 italic whitespace-nowrap">Request received</p>
 			case "already_friend":
 				return (
-					<Button disabled variant="ghost" className="text-green-600 px-4 py-1 rounded-md text-sm cursor-not-allowed">
-						<CheckCircle size={16} className="mr-1" /> Friends
+					<Button
+						disabled
+						variant="ghost"
+						size="sm"
+						className="text-green-600 px-3 py-1 rounded-md text-sm cursor-not-allowed flex items-center gap-1 hover:bg-green-50"
+					>
+						<CheckCircle size={16} /> Friends
 					</Button>
 				)
 			case "loading":
-				return <div className="loader-small"></div>
+				return <div className="h-6 w-16"></div>
 			case "not_found":
 				return null
 			case "idle":
@@ -221,11 +240,12 @@ const ModalFindFriend: React.FC<ModalFindFriendProps> = ({ isOpen, setIsOpen }) 
 	}
 
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		setPhoneNumber(e.target.value)
+		const newPhone = e.target.value
+		setPhoneNumber(newPhone)
+
 		if (searchTriggered) {
-			setFriendshipStatus("idle")
 			setSearchTriggered(false)
-			setApiError(null)
+			setFriendshipStatus("idle")
 		}
 		setApiError(null)
 	}
@@ -251,6 +271,7 @@ const ModalFindFriend: React.FC<ModalFindFriendProps> = ({ isOpen, setIsOpen }) 
 				>
 					<div className="fixed inset-0 bg-black bg-opacity-50" />
 				</TransitionChild>
+
 				<div className="fixed inset-0 overflow-y-auto">
 					<div className="flex min-h-full items-center justify-center p-4 text-center">
 						<TransitionChild
@@ -265,11 +286,12 @@ const ModalFindFriend: React.FC<ModalFindFriendProps> = ({ isOpen, setIsOpen }) 
 							<DialogPanel className="bg-[#385068] rounded-[20px] w-full max-w-md transform overflow-hidden p-6 text-left align-middle shadow-xl transition-all">
 								<DialogTitle className="text-xl font-bold mb-4 flex items-center justify-between text-white leading-6">
 									<span className="text-[25px]">Find Friend</span>
-									<button onClick={handleClose}>
-										<Image src={Images.IconCloseModal} alt="close modal" width={35} height={35} />
+									<button onClick={handleClose} className="p-1 rounded-full hover:bg-white/10">
+										<Image src={Images.IconCloseModal} alt="close modal" width={30} height={30} />
 									</button>
 								</DialogTitle>
 								<hr className="w-full border-gray-500 mb-5" />
+
 								<div className="relative mb-4">
 									<Input
 										type="tel"
@@ -277,45 +299,63 @@ const ModalFindFriend: React.FC<ModalFindFriendProps> = ({ isOpen, setIsOpen }) 
 										value={phoneNumber}
 										onChange={handleInputChange}
 										onKeyDown={handleKeyDown}
-										className="w-full py-[22px] pl-10 pr-10 bg-[#fff] border border-[#545454] rounded-lg text-gray-900 focus:outline-none placeholder-[#828282]"
+										className="w-full py-5 pl-10 pr-20 bg-white border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-400 text-sm"
 									/>
-									<Search className="h-5 w-5 absolute top-1/2 left-3 transform -translate-y-1/2 text-gray-400" />
+									<Search className="h-5 w-5 absolute top-1/2 left-3 transform -translate-y-1/2 text-gray-400 pointer-events-none" />
 									<Button
 										onClick={handleSearch}
-										disabled={findUserLoading || friendshipStatus === "loading"}
+										disabled={findUserLoading || friendsApiLoading || !phoneNumber.trim()}
 										size="sm"
-										className="absolute top-1/2 right-2 transform -translate-y-1/2 px-3 py-1 bg-blue-600 hover:bg-blue-700"
+										className="absolute top-1/2 right-2 transform -translate-y-1/2 px-3 py-1 bg-blue-600 hover:bg-blue-700 text-white text-xs rounded-md disabled:opacity-50"
 									>
 										{findUserLoading || friendshipStatus === "loading" ? "Searching..." : "Search"}
 									</Button>
 								</div>
-								<div className="mt-4 min-h-[80px]">
+
+								<div className="mt-4 min-h-[60px] p-1 bg-[#49627a] rounded-lg">
 									{(findUserLoading || friendshipStatus === "loading") && !apiError && (
-										<div className="flex justify-center items-center p-4">
-											<div className="loader"></div>
+										<div className="flex justify-center items-center h-full py-2">
+											<div className="loader-small"></div> { }
+											<style jsx>{`
+                        .loader-small {
+                          width: 20px;
+                          aspect-ratio: 1;
+                          border-radius: 50%;
+                          border: 2px solid #ccc;
+                          border-top-color: #3498db;
+                          animation: spin 0.6s linear infinite;
+                        }
+                        @keyframes spin {
+                          to {
+                            transform: rotate(360deg);
+                          }
+                        }
+                      `}</style>
 										</div>
 									)}
-									{apiError && <div className="text-center text-red-400 p-4">{apiError}</div>}
+									{apiError && !findUserLoading && friendshipStatus !== "loading" && (
+										<div className="text-center text-red-300 text-sm py-2">{apiError}</div>
+									)}
 									{!findUserLoading && friendshipStatus !== "loading" && !apiError && foundUser && searchTriggered && (
-										<div className="bg-white rounded-lg p-3 flex items-center justify-between space-x-3 shadow">
-											<div className="flex items-center space-x-3 overflow-hidden">
+										<div className="bg-white rounded-md p-2 flex items-center justify-between space-x-2 shadow-sm">
+											<div className="flex items-center space-x-2 overflow-hidden flex-grow min-w-0">
 												<Image
 													src={foundUser.avatar || Images.AvatarDefault}
 													alt={foundUser.name || "User"}
-													width={40}
-													height={40}
+													width={36}
+													height={36}
 													className="rounded-full flex-shrink-0 object-cover"
 												/>
-												<p className="text-black font-medium truncate">{foundUser.name}</p>
+												<p className="text-black font-medium text-sm truncate">{foundUser.name}</p>
 											</div>
 											<div className="flex-shrink-0">{renderFriendStatusButton()}</div>
 										</div>
 									)}
 									{!findUserLoading && friendshipStatus === "not_found" && searchTriggered && !apiError && (
-										<div className="text-center text-gray-400 p-4">User not found.</div>
+										<div className="text-center text-gray-400 text-sm py-2">User not found.</div>
 									)}
 									{!searchTriggered && friendshipStatus === "idle" && !findUserLoading && !apiError && (
-										<div className="text-center text-gray-400 p-4">Enter a phone number to find a friend.</div>
+										<div className="text-center text-gray-400 text-sm py-2">Enter a phone number to find a friend.</div>
 									)}
 								</div>
 							</DialogPanel>

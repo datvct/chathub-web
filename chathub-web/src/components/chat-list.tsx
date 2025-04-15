@@ -71,6 +71,7 @@ const ChatList = ({
   const [modalCreateGroupChatOpen, setModalCreateNewGroupChatOpen] = useState(false)
   const [modalProfileOpen, setModalProfileOpen] = useState(false)
   const [isModalProfileOpen, setIsProfileModalOpen] = useState(false)
+  const [isFindFriendModalOpen, setIsFindFriendModalOpen] = useState(false);
   const [isChangePasswordModalOpen, setIsChangePasswordModalOpen] = useState(false)
   const [isFriendListModalOpen, setIsFriendListModalOpen] = useState(false)
   const [isFriendRequestModalOpen, setIsFriendRequestModalOpen] = useState(false)
@@ -173,6 +174,16 @@ const ChatList = ({
             >
               <Image src={Images.IconProfile} alt="Profile" width={24} height={24} />
               <span className="block ml-3 font-medium truncate">Profile</span>
+            </button>
+          </MenuItem>
+
+          <MenuItem>
+            <button
+              className="w-full group rounded-lg px-4 py-2 flex items-center cursor-pointer hover:bg-gray-600"
+              onClick={() => setIsFindFriendModalOpen(true)}
+            >
+              <Image src={Images.IconUserSearch} alt="Profile" width={24} height={24} />
+              <span className="block ml-3 font-medium truncate">Find Friend</span>
             </button>
           </MenuItem>
 
@@ -369,6 +380,10 @@ const ChatList = ({
         onCancel={confirmLogoutCancel}
         title="Confirm Logout"
         message={"Are you sure you want to log out of your account?"}
+      />
+      <ModalFindFriend
+        isOpen={isFindFriendModalOpen}
+        setIsOpen={setIsFindFriendModalOpen}
       />
     </div>
   )

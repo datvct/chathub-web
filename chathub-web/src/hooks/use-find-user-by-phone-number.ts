@@ -18,14 +18,14 @@ export function useFindUserByPhoneNumber() {
     try {
       const response = await findByPhoneNumber(phoneNumber)
       if (!response) {
-        setError("Không tìm thấy người dùng")
+        setError("User not found")
         return { isSuccess: false }
       }
 
       setUser(response)
       return { isSuccess: true }
     } catch (error) {
-      setError("Đã xảy ra lỗi khi kiểm tra số điện thoại")
+      setError("An error occurred while checking the phone number")
       return { isSuccess: false }
     } finally {
       setLoading(false)
