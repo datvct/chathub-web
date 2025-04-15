@@ -64,7 +64,7 @@ const ChatMessage = ({ messages, userId, isGroupChat, messagesEndRef, token, ref
                   <div className="flex items-center gap-2">
                     <div className="flex items-center gap-2 relative">
                       <div
-                        className={`absolute left-10 bg-[#252728] pl-3 pr-5 py-3 rounded-lg shadow-md ${openMenuId === msg.id ? "block" : "hidden"}`}
+                        className={`absolute right-16 w-[150px] bg-[#252728] pl-3 pr-5 py-3 rounded-lg shadow-md ${openMenuId === msg.id ? "block" : "hidden"}`}
                       >
                         <ul>
                           {msg.unsent === false && (
