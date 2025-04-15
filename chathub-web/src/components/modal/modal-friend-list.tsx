@@ -174,11 +174,11 @@ const ModalFriendList: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) =>
                             className="flex items-center odd:bg-[#E4DEED] even:bg-[#AF9CC9] rounded-lg p-3 mb-3 space-x-3"
                           >
                             <Image
-                              src={friend.avatar}
-                              alt={friend.name}
+                              src={friend.avatar || Images.AvatarDefault}
+                              alt={friend.name || "Avatar"}
                               width={45}
                               height={45}
-                              className="rounded-full"
+                              className="rounded-full object-cover"
                             />
 
                             <div className="flex-1">
