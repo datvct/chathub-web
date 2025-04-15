@@ -247,7 +247,7 @@ const ChatList = ({
                     alt={chat.chatType === "GROUP" ? chat.groupName : chat.senderName || "Avatar"}
                     width={48}
                     height={48}
-                    className="rounded-full"
+                    className="rounded-full object-cover"
                   />
                 </div>
                 <div className="flex-1">

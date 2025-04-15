@@ -28,6 +28,8 @@ import ModalSuccess from "./modal/modal-success"
 import ModalDeleteConversation from "~/components/modal/modal-delete-conversation"
 import ModalUpdateNickname from "./modal/modal-update-nickname"
 import ProfileViewModal from "./modal/modal-profile-view"
+import ModalImageViewer from "./modal/modal-image-viewer"
+
 import { Button } from "./ui/button"
 import { Menu, MenuButton, MenuItem, MenuItems, Transition } from "@headlessui/react"
 
@@ -95,14 +97,26 @@ const ChatInfo = ({
   const [isOpenUpdateGroupInfo, setIsOpenUpdateGroupInfo] = useState(false)
   const [isOpenDeleteConversation, setIsOpenDeleteConversation] = useState(false)
   const [isNicknameModalOpen, setIsNicknameModalOpen] = useState(false)
-  const [isProfileViewModalOpen, setIsProfileViewModalOpen] = useState(false);
-  const [selectedFriendForView, setSelectedFriendForView] = useState<UserDTO | null>(null);
+  const [isProfileViewModalOpen, setIsProfileViewModalOpen] = useState(false)
+  const [selectedFriendForView, setSelectedFriendForView] = useState<UserDTO | null>(null)
+  const [isImageViewerOpen, setIsImageViewerOpen] = useState(false)
+  const [selectedImageUrlForInfo, setSelectedImageUrlForInfo] = useState<string | null>(null)
 
   const [memberToAction, setMemberToAction] = useState<MemberDTO | null>(null)
   const [actionType, setActionType] = useState<"remove" | "updateNickname" | null>(null)
 
   const isCurrentUserAdmin = chatDetail?.members?.find(m => m.id === userId)?.is_admin ?? true
   const otherMember = chatDetail?.members?.find(m => m.id !== userId)
+
+  const handleAvatarClickInInfo = (imageUrl: string | undefined | null) => {
+    if (imageUrl) {
+      setSelectedImageUrlForInfo(imageUrl);
+      setIsImageViewerOpen(true);
+      console.log("Opening image viewer for ChatInfo avatar:", imageUrl);
+    } else {
+      toast.info("No avatar available to view.");
+    }
+  }
 
   const fetchChatDetails = async () => {
     if (selectedChat && userId && token) {
@@ -301,7 +315,7 @@ const ChatInfo = ({
           alt={member.name || "Member"}
           width={40}
           height={40}
-          className="rounded-full w-10 h-10 flex-shrink-0"
+          className="rounded-full w-10 h-10 flex-shrink-0 object-cover"
         />
         <div className="flex-1 min-w-0">
           <p className="text-sm font-medium text-white truncate flex items-center">
@@ -413,13 +427,17 @@ const ChatInfo = ({
               <Image
                 src={
                   chatDetail?.avatar ||
-                  (isGroupChat ? Images.AvatarDefault : otherMember?.avatar) ||
+                  (!isGroupChat ? otherMember?.avatar : null) ||
                   Images.AvatarDefault
                 }
                 alt={chatDetail?.name || (isGroupChat ? "Group" : otherMember?.name) || "Avatar"}
                 width={80}
                 height={80}
-                className="w-20 h-20 rounded-full mb-3 border-2 border-gray-600"
+                className="w-20 h-20 rounded-full mb-3 border-2 object-cover cursor-pointer"
+                onClick={() => handleAvatarClickInInfo(
+                  chatDetail?.avatar ||
+                  (!isGroupChat ? otherMember?.avatar : null)
+                )}
               />
               <p className="text-lg font-semibold truncate max-w-full px-4">
                 {chatDetail?.name || (isGroupChat ? "Group Chat" : otherMember?.name) || "Conversation"}
@@ -435,7 +453,7 @@ const ChatInfo = ({
                 >
                   {isPinned ? <RiUnpinFill size={20} /> : <BsPinAngleFill size={20} />}
                 </button>
-                <span>{isPinned ? "Unpin" : "Pin"}</span>
+                <span className="mt-1.5 whitespace-nowrap">{isPinned ? "Unpin" : "Pin"}</span>
               </div>
               {isGroupChat && (
                 <div className="flex flex-col items-center">
@@ -445,7 +463,7 @@ const ChatInfo = ({
                   >
                     <AiOutlineUsergroupAdd size={22} />
                   </button>
-                  <span className="whitespace-nowrap">Add Member</span>
+                  <span className="mt-1.5 whitespace-nowrap">Add Member</span>
                 </div>
               )}
               {isGroupChat && isCurrentUserAdmin && (
@@ -453,10 +471,11 @@ const ChatInfo = ({
                   <button
                     className="bg-[#484848] h-10 w-10 rounded-full flex items-center justify-center hover:bg-gray-600"
                     onClick={() => setIsOpenUpdateGroupInfo(true)}
+                    title="Update group name/avatar"
                   >
                     <IoSettingsOutline size={20} />
                   </button>
-                  <span className="whitespace-nowrap">Group Settings</span>
+                  <span className="mt-1.5 whitespace-nowrap">Group Settings</span>
                 </div>
               )}
             </div>
@@ -467,7 +486,8 @@ const ChatInfo = ({
                 <h3 className="text-sm font-semibold text-gray-300 mb-2 px-2">Members ({chatDetail.members.length})</h3>
                 <button
                   onClick={() => setView("members")}
-                  className="flex items-center justify-between w-full py-2 px-2 rounded-lg hover:bg-gray-700 text-white"
+                  className="flex items-center justify-between w-full py-2 px-2 mt-1 rounded-lg hover:bg-gray-700
+                  text-sm text-white transition-colors duration-150"
                 >
                   <span>View all members</span>
                   <FaChevronLeft size={12} className="transform rotate-180" />
@@ -626,6 +646,15 @@ const ChatInfo = ({
           isOpen={isProfileViewModalOpen}
           setIsOpen={setIsProfileViewModalOpen}
           friend={selectedFriendForView}
+        />
+      )}
+
+      {isImageViewerOpen && selectedImageUrlForInfo && (
+        <ModalImageViewer
+          isOpen={isImageViewerOpen}
+          setIsOpen={setIsImageViewerOpen}
+          imageUrl={selectedImageUrlForInfo}
+          imageAlt="Profile Avatar"
         />
       )}
     </div>

@@ -2,6 +2,7 @@
 
 import ChatHeader from "./chat-header"
 import ChatInput from "./chat-input"
+import ModalImageViewer from "./modal/modal-image-viewer"
 import { useEffect, useRef, useState, useCallback } from "react"
 import { ConversationResponse, MessageResponse } from "~/codegen/data-contracts"
 import { MessageType } from "../types/types"
@@ -51,6 +52,27 @@ const ChatScreen = ({
   //     }
   //   }
   // }
+
+  const [isImageViewerOpen, setIsImageViewerOpen] = useState(false)
+  const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>(null)
+
+  const handleImageClickInMessage = (imageUrl: string) => {
+    if (imageUrl) {
+      setSelectedImageUrl(imageUrl)
+      setIsImageViewerOpen(true)
+      console.log("Opening image viewer for:", imageUrl)
+    }
+  }
+
+  const refetchMessages = async () => {
+    if (conversationId) {
+      const response = await getMessageByConversationId(conversationId, userId, token)
+      if (response) {
+        const uniqueMessages = Array.from(new Map(response.map(m => [m.id, m])).values())
+        setMessages(response)
+      }
+    }
+  }
 
   useEffect(() => {
     const fetchMessage = async () => {
@@ -140,7 +162,7 @@ const ChatScreen = ({
         name={conversationData?.groupName ?? conversationData?.senderName}
         setIsChatInfoOpen={setIsChatInfoOpen}
         isChatInfoOpen={isChatInfoOpen}
-        avatar={conversationData?.groupAvatar}
+        avatar={conversationData?.chatType === "GROUP" ? conversationData?.groupAvatar : conversationData?.senderAvatar}
         isChatSearchOpen={isChatSearchOpen}
         setIsChatSearchOpen={setIsChatSearchOpen}
       />
@@ -152,11 +174,16 @@ const ChatScreen = ({
           isGroupChat={isGroupChat}
           messagesEndRef={messagesEndRef}
           token={token}
-          refetchMessages={handleRefreshMessage}
+          refetchMessages={refetchMessages}
+          onImageClick={handleImageClickInMessage}
         />
       </div>
 
       <ChatInput onSendMessage={handleSendMessage} />
+
+      {isImageViewerOpen && selectedImageUrl && (
+        <ModalImageViewer isOpen={isImageViewerOpen} setIsOpen={setIsImageViewerOpen} imageUrl={selectedImageUrl} />
+      )}
     </div>
   )
 }

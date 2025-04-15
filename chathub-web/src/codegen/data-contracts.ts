@@ -144,6 +144,7 @@ export interface ConversationResponse {
   pinned?: boolean
   unsent?: boolean
   dissolved?: boolean
+  unsent?: boolean
 }
 
 export interface ParticipantDTO {
