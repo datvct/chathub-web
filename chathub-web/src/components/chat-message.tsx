@@ -66,7 +66,7 @@ const ChatMessage = ({
               )}
               <div
                 id={`message-${msg.id}`}
-                className={`message items-center gap-2 h-[141px] ${
+                className={`message items-center gap-2 ${
                   msg.senderId === userId ? "justify-end" : "justify-start"
                 } ${msg.userDeleted == true ? "hidden" : "flex"}`}
               >

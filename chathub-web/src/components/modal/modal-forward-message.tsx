@@ -243,8 +243,7 @@ const ForwardMessageModal: React.FC<ForwardMessageModalProps> = ({ isOpen, onClo
                   ))}
                 </div>
 
-{/* Nếu muốn đổi UI mở comment */}
-                {/* <div className="mb-4">
+                <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Type your message here (optional)
                   </label>
@@ -254,7 +253,7 @@ const ForwardMessageModal: React.FC<ForwardMessageModalProps> = ({ isOpen, onClo
                     value={note}
                     onChange={e => setNote(e.target.value)}
                   />
-                </div> */}
+                </div>
 
                 <div className="mb-4 border p-3 rounded bg-gray-100 text-sm">
                   <div className="font-semibold mb-1">
