@@ -12,7 +12,7 @@ import { TiArrowBackOutline, TiArrowForwardOutline } from "react-icons/ti"
 import { useState } from "react"
 import { unsendMessage, deleteMessage, forwardMessage } from "~/lib/get-message"
 import ForwardMessageModal from "./modal/modal-forward-message"
-import { IoReturnUpForward } from "react-icons/io5";
+import { IoReturnUpForward } from "react-icons/io5"
 
 interface ChatMessageProps {
   messages: MessageResponse[]
@@ -58,13 +58,13 @@ const ChatMessage = ({ messages, userId, isGroupChat, messagesEndRef, token, ref
               )}
               <div
                 id={`message-${msg.id}`}
-                className={`message items-center gap-2 h-[141px] ${msg.senderId === userId ? "justify-end" : "justify-start"} ${msg.userDeleted == true ? "hidden" : "flex"}`}
+                className={`message items-center gap-2 ${msg.senderId === userId ? "justify-end" : "justify-start"} ${msg.userDeleted == true ? "hidden" : "flex"}`}
               >
                 {msg.senderId === userId && (
                   <div className="flex items-center gap-2">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 relative">
                       <div
-                        className={`bg-[#252728] pl-3 pr-5 py-3 rounded-lg shadow-md ${openMenuId === msg.id ? "block" : "hidden"}`}
+                        className={`absolute left-10 bg-[#252728] pl-3 pr-5 py-3 rounded-lg shadow-md ${openMenuId === msg.id ? "block" : "hidden"}`}
                       >
                         <ul>
                           {msg.unsent === false && (
@@ -72,14 +72,14 @@ const ChatMessage = ({ messages, userId, isGroupChat, messagesEndRef, token, ref
                               className="hover:bg-[#333334] p-2 pr-3 rounded cursor-pointer"
                               onClick={() => handleUnsend(msg.id)}
                             >
-                              Recall
+                              Unsend
                             </li>
                           )}
                           <li
                             className="hover:bg-[#333334] p-2 pr-3 rounded cursor-pointer"
                             onClick={() => handleDelete(msg.id)}
                           >
-                            Delete Message
+                            Delete For Me Only
                           </li>
                           {msg.unsent === false && (
                             <li
@@ -116,9 +116,10 @@ const ChatMessage = ({ messages, userId, isGroupChat, messagesEndRef, token, ref
                         <TiArrowBackOutline />
                       </button>
                     )}
+                    {msg.unsent === false && (
                     <button className="hover:bg-[#333334] p-2 rounded-full">
                       <CiFaceSmile />
-                    </button>
+                    </button>)}
                   </div>
                 )}
                 {msg.senderId !== userId && (
@@ -134,7 +135,19 @@ const ChatMessage = ({ messages, userId, isGroupChat, messagesEndRef, token, ref
                   {isGroupChat && msg.senderId !== userId && (
                     <span className="text-xs text-white">{msg.senderName}</span>
                   )}
-                  {msg.messageType === MessageType.IMAGE ? (
+
+                  {msg.unsent === true ? (
+                    <p
+                      className={`p-3 rounded-lg w-max max-w-xs break-words text-black whitespace-pre-wrap ${
+                        msg.senderId === userId ? "bg-[#1566A3] text-white" : "bg-[#F0F0F0]"
+                      } ${isOnlyEmoji(msg.content) ? "text-4xl p-2 bg-transparent" : ""}`}
+                    >
+                      You unsent a message
+                      <span className={`text-xs block mt-1 ${msg.senderId === userId ? "text-white" : "text-black"}`}>
+                        {formatTimeSendAt(msg.sentAt)}
+                      </span>
+                    </p>
+                  ) : msg.messageType === MessageType.IMAGE ? (
                     <>
                       <Image
                         src={msg.content ?? Images.ImageDefault}
@@ -172,17 +185,6 @@ const ChatMessage = ({ messages, userId, isGroupChat, messagesEndRef, token, ref
                       <source src={msg.content} type="video/mp4" />
                       Your browser does not support the video tag.
                     </video>
-                  ) : msg.unsent === true ? (
-                    <p
-                      className={`p-3 rounded-lg w-max max-w-xs break-words text-black whitespace-pre-wrap ${
-                        msg.senderId === userId ? "bg-[#1566A3] text-white" : "bg-[#F0F0F0]"
-                      } ${isOnlyEmoji(msg.content) ? "text-4xl p-2 bg-transparent" : ""}`}
-                    >
-                      Message recalled
-                      <span className={`text-xs block mt-1 ${msg.senderId === userId ? "text-white" : "text-black"}`}>
-                        {formatTimeSendAt(msg.sentAt)}
-                      </span>
-                    </p>
                   ) : (
                     <div
                       className={`p-3 rounded-lg w-max max-w-xs break-words text-black whitespace-pre-wrap ${
@@ -190,14 +192,18 @@ const ChatMessage = ({ messages, userId, isGroupChat, messagesEndRef, token, ref
                       } ${isOnlyEmoji(msg.content) && msg.content?.trim() ? "text-4xl p-2 bg-transparent" : ""}`}
                     >
                       {msg.content?.trim() ? msg.content.replace(/^"(.*)"$/, "$1") : ""}
-                      {msg.forwarded===true && <div className={`flex flex-col mt-1 p-2 border-l-4 ${msg.senderId === userId ? "bg-[#0000004d] text-[#9facbc] border-[#66a6ff]":"bg-[#fff]"}`}>
-                        <div className="flex gap-1 items-center">
-                          <IoReturnUpForward />
-                          <img src={msg.avatar} alt="" className="rounded-full w-[20px]"/>
-                          <p>{msg.senderName}</p>
+                      {msg.forwarded === true && (
+                        <div
+                          className={`flex flex-col mt-1 p-2 border-l-4 ${msg.senderId === userId ? "bg-[#0000004d] text-[#9facbc] border-[#66a6ff]" : "bg-[#fff]"}`}
+                        >
+                          <div className="flex gap-1 items-center">
+                            <IoReturnUpForward />
+                            <img src={msg.avatar} alt="" className="rounded-full w-[20px]" />
+                            <p>{msg.senderName}</p>
+                          </div>
+                          <p>{msg.forwardedMessage.originalContentSnapshot}</p>
                         </div>
-                        <p>{msg.forwardedMessage.originalContentSnapshot}</p>
-                      </div>}
+                      )}
                       <span className={`text-xs block mt-1 ${msg.senderId === userId ? "text-white" : "text-black"}`}>
                         {formatTimeSendAt(msg.sentAt)}
                       </span>
@@ -234,11 +240,19 @@ const ChatMessage = ({ messages, userId, isGroupChat, messagesEndRef, token, ref
                         className={`bg-[#252728] pl-3 pr-5 py-3 rounded-lg shadow-md ${openMenuId === msg.id ? "block" : "hidden"}`}
                       >
                         <ul>
+                          {msg.unsent === false && (
+                            <li
+                              className="hover:bg-[#333334] p-2 pr-3 rounded cursor-pointer"
+                              onClick={() => handleUnsend(msg.id)}
+                            >
+                              Unsend
+                            </li>
+                          )}
                           <li
                             className="hover:bg-[#333334] p-2 pr-3 rounded cursor-pointer"
                             onClick={() => handleDelete(msg.id)}
                           >
-                            Delete Message
+                            Delete For Me Only
                           </li>
                           {msg.unsent === false && (
                             <li

@@ -11,6 +11,7 @@ import { useFriends } from "../../hooks/use-friends"
 import { useConversation } from "../../hooks/use-converstation"
 import { findSingleChat } from "~/lib/get-conversation"
 import WebSocketService from "../../lib/web-socket-service"
+import { toast } from "react-toastify"
 
 interface ForwardMessageModalProps {
   isOpen: boolean
@@ -22,13 +23,14 @@ interface ForwardMessageModalProps {
 
 const ForwardMessageModal: React.FC<ForwardMessageModalProps> = ({ isOpen, onClose, message, userId, token }) => {
   const [selectedUsers, setSelectedUsers] = useState<number[]>([])
-  const [note, setNote] = useState("")
+  const [note, setNote] = useState("You have forward this message")
   const [searchTerm, setSearchTerm] = useState("")
   const [dataGroup, setDataGroup] = useState<ConversationResponse[]>([])
   const [selectedGroups, setSelectedGroups] = useState<number[]>([])
   const { friends: fetchedFriends } = useFriends(userId, token)
   const { getRecentConversation } = useConversation(userId, token)
   const [conversationIds, setConversationIds] = useState<number[]>([])
+  const [pendingUserIds, setPendingUserIds] = useState<number[]>([]);
 
   useEffect(() => {
     if (userId) {
@@ -111,31 +113,69 @@ const ForwardMessageModal: React.FC<ForwardMessageModalProps> = ({ isOpen, onClo
   }
 
   const toggleUser = async (friendId: number) => {
-    const isSelected = selectedUsers.includes(friendId)
-
+    const isSelected = selectedUsers.includes(friendId);
+  
     if (isSelected) {
-      setSelectedUsers(prev => prev.filter(uid => uid !== friendId))
-
-      const conversation = await findSingleChat(userId, friendId, token)
-      const conversationId = conversation?.id
+      setSelectedUsers(prev => prev.filter(uid => uid !== friendId));
+  
+      const conversation = await findSingleChat(userId, friendId, token);
+      const conversationId = conversation?.id;
+  
       if (conversationId) {
-        setConversationIds(prev => prev.filter(id => id !== conversationId))
+        setConversationIds(prev => prev.filter(id => id !== conversationId));
+      } else {
+        setPendingUserIds(prev => prev.filter(id => id !== friendId));
       }
     } else {
-      setSelectedUsers(prev => [...prev, friendId])
-
-      const conversation = await findSingleChat(userId, friendId, token)
-      console.log("conversation", conversation)
-
+      setSelectedUsers(prev => [...prev, friendId]);
+  
+      const conversation = await findSingleChat(userId, friendId, token);
       const conversationId = conversation?.id
+      console.log("conversationId", conversationId)
+  
       if (conversationId) {
-        setConversationIds(prev => [...prev, conversationId])
+        setConversationIds(prev => [...prev, conversationId]);
       } else {
-        console.warn("Không tìm thấy conversation cho friendId:", friendId)
+        console.warn("Không tìm thấy conversation cho friendId:", friendId);
+        setPendingUserIds(prev => [...prev, friendId]);
+  
+        // 👉 Gọi API tạo conversation tại đây
+        await createSingleConversation(userId, friendId);
       }
     }
-  }
-
+  };
+  
+  const createSingleConversation = async (currentUserId: number, friendId: number) => {
+    const formData = new FormData();
+    formData.append("userIds", currentUserId.toString());
+    formData.append("userIds", friendId.toString());
+  
+    try {
+      const response = await fetch("http://localhost:8080/conversation/create", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          // Không set Content-Type vì đang dùng FormData
+        },
+        body: formData,
+      });
+  
+      if (response.ok) {
+        const data = await response.json();
+        console.log("✅ Created conversation:", data);
+  
+        setConversationIds(prev => [...prev, data.id]);
+        setPendingUserIds(prev => prev.filter(id => id !== friendId)); // đã tạo -> gỡ khỏi pending
+      } else {
+        const err = await response.json();
+        console.error("❌ Failed to create conversation:", err);
+        toast.error(err.message || "Failed to create conversation.");
+      }
+    } catch (err: any) {
+      console.error("❌ Error creating conversation:", err);
+      toast.error(err.message || "Failed to create conversation.");
+    }
+  };
   const toggleGroup = (id: number) => {
     setSelectedGroups(prev => (prev.includes(id) ? prev.filter(gid => gid !== id) : [...prev, id]))
   }
@@ -204,7 +244,8 @@ const ForwardMessageModal: React.FC<ForwardMessageModalProps> = ({ isOpen, onClo
                   ))}
                 </div>
 
-                <div className="mb-4">
+{/* Nếu muốn đổi UI mở comment */}
+                {/* <div className="mb-4">
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Type your message here (optional)
                   </label>
@@ -214,7 +255,7 @@ const ForwardMessageModal: React.FC<ForwardMessageModalProps> = ({ isOpen, onClo
                     value={note}
                     onChange={e => setNote(e.target.value)}
                   />
-                </div>
+                </div> */}
 
                 <div className="mb-4 border p-3 rounded bg-gray-100 text-sm">
                   <div className="font-semibold mb-1">
