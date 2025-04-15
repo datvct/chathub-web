@@ -2,7 +2,7 @@ import Image from "next/image"
 import { MessageResponse } from "~/codegen/data-contracts"
 import { Images } from "~/constants/images"
 import { formatDisplayDate, formatTimeSendAt, getFileName } from "~/lib/utils"
-import { isOnlyEmoji } from "~/lib/emojiUtils" // Hàm kiểm tra tin nhắn chỉ có emoji
+import { isOnlyEmoji } from "~/lib/emojiUtils"
 import { MessageType } from "~/types/types"
 import Link from "next/link"
 import { IoIosDocument } from "react-icons/io"
@@ -21,9 +21,18 @@ interface ChatMessageProps {
   messagesEndRef: React.RefObject<HTMLDivElement>
   token: string
   refetchMessages: () => void
+  onImageClick: (imageUrl: string) => void
 }
 
-const ChatMessage = ({ messages, userId, isGroupChat, messagesEndRef, token, refetchMessages }: ChatMessageProps) => {
+const ChatMessage = ({
+  messages,
+  userId,
+  isGroupChat,
+  messagesEndRef,
+  token,
+  refetchMessages,
+  onImageClick,
+}: ChatMessageProps) => {
   let lastMessageDate: string | null = null
   const [openMenuId, setOpenMenuId] = useState<number | null>(null)
   const [forwardingMessage, setForwardingMessage] = useState<MessageResponse | null>(null)
@@ -47,7 +56,6 @@ const ChatMessage = ({ messages, userId, isGroupChat, messagesEndRef, token, ref
         .slice()
         .sort((a, b) => new Date(a.sentAt).getTime() - new Date(b.sentAt).getTime())
         .map(msg => {
-          console.log("Message content:", msg.content)
           const currentMessageDate = moment(msg.sentAt).format("YYYY-MM-DD")
           const isNewDate = currentMessageDate !== lastMessageDate
           lastMessageDate = currentMessageDate
@@ -58,7 +66,9 @@ const ChatMessage = ({ messages, userId, isGroupChat, messagesEndRef, token, ref
               )}
               <div
                 id={`message-${msg.id}`}
-                className={`message items-center gap-2 ${msg.senderId === userId ? "justify-end" : "justify-start"} ${msg.userDeleted == true ? "hidden" : "flex"}`}
+                className={`message items-center gap-2 h-[141px] ${
+                  msg.senderId === userId ? "justify-end" : "justify-start"
+                } ${msg.userDeleted == true ? "hidden" : "flex"}`}
               >
                 {msg.senderId === userId && (
                   <div className="flex items-center gap-2">
@@ -117,17 +127,18 @@ const ChatMessage = ({ messages, userId, isGroupChat, messagesEndRef, token, ref
                       </button>
                     )}
                     {msg.unsent === false && (
-                    <button className="hover:bg-[#333334] p-2 rounded-full">
-                      <CiFaceSmile />
-                    </button>)}
+                      <button className="hover:bg-[#333334] p-2 rounded-full">
+                        <CiFaceSmile />
+                      </button>
+                    )}
                   </div>
                 )}
                 {msg.senderId !== userId && (
                   <Image
-                    src={Images.AvatarDefault}
+                    src={msg.avatar || Images.AvatarDefault}
                     width={32}
                     height={32}
-                    alt="avatar"
+                    alt={msg.senderName || "Avatar"}
                     className="w-8 h-8 mr-2 rounded-[20px] mt-4"
                   />
                 )}
@@ -149,14 +160,25 @@ const ChatMessage = ({ messages, userId, isGroupChat, messagesEndRef, token, ref
                     </p>
                   ) : msg.messageType === MessageType.IMAGE ? (
                     <>
-                      <Image
-                        src={msg.content ?? Images.ImageDefault}
-                        alt="sent"
-                        className="rounded-lg w-40"
-                        width={150}
-                        height={150}
-                      />
-                      <span className="text-[10px] text-white block mt-1">{formatTimeSendAt(msg.sentAt)}</span>
+                      <button
+                        onClick={() => msg.content && onImageClick(msg.content)}
+                        className="block relative overflow-hidden rounded-lg cursor-pointer max-w-xs group"
+                        disabled={!msg.content}
+                      >
+                        <Image
+                          src={msg.content || Images.ImageDefault}
+                          alt="Sent image"
+                          className="rounded-lg object-cover transition-transform duration-200 group-hover:scale-105"
+                          width={160}
+                          height={160}
+                        />
+                        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity duration-200"></div>
+                        <span className="text-[10px] text-white block mt-1 absolute bottom-1 right-1 bg-black bg-opacity-50 px-1 rounded">
+                          {" "}
+                          {}
+                          {formatTimeSendAt(msg.sentAt)}
+                        </span>
+                      </button>
                     </>
                   ) : msg.messageType === MessageType.LINK ? (
                     <>
@@ -194,7 +216,9 @@ const ChatMessage = ({ messages, userId, isGroupChat, messagesEndRef, token, ref
                       {msg.content?.trim() ? msg.content.replace(/^"(.*)"$/, "$1") : ""}
                       {msg.forwarded === true && (
                         <div
-                          className={`flex flex-col mt-1 p-2 border-l-4 ${msg.senderId === userId ? "bg-[#0000004d] text-[#9facbc] border-[#66a6ff]" : "bg-[#fff]"}`}
+                          className={`flex flex-col mt-1 p-2 border-l-4 ${
+                            msg.senderId === userId ? "bg-[#0000004d] text-[#9facbc] border-[#66a6ff]" : "bg-[#fff]"
+                          }`}
                         >
                           <div className="flex gap-1 items-center">
                             <IoReturnUpForward />
@@ -237,7 +261,9 @@ const ChatMessage = ({ messages, userId, isGroupChat, messagesEndRef, token, ref
                         <CiMenuKebab />
                       </button>
                       <div
-                        className={`bg-[#252728] pl-3 pr-5 py-3 rounded-lg shadow-md ${openMenuId === msg.id ? "block" : "hidden"}`}
+                        className={`bg-[#252728] pl-3 pr-5 py-3 rounded-lg shadow-md ${
+                          openMenuId === msg.id ? "block" : "hidden"
+                        }`}
                       >
                         <ul>
                           {msg.unsent === false && (

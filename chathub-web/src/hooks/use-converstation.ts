@@ -164,17 +164,26 @@ export const useConversation = (userId: number, token: string) => {
     }
   }
 
-  const updateGroupInfo = async (conversationId: number, request: UpdateGroupInfoRequest, token: string) => {
-    setLoading(true)
-    setError(null)
+  const updateGroupInfo = async (
+    conversationId: number,
+    groupName: string,
+    avatarFile: File | null
+  ): Promise<SuccessResponse | null> => {
+    if (!userId || !token) {
+      setError("User ID or Token is missing.");
+      return null;
+    };
+    setLoading(true);
+    setError(null);
     try {
-      const response = await updateGroupInfoAPI(conversationId, request, token)
-      return response
+      const response = await updateGroupInfoAPI(conversationId, userId, groupName, avatarFile, token);
+      return response;
     } catch (err: any) {
-      setError(err.message || "Failed to update group info")
-      return null
+      console.error("Failed to update group info in hook:", err);
+      setError(err.message || "Failed to update group info.");
+      throw err;
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
