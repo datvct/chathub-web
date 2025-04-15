@@ -33,6 +33,18 @@ const ForwardMessageModal: React.FC<ForwardMessageModalProps> = ({ isOpen, onClo
   const [pendingUserIds, setPendingUserIds] = useState<number[]>([]);
 
   useEffect(() => {
+    if (!isOpen) {
+      // Reset toàn bộ state khi modal đóng
+      setSelectedUsers([])
+      setSelectedGroups([])
+      setSearchTerm("")
+      setNote("")
+      setConversationIds([])
+      setPendingUserIds([])
+    }
+  }, [isOpen])
+
+  useEffect(() => {
     if (userId) {
       const init = async () => {
         const response = await getRecentConversation(userId, token)
@@ -107,7 +119,7 @@ const ForwardMessageModal: React.FC<ForwardMessageModalProps> = ({ isOpen, onClo
         })
       })
     }
-
+    resetState()
     onClose() // Đóng modal sau khi hoàn thành
   }
 
@@ -178,6 +190,15 @@ const ForwardMessageModal: React.FC<ForwardMessageModalProps> = ({ isOpen, onClo
   const toggleGroup = (id: number) => {
     setSelectedGroups(prev => (prev.includes(id) ? prev.filter(gid => gid !== id) : [...prev, id]))
   }
+
+  const resetState = () => {
+    setSelectedUsers([])
+    setSelectedGroups([])
+    setSearchTerm("")
+    setNote("")
+    setConversationIds([])
+    setPendingUserIds([])
+  }  
 
   if (!message) return null
 

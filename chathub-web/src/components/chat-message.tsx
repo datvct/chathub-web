@@ -91,7 +91,7 @@ const ChatMessage = ({
                           >
                             Delete For Me Only
                           </li>
-                          {msg.unsent === false && (
+                          {(msg.unsent === false && (msg.content!="\" have forward this message\"" )) && (
                             <li
                               className="hover:bg-[#333334] p-2 pr-3 rounded cursor-pointer"
                               onClick={() => {
@@ -114,7 +114,7 @@ const ChatMessage = ({
                         <CiMenuKebab />
                       </button>
                     </div>
-                    {msg.unsent === false && (
+                    {(msg.unsent === false && (msg.content!="\" have forward this message\""))&& (
                       <button
                         className="hover:bg-[#333334] p-2 rounded-full"
                         onClick={() => {
@@ -239,7 +239,7 @@ const ChatMessage = ({
                     <button className="hover:bg-[#333334] p-2 rounded-full">
                       <CiFaceSmile />
                     </button>
-                    {msg.unsent === false && (
+                    {(msg.unsent === false && (msg.content!="\" have forward this message\""))&& (
                       <button
                         className="hover:bg-[#333334] p-2 rounded-full"
                         onClick={() => {
@@ -266,21 +266,13 @@ const ChatMessage = ({
                         }`}
                       >
                         <ul>
-                          {msg.unsent === false && (
-                            <li
-                              className="hover:bg-[#333334] p-2 pr-3 rounded cursor-pointer"
-                              onClick={() => handleUnsend(msg.id)}
-                            >
-                              Unsend
-                            </li>
-                          )}
                           <li
                             className="hover:bg-[#333334] p-2 pr-3 rounded cursor-pointer"
                             onClick={() => handleDelete(msg.id)}
                           >
                             Delete For Me Only
                           </li>
-                          {msg.unsent === false && (
+                          {(msg.unsent === false && (msg.content!="\" have forward this message\""))&& (
                             <li
                               className="hover:bg-[#333334] p-2 pr-3 rounded cursor-pointer"
                               onClick={() => {
