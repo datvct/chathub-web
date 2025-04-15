@@ -160,25 +160,31 @@ const ChatMessage = ({
                       </span>
                     </p>
                   ) : msg.messageType === MessageType.IMAGE ? (
-                    <>
-                      <button
-                        onClick={() => msg.content && onImageClick(msg.content)}
-                        className="block relative overflow-hidden rounded-lg cursor-pointer max-w-xs group"
-                        disabled={!msg.content}
-                      >
-                        <Image
-                          src={msg.content || Images.ImageDefault}
-                          alt="Sent image"
-                          className="rounded-lg object-cover transition-transform duration-200 group-hover:scale-105"
-                          width={160}
-                          height={160}
-                        />
-                        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity duration-200"></div>
-                        <span className="text-[10px] text-white block mt-1 absolute bottom-1 right-1 bg-black bg-opacity-50 px-1 rounded">
-                          {formatTimeSendAt(msg.sentAt)}
-                        </span>
-                      </button>
-                    </>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-w-xs">
+                      {msg.content
+                        ?.split(",")
+                        .map((imgUrl, index) => (
+                          <button
+                            key={index}
+                            onClick={() => onImageClick(imgUrl)}
+                            className="relative overflow-hidden rounded-lg cursor-pointer group"
+                          >
+                            <Image
+                              src={imgUrl}
+                              alt={`Sent image ${index + 1}`}
+                              className="rounded-lg object-cover transition-transform duration-200 group-hover:scale-105"
+                              width={160}
+                              height={160}
+                            />
+                            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity duration-200"></div>
+                            {index === 0 && (
+                              <span className="text-[10px] text-white block mt-1 absolute bottom-1 right-1 bg-black bg-opacity-50 px-1 rounded">
+                                {formatTimeSendAt(msg.sentAt)}
+                              </span>
+                            )}
+                          </button>
+                        ))}
+                    </div>
                   ) : msg.messageType === MessageType.LINK ? (
                     <>
                       <Link href={msg.content} target="_blank" rel="noopener noreferrer" className="text-[#1566A3]">
