@@ -24,7 +24,6 @@ export const unfriend = async (token: string, userId: number, friendId: number) 
       return "Unfriend Failed"
     }
   } catch (error) {
-    console.error("Error Unfriend:", error)
     return null
   }
 }

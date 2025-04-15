@@ -14,7 +14,6 @@ export async function uploadFile(fileName: string, contentType: string, token?: 
     )
     return response
   } catch (error) {
-    console.error("Registration error:", error)
     throw error
   }
 }

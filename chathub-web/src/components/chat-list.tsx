@@ -132,23 +132,18 @@ const ChatList = ({
 
   const handleConfirmLogout = async () => {
     setIsLoggingOut(true)
-    console.log("Logging out...")
     try {
       Cookies.remove("authToken", { path: "/" })
       Cookies.remove("userId", { path: "/" })
-      console.log("Cookies removed")
 
       dispatch(logout())
-      console.log("Redux state cleared")
 
       setIsConfirmLogoutOpen(false)
 
       toast.success("Logged out successfully!")
 
       router.push("/sign-in")
-      console.log("Redirecting to /sign-in")
     } catch (error) {
-      console.error("Logout failed:", error)
       toast.error("Logout failed. Please try again.")
       setIsLoggingOut(false)
     }
@@ -274,7 +269,11 @@ const ChatList = ({
                     </div>
                   </div>
                   <div className="flex justify-between items-center w-[80%]">
-                    <p className="text-sm text-[#838383] truncate">{getDislayMessage(chat).trim().replace(/^"(.*)"$/, "$1")}</p>
+                    <p className="text-sm text-[#838383] truncate">
+                      {getDislayMessage(chat)
+                        .trim()
+                        .replace(/^"(.*)"$/, "$1")}
+                    </p>
                     {chat.isSeen && (
                       <span className="bg-[#0078D4] text-xs font-bold text-white rounded-[20px] px-1 flex items-center justify-center">
                         NEW

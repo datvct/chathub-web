@@ -9,7 +9,6 @@ export async function changePassword(data: ChangePasswordRequest) {
     const response = (await userInstance.changePassword(data).then(res => res.json())) as SuccessResponse
     return response
   } catch (error) {
-    console.error("Error changing password: ", error)
     throw error
   }
 }

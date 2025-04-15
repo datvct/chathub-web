@@ -60,7 +60,6 @@ const ChatScreen = ({
     if (imageUrl) {
       setSelectedImageUrl(imageUrl)
       setIsImageViewerOpen(true)
-      console.log("Opening image viewer for:", imageUrl)
     }
   }
 
@@ -104,7 +103,6 @@ const ChatScreen = ({
     }
 
     ws.subscribe(messageTopic, handleNewMessage)
-    console.log("Subscribed to topic:", messageTopic)
     return () => {
       ws.unsubscribe(messageTopic, handleNewMessage)
     }

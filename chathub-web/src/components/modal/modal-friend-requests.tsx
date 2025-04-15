@@ -104,7 +104,7 @@ const ModalFriendRequests: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean
 
   return (
     <>
-      { }
+      {}
       <ModalConfirm
         isOpen={isConfirmOpen}
         setIsOpen={setIsConfirmOpen}
@@ -115,7 +115,7 @@ const ModalFriendRequests: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean
 
       <Transition appear show={isOpen} as={Fragment}>
         <Dialog as="div" className="relative z-50" onClose={() => setIsOpen(false)}>
-          { }
+          {}
           <TransitionChild
             as={Fragment}
             enter="ease-out duration-300"
@@ -174,7 +174,7 @@ const ModalFriendRequests: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean
                   <div className="flex-shrink-0">
                     {loading && (
                       <div className="flex justify-center items-center py-4">
-                        <div className="loader"></div> { }
+                        <div className="loader"></div> {}
                       </div>
                     )}
                     {error && <p className="text-red-400 text-center py-2">{error}</p>}

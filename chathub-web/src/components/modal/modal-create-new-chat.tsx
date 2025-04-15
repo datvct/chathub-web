@@ -34,7 +34,6 @@ const ModalCreateNewChat: React.FC<ModalCreateNewChatProps> = ({ isOpen, setIsOp
 
   const handleCreateChat = async () => {
     if (!selectedUser) {
-      console.error("No user selected.")
       return
     }
 
@@ -70,7 +69,6 @@ const ModalCreateNewChat: React.FC<ModalCreateNewChatProps> = ({ isOpen, setIsOp
         toast.error(error || "Failed to create chat.")
       }
     } catch (catchError: any) {
-      console.error("Error creating chat:", catchError)
       toast.error(catchError.message || "Failed to create chat.")
     }
   }
