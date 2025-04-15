@@ -66,7 +66,7 @@ const ChatMessage = ({
               )}
               <div
                 id={`message-${msg.id}`}
-                className={`message items-center gap-2 h-[141px] ${
+                className={`message items-center gap-2 ${
                   msg.senderId === userId ? "justify-end" : "justify-start"
                 } ${msg.userDeleted == true ? "hidden" : "flex"}`}
               >
@@ -74,9 +74,7 @@ const ChatMessage = ({
                   <div className="flex items-center gap-2">
                     <div className="flex items-center gap-2 relative">
                       <div
-                        className={`bg-[#252728] pl-3 pr-5 py-3 rounded-lg shadow-md ${
-                          openMenuId === msg.id ? "block" : "hidden"
-                        }`}
+                        className={`absolute right-16 bottom-1 w-[200px] bg-[#252728] pl-3 pr-5 py-3 rounded-lg shadow-md ${openMenuId === msg.id ? "block" : "hidden"}`}
                       >
                         <ul>
                           {msg.unsent === false && (
@@ -153,7 +151,7 @@ const ChatMessage = ({
                     <p
                       className={`p-3 rounded-lg w-max max-w-xs break-words text-black whitespace-pre-wrap ${
                         msg.senderId === userId ? "bg-[#1566A3] text-white" : "bg-[#F0F0F0]"
-                      } ${isOnlyEmoji(msg.content) ? "text-4xl p-2 bg-transparent" : ""}`}
+                      }`}
                     >
                       You unsent a message
                       <span className={`text-xs block mt-1 ${msg.senderId === userId ? "text-white" : "text-black"}`}>
@@ -213,9 +211,9 @@ const ChatMessage = ({
                     <div
                       className={`p-3 rounded-lg w-max max-w-xs break-words text-black whitespace-pre-wrap ${
                         msg.senderId === userId ? "bg-[#1566A3] text-white" : "bg-[#F0F0F0]"
-                      } ${isOnlyEmoji(msg.content) && msg.content?.trim() ? "text-4xl p-2 bg-transparent" : ""}`}
+                      } ${isOnlyEmoji(msg.content) && msg.content?.trim() && msg.unsent === false ? "text-4xl p-2 bg-transparent" : ""}`}
                     >
-                      {msg.content?.trim() ? msg.content.replace(/^"(.*)"$/, "$1") : ""}
+                      {(msg.content?.trim() && msg.forwarded===false) || (msg.content!="\" have forward this message\"" && msg.forwarded===true )? msg.content.replace(/^"(.*)"$/, "$1") : ""}
                       {msg.forwarded === true && (
                         <div
                           className={`flex flex-col mt-1 p-2 border-l-4 ${

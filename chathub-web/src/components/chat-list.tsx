@@ -262,8 +262,8 @@ const ChatList = ({
                       {chat.pinned && <BsPinAngleFill size={20} color="white" className="text-white" />}
                     </div>
                   </div>
-                  <div className="flex justify-between items-center w-[50%]">
-                    <p className="text-sm text-[#838383] truncate">{getDislayMessage(chat)}</p>
+                  <div className="flex justify-between items-center w-[80%]">
+                    <p className="text-sm text-[#838383] truncate">{getDislayMessage(chat).trim().replace(/^"(.*)"$/, "$1")}</p>
                     {chat.isSeen && (
                       <span className="bg-[#0078D4] text-xs font-bold text-white rounded-[20px] px-1 flex items-center justify-center">
                         NEW
