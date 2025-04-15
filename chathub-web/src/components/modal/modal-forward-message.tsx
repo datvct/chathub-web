@@ -23,7 +23,7 @@ interface ForwardMessageModalProps {
 
 const ForwardMessageModal: React.FC<ForwardMessageModalProps> = ({ isOpen, onClose, message, userId, token }) => {
   const [selectedUsers, setSelectedUsers] = useState<number[]>([])
-  const [note, setNote] = useState("You have forward this message")
+  const [note, setNote] = useState(" have forward this message")
   const [searchTerm, setSearchTerm] = useState("")
   const [dataGroup, setDataGroup] = useState<ConversationResponse[]>([])
   const [selectedGroups, setSelectedGroups] = useState<number[]>([])

@@ -213,7 +213,7 @@ const ChatMessage = ({
                         msg.senderId === userId ? "bg-[#1566A3] text-white" : "bg-[#F0F0F0]"
                       } ${isOnlyEmoji(msg.content) && msg.content?.trim() && msg.unsent === false ? "text-4xl p-2 bg-transparent" : ""}`}
                     >
-                      {msg.content?.trim() ? msg.content.replace(/^"(.*)"$/, "$1") : ""}
+                      {(msg.content?.trim() && msg.forwarded===false) || (msg.content!="\" have forward this message\"" && msg.forwarded===true )? msg.content.replace(/^"(.*)"$/, "$1") : ""}
                       {msg.forwarded === true && (
                         <div
                           className={`flex flex-col mt-1 p-2 border-l-4 ${
