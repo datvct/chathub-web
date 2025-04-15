@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react"
 import Image from "next/image"
 import { Dialog, DialogPanel, DialogTitle, Transition, TransitionChild } from "@headlessui/react"
 import { Input } from "../ui/input"
+import { Button } from "../ui/button"
 import { Images } from "../../constants/images"
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs"
 import { useSelector } from "react-redux"
@@ -93,7 +94,7 @@ const ProfileViewModal: React.FC<ProfileViewModalProps> = ({ isOpen, setIsOpen, 
                   <div className="relative">
                     <label htmlFor="profile-upload" className="relative cursor-pointer">
                       <Image
-                        src={friend?.avatar ?? Images.AvatarDefault}
+                        src={friend?.avatar ? friend?.avatar : Images.AvatarDefault}
                         alt="profile default"
                         width={100}
                         height={100}

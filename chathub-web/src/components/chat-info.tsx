@@ -28,6 +28,8 @@ import ModalSuccess from "./modal/modal-success"
 import ModalDeleteConversation from "~/components/modal/modal-delete-conversation"
 import ModalUpdateNickname from "./modal/modal-update-nickname"
 import ProfileViewModal from "./modal/modal-profile-view"
+import ModalViewImage from "./modal/modal-image-viewer"
+
 import { Button } from "./ui/button"
 import { Menu, MenuButton, MenuItem, MenuItems, Transition } from "@headlessui/react"
 
@@ -95,14 +97,26 @@ const ChatInfo = ({
   const [isOpenUpdateGroupInfo, setIsOpenUpdateGroupInfo] = useState(false)
   const [isOpenDeleteConversation, setIsOpenDeleteConversation] = useState(false)
   const [isNicknameModalOpen, setIsNicknameModalOpen] = useState(false)
-  const [isProfileViewModalOpen, setIsProfileViewModalOpen] = useState(false);
-  const [selectedFriendForView, setSelectedFriendForView] = useState<UserDTO | null>(null);
+  const [isProfileViewModalOpen, setIsProfileViewModalOpen] = useState(false)
+  const [selectedFriendForView, setSelectedFriendForView] = useState<UserDTO | null>(null)
+  const [isImageViewerOpen, setIsImageViewerOpen] = useState(false)
+  const [selectedImageUrlForInfo, setSelectedImageUrlForInfo] = useState<string | null>(null)
 
   const [memberToAction, setMemberToAction] = useState<MemberDTO | null>(null)
   const [actionType, setActionType] = useState<"remove" | "updateNickname" | null>(null)
 
   const isCurrentUserAdmin = chatDetail?.members?.find(m => m.id === userId)?.is_admin ?? true
   const otherMember = chatDetail?.members?.find(m => m.id !== userId)
+
+  const handleAvatarClickInInfo = (imageUrl: string | undefined | null) => {
+    if (imageUrl) {
+      setSelectedImageUrlForInfo(imageUrl);
+      setIsImageViewerOpen(true);
+      console.log("Opening image viewer for ChatInfo avatar:", imageUrl);
+    } else {
+      toast.info("No avatar available to view.");
+    }
+  }
 
   const fetchChatDetails = async () => {
     if (selectedChat && userId && token) {
@@ -419,7 +433,11 @@ const ChatInfo = ({
                 alt={chatDetail?.name || (isGroupChat ? "Group" : otherMember?.name) || "Avatar"}
                 width={80}
                 height={80}
-                className="w-20 h-20 rounded-full mb-3 border-2 border-gray-600 object-cover"
+                className="w-20 h-20 rounded-full mb-3 border-2 object-cover cursor-pointer"
+                onClick={() => handleAvatarClickInInfo(
+                  chatDetail?.avatar ||
+                  (!isGroupChat ? otherMember?.avatar : null)
+                )}
               />
               <p className="text-lg font-semibold truncate max-w-full px-4">
                 {chatDetail?.name || (isGroupChat ? "Group Chat" : otherMember?.name) || "Conversation"}
@@ -626,6 +644,15 @@ const ChatInfo = ({
           isOpen={isProfileViewModalOpen}
           setIsOpen={setIsProfileViewModalOpen}
           friend={selectedFriendForView}
+        />
+      )}
+
+      {isImageViewerOpen && selectedImageUrlForInfo && (
+        <ModalViewImage
+          isOpen={isImageViewerOpen}
+          setIsOpen={setIsImageViewerOpen}
+          imageUrl={selectedImageUrlForInfo}
+          imageAlt="Profile Avatar"
         />
       )}
     </div>

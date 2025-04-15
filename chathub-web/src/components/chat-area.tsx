@@ -2,6 +2,7 @@
 
 import ChatHeader from "./chat-header"
 import ChatInput from "./chat-input"
+import ModalViewImage from "./modal/modal-image-viewer"
 import { useEffect, useRef, useState, useCallback } from "react"
 import { ConversationResponse, MessageResponse } from "~/codegen/data-contracts"
 import { MessageType } from "../types/types"
@@ -40,6 +41,18 @@ const ChatScreen = ({
   const ws = WebSocketService.getInstance()
   const [messages, setMessages] = useState<MessageResponse[]>([])
   const messagesEndRef = useRef<HTMLDivElement | null>(null)
+
+  const [isImageViewerOpen, setIsImageViewerOpen] = useState(false)
+  const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>(null)
+
+  const handleImageClickInMessage = (imageUrl: string) => {
+    if (imageUrl) {
+      setSelectedImageUrl(imageUrl);
+      setIsImageViewerOpen(true);
+      console.log("Opening image viewer for:", imageUrl);
+    }
+  }
+
   const refetchMessages = async () => {
     if (conversationId) {
       const response = await getMessageByConversationId(conversationId, userId, token)
@@ -147,10 +160,26 @@ const ChatScreen = ({
       />
 
       <div className="flex flex-col-reverse overflow-y-auto h-[75vh] custom-scrollbar">
-        <ChatMessage messages={messages} userId={userId} isGroupChat={isGroupChat} messagesEndRef={messagesEndRef} token={token} refetchMessages={refetchMessages} />
+        <ChatMessage
+          messages={messages}
+          userId={userId}
+          isGroupChat={isGroupChat}
+          messagesEndRef={messagesEndRef}
+          token={token}
+          refetchMessages={refetchMessages}
+          onImageClick={handleImageClickInMessage}
+        />
       </div>
 
       <ChatInput onSendMessage={handleSendMessage} />
+
+      {isImageViewerOpen && selectedImageUrl && (
+        <ModalViewImage
+          isOpen={isImageViewerOpen}
+          setIsOpen={setIsImageViewerOpen}
+          imageUrl={selectedImageUrl}
+        />
+      )}
     </div>
   )
 }
