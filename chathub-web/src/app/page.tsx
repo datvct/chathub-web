@@ -31,6 +31,11 @@ export default function Home() {
   const [conversations, setConversations] = useState([])
   const [typingStatus, setTypingStatus] = useState({})
   const [seenMessages, setSeenMessages] = useState({})
+  const [reloadTrigger, setReloadTrigger] = useState(false)
+
+  const handleReloadTrigger = () => {
+    setReloadTrigger(prevState => !prevState)
+  }
 
   const handlePinChangeSuccess = useCallback(() => {
     setNeedRefetchConversations(prevState => !prevState)
@@ -64,6 +69,19 @@ export default function Home() {
   const fetchDataConversation = async () => {
     if (userId) {
       let isMounted = true
+
+      const websocket = WebSocketService.getInstance()
+      if (websocket.isConnected()) {
+        websocket.disconnect()
+        setConversationData(null)
+        setSelectedChat(null)
+        setConversations([])
+        setTypingStatus({})
+        setSeenMessages({})
+        setReloadTrigger(false)
+        setNeedRefetchConversations(false)
+      }
+
       const init = async () => {
         try {
           const response = await getRecentConversation(userId, token)
@@ -89,39 +107,22 @@ export default function Home() {
               WebSocketService.getInstance().subscribe(TOPICS.MESSAGE(id.toString()), message => {
                 const newMessage = message
                 setConversations(prev => {
-                  return (
-                    prev
-                      // .map(c =>
-                      //   c.id === id
-                      //     ? {
-                      //         ...c,
-                      //         lastMessage: newMessage.content,
-                      //         lastMessageAt: newMessage.sentAt,
-                      //         senderId: newMessage.senderId,
-                      //         lastMessageType: newMessage.messageType,
-                      //         unsent: newMessage.unsent,
+                  return prev.map(c => {
+                    if (c.id !== id) return c
 
-                      //       }
-                      //     : c,
-                      // )
-                      // .sort((a, b) => new Date(b.lastMessageAt).getTime() - new Date(a.lastMessageAt).getTime())
-                      .map(c => {
-                        if (c.id !== id) return c
+                    const isNew = !c.lastMessageAt || new Date(newMessage.sentAt) > new Date(c.lastMessageAt)
 
-                        const isNew = !c.lastMessageAt || new Date(newMessage.sentAt) > new Date(c.lastMessageAt)
+                    const shouldUpdateTime = isNew && !newMessage.unsent && !newMessage.userDeleted
 
-                        const shouldUpdateTime = isNew && !newMessage.unsent && !newMessage.userDeleted
-
-                        return {
-                          ...c,
-                          lastMessage: newMessage.content,
-                          lastMessageType: newMessage.messageType,
-                          userDeleted: newMessage.userDeleted,
-                          unsent: newMessage.unsent,
-                          lastMessageAt: shouldUpdateTime ? newMessage.sentAt : c.lastMessageAt,
-                        }
-                      })
-                  )
+                    return {
+                      ...c,
+                      lastMessage: newMessage.content,
+                      lastMessageType: newMessage.messageType,
+                      userDeleted: newMessage.userDeleted,
+                      unsent: newMessage.unsent,
+                      lastMessageAt: shouldUpdateTime ? newMessage.sentAt : c.lastMessageAt,
+                    }
+                  })
                 })
               })
 
@@ -181,8 +182,8 @@ export default function Home() {
   }
   useEffect(() => {
     fetchDataConversation()
-  }, [])
-
+  }, [reloadTrigger])
+  console.log("conversations", conversations)
   return (
     <>
       <div className="flex flex-row justify-between h-screen">
@@ -194,6 +195,7 @@ export default function Home() {
           conversations={conversations}
           userId={userId}
           token={token}
+          handleReloadTrigger={handleReloadTrigger}
         />
         {selectedChat ? (
           <ChatScreen

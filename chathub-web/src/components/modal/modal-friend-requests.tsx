@@ -125,7 +125,7 @@ const ModalFriendRequests: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
           >
-            <div className="fixed inset-0 bg-black bg-opacity-25" />
+            <div className="fixed inset-0 bg-balck bg-opacity-25" />
           </TransitionChild>
 
           <div className="fixed inset-0 overflow-y-auto">
@@ -139,7 +139,7 @@ const ModalFriendRequests: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <DialogPanel className="bg-[#385068] rounded-[5%] w-[80%] h-[95%] max-w-2xl max-h-screen transform overflow-hidden p-6 text-left align-middle shadow-xl transition-all flex flex-col">
+                <DialogPanel className="bg-[#385068] rounded-3xl w-[80%] h-[95%] max-w-2xl max-h-screen transform overflow-hidden p-6 text-left align-middle shadow-xl transition-all flex flex-col">
                   <DialogTitle className="text-xl font-bold mb-4 flex items-center justify-between text-white leading-6 flex-shrink-0">
                     <div className="flex items-center gap-x-2">
                       <Image src={Images.IconChatList} alt="Chat Icon" width={40} height={40} />
