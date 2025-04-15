@@ -154,25 +154,42 @@ export const getChatDetailSectionAPI = async (conversationId: number, userId: nu
   }
 }
 
-export const updateGroupInfoAPI = async (conversationId: number, data: UpdateGroupInfoRequest, token: string) => {
+export const updateGroupInfoAPI = async (
+  conversationId: number,
+  userId: number,
+  groupName: string,
+  avatarFile: File | null,
+  token: string
+): Promise<SuccessResponse | null> => {
   try {
-    const response = (await conversationInstance
-      .updateGroupInfo(
-        conversationId,
-        { request: data },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      )
-      .then(res => res.json())) as SuccessResponse
-    return response
-  } catch (error) {
-    console.error("Error updating group info:", error)
-    return null
+    const formData = new FormData();
+    formData.append('userId', userId.toString());
+    formData.append('groupName', groupName);
+    if (avatarFile) {
+      formData.append('avatar', avatarFile);
+    }
+
+    const response = await fetch(`${process.env.API_URL}/conversation/${conversationId}/updateGroupInfo`, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData,
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({ message: `HTTP error! Status: ${response.status}` }));
+      throw new Error(errorData.message || `Failed to update group info. Status: ${response.status}`);
+    }
+
+    const successResponse = await response.json() as SuccessResponse;
+    return successResponse;
+
+  } catch (error: any) {
+    console.error("Error updating group info API:", error);
+    throw new Error(error.message || "An unexpected error occurred while updating group info.");
   }
-}
+};
 
 export const pinConversationAPI = async (conversationId: number, userId: number, isPinned: boolean, token: string) => {
   try {
@@ -357,7 +374,7 @@ export const updateNicknameAPI = async (data: UpdateNickNameRequest, token: stri
 }
 
 export const findSingleChat = async (userId: number, friendId: number, token: string) => {
-  try{
+  try {
     const response = (await conversationInstance.findSingleChat(
       { userId, friendId },
       {
@@ -366,7 +383,7 @@ export const findSingleChat = async (userId: number, friendId: number, token: st
         },
       },
     ).then(res => res.json())) as ConversationResponse
-    return response 
+    return response
   } catch (error) {
     console.error("Error finding single chat:", error)
     return null
