@@ -92,7 +92,7 @@ const ChatMessage = ({
                           >
                             Delete For Me Only
                           </li>
-                          {(msg.unsent === false && (msg.content!="\" have forward this message\"" )) && (
+                          {msg.unsent === false && msg.content != '" have forward this message"' && (
                             <li
                               className="hover:bg-[#333334] p-2 pr-3 rounded cursor-pointer"
                               onClick={() => {
@@ -115,7 +115,7 @@ const ChatMessage = ({
                         <CiMenuKebab />
                       </button>
                     </div>
-                    {(msg.unsent === false && (msg.content!="\" have forward this message\""))&& (
+                    {msg.unsent === false && msg.content != '" have forward this message"' && (
                       <button
                         className="hover:bg-[#333334] p-2 rounded-full"
                         onClick={() => {
@@ -161,29 +161,30 @@ const ChatMessage = ({
                     </p>
                   ) : msg.messageType === MessageType.IMAGE ? (
                     <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-w-xs">
-                      {msg.content
-                        ?.split(",")
-                        .map((imgUrl, index) => (
-                          <button
-                            key={index}
-                            onClick={() => onImageClick(imgUrl)}
-                            className="relative overflow-hidden rounded-lg cursor-pointer group"
-                          >
-                            <Image
-                              src={imgUrl}
-                              alt={`Sent image ${index + 1}`}
-                              className="rounded-lg object-cover transition-transform duration-200 group-hover:scale-105"
-                              width={160}
-                              height={160}
-                            />
-                            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity duration-200"></div>
-                            {index === 0 && (
-                              <span className="text-[10px] text-white block mt-1 absolute bottom-1 right-1 bg-black bg-opacity-50 px-1 rounded">
-                                {formatTimeSendAt(msg.sentAt)}
-                              </span>
-                            )}
-                          </button>
-                        ))}
+                      {msg.content?.split(",").map((imgUrl, index) => (
+                        <button
+                          key={index}
+                          // onClick={() => onImageClick(imgUrl)}
+                          className="relative overflow-hidden rounded-lg cursor-pointer group"
+                        >
+                          {/* <Image
+                            src={imgUrl}
+                            alt={`Sent image ${index + 1}`}
+                            className="rounded-lg object-cover transition-transform duration-200 group-hover:scale-105"
+                            width={160}
+                            height={160}
+                          /> */}
+                          <a href={imgUrl} target="_blank" rel="noopener noreferrer">
+                            avvxxxxxx
+                          </a>
+                          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity duration-200"></div>
+                          {index === 0 && (
+                            <span className="text-[10px] text-white block mt-1 absolute bottom-1 right-1 bg-black bg-opacity-50 px-1 rounded">
+                              {formatTimeSendAt(msg.sentAt)}
+                            </span>
+                          )}
+                        </button>
+                      ))}
                     </div>
                   ) : msg.messageType === MessageType.LINK ? (
                     <>
@@ -247,7 +248,7 @@ const ChatMessage = ({
                     <button className="hover:bg-[#333334] p-2 rounded-full">
                       <CiFaceSmile />
                     </button>
-                    {(msg.unsent === false && (msg.content!="\" have forward this message\""))&& (
+                    {msg.unsent === false && msg.content != '" have forward this message"' && (
                       <button
                         className="hover:bg-[#333334] p-2 rounded-full"
                         onClick={() => {
@@ -280,7 +281,7 @@ const ChatMessage = ({
                           >
                             Delete For Me Only
                           </li>
-                          {(msg.unsent === false && (msg.content!="\" have forward this message\""))&& (
+                          {msg.unsent === false && msg.content != '" have forward this message"' && (
                             <li
                               className="hover:bg-[#333334] p-2 pr-3 rounded cursor-pointer"
                               onClick={() => {

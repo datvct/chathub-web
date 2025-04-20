@@ -18,9 +18,10 @@ interface ModalCreateGroupChatProps {
   setIsOpen: (open: boolean) => void
   userId: number
   token: string
+  onCreated?: (conversationId: number) => void
 }
 
-const ModalCreateGroupChat: React.FC<ModalCreateGroupChatProps> = ({ isOpen, setIsOpen, userId, token }) => {
+const ModalCreateGroupChat: React.FC<ModalCreateGroupChatProps> = ({ isOpen, setIsOpen, userId, token, onCreated }) => {
   const [groupName, setGroupName] = useState<string>("")
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
   const [selectedFile, setSelectedFile] = useState<File | null>(null)
@@ -75,6 +76,8 @@ const ModalCreateGroupChat: React.FC<ModalCreateGroupChatProps> = ({ isOpen, set
         body: formData,
       })
       if (response.status === 200) {
+        const data = await response.json()
+        onCreated(data.id)
         toast.success("Group chat created successfully!")
         setIsOpen(false)
         setGroupName("")
@@ -92,8 +95,8 @@ const ModalCreateGroupChat: React.FC<ModalCreateGroupChatProps> = ({ isOpen, set
     friends?.filter(user => {
       const searchTerm = searchQuery.toLowerCase()
       const nameMatch = user.name?.toLowerCase().includes(searchTerm)
-
-      return nameMatch
+      const phoneMatch = user.phoneNumber?.toLowerCase().includes(searchTerm)
+      return nameMatch || phoneMatch
     }) || []
 
   return (

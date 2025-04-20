@@ -49,6 +49,31 @@ export class Conversation<SecurityDataType = unknown> extends HttpClient<Securit
    * No description
    *
    * @tags conversation-controller
+   * @name RevokeDeputy
+   * @request PUT:/conversation/{conversationId}/revoke-deputy
+   * @secure
+   */
+  revokeDeputy = (
+    conversationId: number,
+    query: {
+      /** @format int64 */
+      userId: number
+      /** @format int64 */
+      adminId: number
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<SuccessResponse, ErrorResponse>({
+      path: `/conversation/${conversationId}/revoke-deputy`,
+      method: "PUT",
+      query: query,
+      secure: true,
+      ...params,
+    })
+  /**
+   * No description
+   *
+   * @tags conversation-controller
    * @name PinConversation
    * @request PUT:/conversation/{conversationId}/pin
    * @secure
@@ -64,6 +89,31 @@ export class Conversation<SecurityDataType = unknown> extends HttpClient<Securit
   ) =>
     this.request<string, ErrorResponse>({
       path: `/conversation/${conversationId}/pin`,
+      method: "PUT",
+      query: query,
+      secure: true,
+      ...params,
+    })
+  /**
+   * No description
+   *
+   * @tags conversation-controller
+   * @name GrantDeputy
+   * @request PUT:/conversation/{conversationId}/grant-deputy
+   * @secure
+   */
+  grantDeputy = (
+    conversationId: number,
+    query: {
+      /** @format int64 */
+      userId: number
+      /** @format int64 */
+      adminId: number
+    },
+    params: RequestParams = {},
+  ) =>
+    this.request<SuccessResponse, ErrorResponse>({
+      path: `/conversation/${conversationId}/grant-deputy`,
       method: "PUT",
       query: query,
       secure: true,
@@ -366,6 +416,8 @@ export class Conversation<SecurityDataType = unknown> extends HttpClient<Securit
     query: {
       /** @format int64 */
       userId: number
+      /** @format int64 */
+      newOwnerId: number
     },
     params: RequestParams = {},
   ) =>

@@ -3,8 +3,6 @@
 import React, { Fragment, useState } from "react"
 import Image from "next/image"
 import { Dialog, DialogPanel, DialogTitle, Transition, TransitionChild } from "@headlessui/react"
-import { useSelector } from "react-redux"
-import { RootState } from "~/lib/reudx/store"
 import { Images } from "../../constants/images"
 import { Search } from "lucide-react"
 import { Button } from "../ui/button"
@@ -17,18 +15,22 @@ import { useFriends } from "~/hooks/use-friends"
 import { useUnfriend } from "~/hooks/use-unfriend"
 import { toast } from "react-toastify"
 import { UserDTO } from "~/codegen/data-contracts"
+import { FriendStatus } from "~/types/types"
 
-const ModalFriendList: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) => void }> = ({ isOpen, setIsOpen }) => {
-  const userId = useSelector((state: RootState) => state.auth.userId)
-  const token = useSelector((state: RootState) => state.auth.token)
+interface ModalFriendListProps {
+  isOpen: boolean
+  setIsOpen: (open: boolean) => void
+  userId: number
+  token: string
+}
 
-  const { friends: fetchedFriends, loading, error } = useFriends(userId, token)
+const ModalFriendList: React.FC<ModalFriendListProps> = ({ isOpen, setIsOpen, userId, token }) => {
+  const { friends: fetchedFriends, loading, error } = useFriends(userId, token, isOpen)
   const { unfriend, isUnfriending, unfriendUserId, unfriendError } = useUnfriend()
 
   const [activeTab, setActiveTab] = useState("all")
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedFriend, setSelectedFriend] = useState<UserDTO | null>(null)
-  const [isDropDownOpen, setIsDropDownOpen] = useState(false)
   const [isProfileViewModalOpen, setIsProfileViewModalOpen] = useState(false)
 
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false)
@@ -41,13 +43,14 @@ const ModalFriendList: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) =>
     setIsProfileViewModalOpen(true)
   }
 
-  const filteredFriends = fetchedFriends?.filter(friend => {
-    if (!friend) return false;
-    const term = searchTerm.toLowerCase();
-    const nameMatch = friend.name?.toLowerCase().includes(term);
-    const phoneMatch = friend.phoneNumber?.includes(term);
-    return nameMatch || phoneMatch;
-  }) || [];
+  const filteredFriends =
+    fetchedFriends?.filter(friend => {
+      if (!friend) return false
+      const term = searchTerm.toLowerCase()
+      const nameMatch = friend.name?.toLowerCase().includes(term)
+      const phoneMatch = friend.phoneNumber?.includes(term)
+      return nameMatch || phoneMatch
+    }) || []
 
   const friendsToDisplay =
     activeTab === "recent" ? filteredFriends.filter(friend => friend.status === "ONLINE") : filteredFriends
@@ -63,9 +66,7 @@ const ModalFriendList: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) =>
     } catch (error: any) {
       toast.error("Failed to unfriend. Please try again.")
     } finally {
-      setTimeout(() => {
-        window.location.reload()
-      }, 6000)
+      setIsOpen(!isOpen)
     }
   }
 
@@ -86,7 +87,6 @@ const ModalFriendList: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) =>
     setIsConfirmModalOpen(false)
     setFriendIdToUnfriend(null)
   }
-
   return (
     <div>
       <Transition appear show={isOpen} as={Fragment}>
@@ -151,23 +151,22 @@ const ModalFriendList: React.FC<{ isOpen: boolean; setIsOpen: (open: boolean) =>
                       className={`px-4 py-2 rounded-lg text-white font-semibold
                         ${activeTab === "recent" ? "bg-[#501794]" : "bg-[#8C8595] hover:bg-[#7746F5]"}`}
                     >
-                      Recently online ({fetchedFriends?.filter(friend => friend.status == "ONLINE")?.length || 0})
+                      Recently online (
+                      {fetchedFriends?.filter(friend => friend.status == FriendStatus.ONLINE)?.length || 0})
                     </button>
                   </div>
 
-                  <div className="max-h-[55vh] overflow-y-auto custom-scrollbar pr-2">
+                  <div className="min-h-[55vh] max-h-[55vh] overflow-y-auto custom-scrollbar pr-2">
                     {loading ? (
                       <div className="flex justify-center items-center h-full">
                         <div className="loader"></div>
                       </div>
                     ) : error ? (
                       <p className="text-red-400 text-center">{error}</p>
-                    ) : !filteredFriends || filteredFriends.length === 0 ? (
-                      <p className="text-center text-gray-400 mt-4">
-                        No friends found matching your search.
-                      </p>
+                    ) : !friendsToDisplay || friendsToDisplay.length === 0 ? (
+                      <p className="text-center text-gray-400 mt-4">No friends found matching your search.</p>
                     ) : (
-                      filteredFriends.map((friend, index) => {
+                      friendsToDisplay.map((friend, index) => {
                         return (
                           <div
                             key={friend.id || index}

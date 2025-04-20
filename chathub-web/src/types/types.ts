@@ -7,6 +7,11 @@ export enum MessageType {
   LINK = "LINK",
 }
 
+export enum FriendStatus {
+  ONLINE = "ONLINE",
+  OFFLINE = "OFFLINE",
+}
+
 export interface Friend {
   name: string
   dateOfBirth?: string | Date
