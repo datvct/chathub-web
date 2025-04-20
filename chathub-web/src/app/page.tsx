@@ -243,6 +243,7 @@ export default function Home() {
             onPinChange={handlePinChangeSuccess}
             onHistoryDeleted={handleHistoryDeletedSuccess}
             onChatInfoUpdated={handleChatInfoUpdate}
+            handleReloadTrigger={handleReloadTrigger}
           />
         )}
       </div>

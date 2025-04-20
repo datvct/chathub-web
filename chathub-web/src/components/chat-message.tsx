@@ -164,7 +164,7 @@ const ChatMessage = ({
                       {msg.content?.split(",").map((imgUrl, index) => (
                         <button
                           key={index}
-                          // onClick={() => onImageClick(imgUrl)}
+                          onClick={() => onImageClick(imgUrl)}
                           className="relative overflow-hidden rounded-lg cursor-pointer group"
                         >
                           <Image

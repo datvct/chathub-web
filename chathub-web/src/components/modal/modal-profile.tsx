@@ -23,7 +23,6 @@ interface ProfileModalProps {
   isOpen: boolean
   setIsOpen: (open: boolean) => void
   setIsChangePasswordModalOpen?: any
-  friend: UserDTO | null
   dataProfile: UserDTO | null
   userId: number
   token: string
@@ -33,7 +32,6 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
   isOpen,
   setIsOpen,
   setIsChangePasswordModalOpen,
-  friend,
   dataProfile,
   userId,
   token,
@@ -224,6 +222,21 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
                         value={profileData?.name}
                         className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500"
                         onChange={e => handleChange("name", e.target.value)}
+                      />
+                    </div>
+                  </div>
+                  <div className="mt-4 relative">
+                    <label htmlFor="date-of-birth" className="block text-sm font-medium text-black">
+                      Number Phone
+                    </label>
+
+                    <div className="mt-1">
+                      <Input
+                        id="number-phone"
+                        type="text"
+                        value={profileData?.phoneNumber}
+                        className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500"
+                        disabled
                       />
                     </div>
                   </div>
