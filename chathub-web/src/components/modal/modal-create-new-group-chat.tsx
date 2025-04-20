@@ -18,7 +18,7 @@ interface ModalCreateGroupChatProps {
   setIsOpen: (open: boolean) => void
   userId: number
   token: string
-  onCreated?: (conversationId: number) => void
+  onCreated?: () => void
 }
 
 const ModalCreateGroupChat: React.FC<ModalCreateGroupChatProps> = ({ isOpen, setIsOpen, userId, token, onCreated }) => {
@@ -76,8 +76,7 @@ const ModalCreateGroupChat: React.FC<ModalCreateGroupChatProps> = ({ isOpen, set
         body: formData,
       })
       if (response.status === 200) {
-        const data = await response.json()
-        onCreated(data.id)
+        onCreated()
         toast.success("Group chat created successfully!")
         setIsOpen(false)
         setGroupName("")
