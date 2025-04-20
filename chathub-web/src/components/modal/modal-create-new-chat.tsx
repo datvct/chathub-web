@@ -8,16 +8,11 @@ import { Images } from "../../constants/images"
 import { Dialog, DialogPanel, DialogTitle, TransitionChild } from "@headlessui/react"
 import { Search, EllipsisVertical } from "lucide-react"
 import "../../styles/custom-scroll.css"
-import { useSelector } from "react-redux"
-import { RootState } from "~/lib/reudx/store"
 import { useFriends } from "~/hooks/use-friends"
 import { ConversationRequest, ConversationResponse } from "~/codegen/data-contracts"
 import { useConversation } from "~/hooks/use-converstation"
 import { toast } from "react-toastify"
-import { createConversationAPI, findSingleChat } from "~/lib/get-conversation"
-import { useRouter } from "next/router"
-import WebSocketService from "~/lib/web-socket-service"
-import { TOPICS } from "~/constants/Topics"
+import { findSingleChat } from "~/lib/get-conversation"
 
 interface ModalCreateNewChatProps {
   isOpen: boolean
@@ -38,7 +33,7 @@ const ModalCreateNewChat: React.FC<ModalCreateNewChatProps> = ({
 }) => {
   const [selectedUser, setSelectedUser] = useState<number | null>(null)
   const [searchQuery, setSearchQuery] = useState<string>("")
-  const { friends, loading: friendsLoading, error } = useFriends(userId, token)
+  const { friends, loading: friendsLoading, error } = useFriends(userId, token, isOpen)
   const { createConversation, loading: conversationLoading } = useConversation(userId, token)
 
   const handleSelectUser = (userId: number) => {
@@ -91,14 +86,14 @@ const ModalCreateNewChat: React.FC<ModalCreateNewChatProps> = ({
         }
       }
     } catch (catchError: any) {
-      // const conversation = await findSingleChat(userId, selectedUser, token)
-      // if (conversation) {
-      //   handleSelectChat(conversation.id, conversation)
-      //   setIsOpen(false)
-      //   setSelectedUser(null)
-      //   setSearchQuery("")
-      //   return
-      // }
+      const conversation = await findSingleChat(userId, selectedUser, token)
+      if (conversation) {
+        handleSelectChat(conversation.id, conversation)
+        setIsOpen(false)
+        setSelectedUser(null)
+        setSearchQuery("")
+        return
+      }
       toast.error(catchError.message || "Failed to create chat.")
     }
   }
@@ -181,7 +176,6 @@ const ModalCreateNewChat: React.FC<ModalCreateNewChatProps> = ({
                           className="rounded-full flex-shrink-0"
                         />
                         <div className="flex-grow min-w-0">
-                          {" "}
                           <p className="font-semibold text-black truncate">{user.name}</p>
                         </div>
                         <EllipsisVertical className="ml-auto text-gray-500 flex-shrink-0" />

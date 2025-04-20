@@ -103,9 +103,9 @@ const ChatList = ({
 
   const getDislayMessage = (item: ConversationResponse) => {
     if (!item.lastMessage || !item.lastMessageType) return "No messages"
-    const sender = item.senderId == userId ? "You" : item.senderName.split(" ")[0]
+    const sender = item.senderId == userId ? "You" : item.senderName
     if (item.unsent) {
-      const sender = item.senderId == userId ? "You" : item.senderName.split(" ")[0]
+      // const sender = item.senderId == userId ? "You" : item.senderName.split(" ")[0]
       return `${sender} unsent a message`
     }
 
@@ -343,7 +343,6 @@ const ChatList = ({
         userId={userId}
         token={token}
         onCreated={(newConversationId: number) => {
-          console.log("New conversation created:", newConversationId)
           handleReloadTrigger?.()
         }}
       />
@@ -352,6 +351,9 @@ const ChatList = ({
         setIsOpen={setModalCreateNewGroupChatOpen}
         userId={userId}
         token={token}
+        onCreated={(newConversationId: number) => {
+          handleReloadTrigger?.()
+        }}
       />
       <ModalProfile
         isOpen={modalProfileOpen}
@@ -375,7 +377,12 @@ const ChatList = ({
           token={token}
         />
       )}
-      <ModalFriendList isOpen={isFriendListModalOpen} setIsOpen={setIsFriendListModalOpen} />
+      <ModalFriendList
+        isOpen={isFriendListModalOpen}
+        setIsOpen={setIsFriendListModalOpen}
+        userId={userId}
+        token={token}
+      />
       <ModalFriendRequests isOpen={isFriendRequestModalOpen} setIsOpen={setIsFriendRequestModalOpen} />
       <ModalListGroup isOpen={modalListGroup} setIsOpen={setModalListGroup} isAdmin={true} />
       <ModalConfirm

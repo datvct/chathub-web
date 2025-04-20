@@ -12,7 +12,7 @@ import {
 } from "~/lib/get-friend"
 import { toast } from "react-toastify"
 
-export function useFriends(userId: number | null, token: string | null) {
+export function useFriends(userId: number | null, token: string | null, isOpen?: boolean) {
   const [friends, setFriends] = useState<UserDTO[] | null>(null)
   const [loading, setLoading] = useState<boolean>(false)
   const [error, setError] = useState<string | null>(null)
@@ -40,7 +40,7 @@ export function useFriends(userId: number | null, token: string | null) {
     }
 
     fetchFriends()
-  }, [userId, token])
+  }, [userId, token, isOpen])
 
   const getListFriendRequests = useCallback(async () => {
     if (!userId || !token) {

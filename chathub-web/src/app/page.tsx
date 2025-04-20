@@ -15,6 +15,7 @@ import { useConversation } from "~/hooks/use-converstation"
 import WebSocketService from "~/lib/web-socket-service"
 import { TOPICS } from "~/constants/Topics"
 import { MessageType } from "~/types/types"
+import { send } from "process"
 
 export default function Home() {
   const userId = useSelector((state: RootState) => state.auth.userId)
@@ -121,6 +122,8 @@ export default function Home() {
                       userDeleted: newMessage.userDeleted,
                       unsent: newMessage.unsent,
                       lastMessageAt: shouldUpdateTime ? newMessage.sentAt : c.lastMessageAt,
+                      senderId: newMessage.senderId ? newMessage.senderId : c.senderId,
+                      senderName: newMessage.senderName ? newMessage.senderName : c.senderName,
                     }
                   })
                 })
@@ -183,7 +186,6 @@ export default function Home() {
   useEffect(() => {
     fetchDataConversation()
   }, [reloadTrigger])
-  console.log("conversations", conversations)
   return (
     <>
       <div className="flex flex-row justify-between h-screen">

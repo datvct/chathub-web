@@ -58,8 +58,8 @@ export interface MessageResponse {
   userDeleted?: boolean
   forwardedMessage?: ForwardedMessageInfo
   reactions?: ReactionDTO[]
-  unsent?: boolean
   forwarded?: boolean
+  unsent?: boolean
 }
 
 export interface ReactionDTO {
@@ -141,16 +141,17 @@ export interface ConversationResponse {
   /** @format date-time */
   createAt?: string
   participants?: ParticipantDTO[]
-  pinned?: boolean
-  unsent?: boolean
+  forwarded?: boolean
   dissolved?: boolean
   unsent?: boolean
+  pinned?: boolean
 }
 
 export interface ParticipantDTO {
   /** @format int64 */
   id?: number
   name?: string
+  role?: "ADMIN" | "DEPUTY" | "MEMBER"
 }
 
 export interface RegistrationRequest {
@@ -228,6 +229,7 @@ export interface MemberDTO {
   id?: number
   name?: string
   avatar?: string
+  role?: "ADMIN" | "DEPUTY" | "MEMBER"
   is_admin?: boolean
 }
 

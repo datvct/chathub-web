@@ -84,8 +84,8 @@ export const formatDisplayDate = (dateString: string) => {
   const today = moment().format("YYYY-MM-DD")
   const yesterday = moment().subtract(1, "days").format("YYYY-MM-DD")
 
-  if (dateString === today) return "Hôm nay"
-  if (dateString === yesterday) return "Hôm qua"
+  if (dateString === today) return "Today"
+  if (dateString === yesterday) return "Yesterday"
 
   return moment(dateString).format("MMM DD, YYYY")
 }
