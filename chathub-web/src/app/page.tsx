@@ -244,6 +244,8 @@ export default function Home() {
             onHistoryDeleted={handleHistoryDeletedSuccess}
             onChatInfoUpdated={handleChatInfoUpdate}
             handleReloadTrigger={handleReloadTrigger}
+            userId={userId}
+            token={token}
           />
         )}
       </div>
