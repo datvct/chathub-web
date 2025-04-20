@@ -342,7 +342,7 @@ const ChatList = ({
         setIsOpen={setModalCreateNewChatOpen}
         userId={userId}
         token={token}
-        onCreated={(newConversationId: number) => {
+        onCreated={() => {
           handleReloadTrigger?.()
         }}
       />
@@ -351,7 +351,7 @@ const ChatList = ({
         setIsOpen={setModalCreateNewGroupChatOpen}
         userId={userId}
         token={token}
-        onCreated={(newConversationId: number) => {
+        onCreated={() => {
           handleReloadTrigger?.()
         }}
       />
@@ -359,7 +359,6 @@ const ChatList = ({
         isOpen={modalProfileOpen}
         setIsOpen={setModalProfileOpen}
         setIsChangePasswordModalOpen={setIsChangePasswordModalOpen}
-        friend={undefined}
         dataProfile={dataProfile}
         userId={userId}
         token={token}
@@ -372,7 +371,6 @@ const ChatList = ({
           isOpen={isModalProfileOpen}
           setIsOpen={setIsProfileModalOpen}
           setIsChangePasswordModalOpen={handleOpenChangePassword}
-          friend={undefined}
           userId={userId}
           token={token}
         />

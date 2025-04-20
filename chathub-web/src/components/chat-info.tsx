@@ -57,6 +57,9 @@ interface ChatInfoProps {
   onPinChange: (isPinned: boolean) => void
   onHistoryDeleted: () => void
   onChatInfoUpdated: () => void
+  handleReloadTrigger: () => void
+  userId?: number
+  token?: string
 }
 
 const ChatInfo = ({
@@ -67,16 +70,16 @@ const ChatInfo = ({
   onPinChange,
   onHistoryDeleted,
   onChatInfoUpdated,
+  handleReloadTrigger,
+  userId,
+  token,
 }: ChatInfoProps) => {
   const router = useRouter()
-  const token = useSelector((state: RootState) => state.auth.token)
-  const userId = useSelector((state: RootState) => state.auth.userId)
 
   const {
     getChatDetailSection,
     removeParticipantFromGroup,
     pinConversation,
-    deleteConversation,
     leaveGroupConversation,
     dissolveGroupConversation,
     loading: conversationLoading,
@@ -205,6 +208,7 @@ const ChatInfo = ({
       try {
         const response = await removeParticipantFromGroup(selectedChat, userId, member.id, token)
         if (response?.statusCode === 200) {
+          handleReloadTrigger()
           toast.success("Member removed successfully!")
           setSuccessMessage("Member removed successfully!")
 
@@ -239,6 +243,7 @@ const ChatInfo = ({
       try {
         const response = await leaveGroupConversation(selectedChat, userId, token)
         if (response?.statusCode === 200) {
+          handleReloadTrigger()
           toast.success("Left group successfully!")
           setIsChatInfoOpen(false)
           onHistoryDeleted()
@@ -261,6 +266,7 @@ const ChatInfo = ({
         try {
           const response = await dissolveGroupConversation(selectedChat, userId, token)
           if (response?.statusCode === 200) {
+            handleReloadTrigger()
             toast.success("Group dissolved successfully!")
             setIsChatInfoOpen(false)
             onHistoryDeleted()
@@ -677,6 +683,7 @@ const ChatInfo = ({
           setIsOpen={setIsOpenDeleteConversation}
           chatId={selectedChat}
           onHistoryDeleted={onHistoryDeleted}
+          handleReloadConverstation={handleReloadTrigger}
         />
       )}
 

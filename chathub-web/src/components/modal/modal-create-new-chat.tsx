@@ -20,7 +20,7 @@ interface ModalCreateNewChatProps {
   userId: number
   token: string
   handleSelectChat?: (chatId: number, converstation: ConversationResponse) => void
-  onCreated?: (conversationId: number) => void
+  onCreated?: () => void
 }
 
 const ModalCreateNewChat: React.FC<ModalCreateNewChatProps> = ({
@@ -69,8 +69,7 @@ const ModalCreateNewChat: React.FC<ModalCreateNewChatProps> = ({
       })
 
       if (response.status === 200) {
-        const data = await response.json()
-        onCreated(data.id)
+        onCreated()
         toast.success("Chat created successfully!")
         setIsOpen(false)
         setSelectedUser(null)

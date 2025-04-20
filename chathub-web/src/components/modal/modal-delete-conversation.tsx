@@ -13,9 +13,16 @@ interface ModalDeleteConversationProps {
   setIsOpen: (isOpen: boolean) => void
   chatId: number
   onHistoryDeleted: () => void
+  handleReloadConverstation?: () => void
 }
 
-const ModalDeleteConversation = ({ isOpen, setIsOpen, chatId, onHistoryDeleted }: ModalDeleteConversationProps) => {
+const ModalDeleteConversation = ({
+  isOpen,
+  setIsOpen,
+  chatId,
+  onHistoryDeleted,
+  handleReloadConverstation,
+}: ModalDeleteConversationProps) => {
   const userId = useSelector((state: RootState) => state.auth.userId)
   const token = useSelector((state: RootState) => state.auth.token)
 
@@ -26,6 +33,7 @@ const ModalDeleteConversation = ({ isOpen, setIsOpen, chatId, onHistoryDeleted }
     try {
       const response = await deleteConversation(chatId, userId, token)
       if (response) {
+        handleReloadConverstation()
         toast.success("Deleted chat history successfully!")
         setIsOpen(false)
         onHistoryDeleted()
