@@ -167,7 +167,9 @@ const ChatInput = ({ onSendMessage }: { onSendMessage: (msg: string, messageType
       setPreviewFiles([])
       setFileType(null)
     } else if (message.trim()) {
-      onSendMessage(message, MessageType.TEXT)
+      const isLink = /^(https?:\/\/[^\s]+)$/.test(message.trim())
+      const messageType = isLink ? MessageType.LINK : MessageType.TEXT
+      onSendMessage(message, messageType)
       setMessage("")
     }
   }  

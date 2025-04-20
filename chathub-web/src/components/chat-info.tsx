@@ -109,6 +109,10 @@ const ChatInfo = ({
   const isCurrentUserAdmin = chatDetail?.members?.find(m => m.id === userId)?.is_admin ?? true
   const otherMember = chatDetail?.members?.find(m => m.id !== userId)
 
+  const [imagesAndVideos, setImagesAndVideos] = useState<any[]>([])
+  const [files, setFiles] = useState<any[]>([])
+  const [links, setLinks] = useState<any[]>([])
+
   const handleAvatarClickInInfo = (imageUrl: string | undefined | null) => {
     if (imageUrl) {
       setSelectedImageUrlForInfo(imageUrl)
@@ -121,7 +125,12 @@ const ChatInfo = ({
   const fetchChatDetails = async () => {
     if (selectedChat && userId && token) {
       const details = await getChatDetailSection(selectedChat, userId, token)
+      console.log(details)
       setChatDetail(details || null)
+      const media = details.list_media || []
+      setImagesAndVideos(media.filter(item => item.type === "IMAGE" || item.type === "VIDEO"))
+      setFiles(media.filter(item => item.type === "DOCUMENT"))
+      setLinks(media.filter(item => item.type === "LINK"))
 
       try {
         const convos = await getRecentConversationByUserID(userId, token)
@@ -483,11 +492,79 @@ const ChatInfo = ({
             )}
 
             <div className="mb-4">
+              <h3 className="text-sm font-semibold text-gray-300 mb-2 px-2">Images & Videos</h3>
+              <div className="flex flex-wrap justify-around gap-2 px-2 max-h-40 overflow-y-auto custom-scrollbar">
+                {imagesAndVideos.length === 0 ? (
+                  <div className="flex items-center gap-3 text-xs text-gray-400">
+                    <FaRegFile size={18} /> No images and videos shared yet.
+                  </div>
+                ) : (
+                  imagesAndVideos.map((item, idx) =>
+                    item.type === "IMAGE" ? (
+                      <Image
+                        key={idx}
+                        src={item.url}
+                        alt="image"
+                        width={64}
+                        height={64}
+                        className="w-16 h-16 object-cover rounded cursor-pointer hover:opacity-80 transition"
+                        onClick={() => {
+                          setSelectedImageUrlForInfo(item.url)
+                          setIsImageViewerOpen(true)
+                        }}
+                      />
+                    ) : (
+                      <video key={idx} src={item.url} controls className="w-16 h-16 rounded bg-black" />
+                    ),
+                  )
+                )}
+              </div>
+            </div>
+
+            <div className="mb-4">
               <h3 className="text-sm font-semibold text-gray-300 mb-2 px-2">Files</h3>
               <div className="flex flex-col gap-2 px-2 max-h-40 overflow-y-auto custom-scrollbar">
-                <div className="flex items-center gap-3 text-xs text-gray-400">
-                  <FaRegFile size={18} /> No files shared yet.
-                </div>
+                {files.length === 0 ? (
+                  <div className="flex items-center gap-3 text-xs text-gray-400">
+                    <FaRegFile size={18} /> No files shared yet.
+                  </div>
+                ) : (
+                  files.map((file, idx) => (
+                    <a
+                      key={idx}
+                      href={file.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 text-xs text-blue-400 hover:underline"
+                    >
+                      <FaRegFile size={16} />
+                      {file.url.split("/").pop()}
+                    </a>
+                  ))
+                )}
+              </div>
+            </div>
+
+            <div className="mb-4">
+              <h3 className="text-sm font-semibold text-gray-300 mb-2 px-2">Links</h3>
+              <div className="flex flex-col gap-2 px-2 max-h-40 overflow-y-auto custom-scrollbar">
+                {links.length === 0 ? (
+                  <div className="flex items-center gap-3 text-xs text-gray-400">
+                    <FaRegFile size={18} /> No links shared yet.
+                  </div>
+                ) : (
+                  links.map((link, idx) => (
+                    <a
+                      key={idx}
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-400 text-xs hover:underline"
+                    >
+                      {link.url}
+                    </a>
+                  ))
+                )}
               </div>
             </div>
 
