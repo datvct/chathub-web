@@ -129,6 +129,17 @@ const ChatInput = ({ onSendMessage }: { onSendMessage: (msg: string, messageType
         if (uploadedUrls.length > 0) {
           const combinedUrlString = uploadedUrls.join(",")
           onSendMessage(combinedUrlString, MessageType.IMAGE)
+
+          // Nếu có nội dung text kèm theo => gửi text nữa
+          if (message.trim()) {
+            const isLink = /^(https?:\/\/[^\s]+)$/.test(message.trim())
+            const messageType = isLink ? MessageType.LINK : MessageType.TEXT
+            onSendMessage(message, messageType)
+            setFiles([])
+            setPreviewFiles([])
+            setFileType(null)
+            setMessage('')
+          }
         }
   
       } else {
