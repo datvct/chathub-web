@@ -128,7 +128,7 @@ const ChatInfo = ({
   const fetchChatDetails = async () => {
     if (selectedChat && userId && token) {
       const details = await getChatDetailSection(selectedChat, userId, token)
-      console.log(details)
+
       setChatDetail(details || null)
       const media = details.list_media || []
       setImagesAndVideos(media.filter(item => item.type === "IMAGE" || item.type === "VIDEO"))
@@ -287,7 +287,6 @@ const ChatInfo = ({
 
   const handleBlockToggle = async () => {
     if (chatDetail?.type !== "SINGLE" || !otherMember?.id || !userId || !token) return
-
     const action = isBlocked ? unblockUser : blockUser
     const actionName = isBlocked ? "Unblocking" : "Blocking"
     const successMessage = `User ${isBlocked ? "unblocked" : "blocked"} successfully!`
@@ -407,7 +406,7 @@ const ChatInfo = ({
   if (!isOpen) return null
 
   return (
-    <div className="bg-[#292929] text-white h-screen overflow-hidden w-80 p-4 flex flex-col absolute right-0 top-0 z-30 shadow-xl">
+    <div className="bg-[#292929] text-white h-screen overflow-hidden w-80 p-4 flex flex-col shadow-xl">
       <div className="flex items-center justify-between pb-3 border-b border-gray-700 mb-4 flex-shrink-0">
         {view === "members" && (
           <button onClick={() => setView("main")} className="p-1 rounded-full hover:bg-gray-700">
@@ -499,7 +498,7 @@ const ChatInfo = ({
 
             <div className="mb-4">
               <h3 className="text-sm font-semibold text-gray-300 mb-2 px-2">Images & Videos</h3>
-              <div className="flex flex-wrap justify-around gap-2 px-2 max-h-40 overflow-y-auto custom-scrollbar">
+              <div className="flex flex-wrap justify-start gap-2 px-2 max-h-40 overflow-y-auto custom-scrollbar">
                 {imagesAndVideos.length === 0 ? (
                   <div className="flex items-center gap-3 text-xs text-gray-400">
                     <FaRegFile size={18} /> No images and videos shared yet.
