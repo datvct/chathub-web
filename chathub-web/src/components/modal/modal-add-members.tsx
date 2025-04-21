@@ -12,7 +12,7 @@ import { FaRegCircle } from "react-icons/fa"
 import { useFriends } from "~/hooks/use-friends"
 import { useSelector } from "react-redux"
 import { RootState } from "~/lib/reudx/store"
-import { UserDTO } from "~/codegen/data-contracts"
+import { MemberDTO, UserDTO } from "~/codegen/data-contracts"
 import { toast } from "react-toastify"
 import { useConversation } from "~/hooks/use-converstation"
 
@@ -20,10 +20,11 @@ interface ModalAddMembersProps {
   isOpen: boolean
   setIsOpen: (open: boolean) => void
   conversationId: number
+  members: MemberDTO[]
   onMembersAdded: () => void
 }
 
-const ModalAddMembers: React.FC<ModalAddMembersProps> = ({ isOpen, setIsOpen, conversationId, onMembersAdded }) => {
+const ModalAddMembers: React.FC<ModalAddMembersProps> = ({ isOpen, setIsOpen, conversationId, onMembersAdded, members }) => {
   const [searchQuery, setSearchQuery] = useState("")
   const userId = useSelector((state: RootState) => state.auth.userId)
   const token = useSelector((state: RootState) => state.auth.token)
@@ -47,11 +48,21 @@ const ModalAddMembers: React.FC<ModalAddMembersProps> = ({ isOpen, setIsOpen, co
   }
 
   const filteredMembers =
-    friends?.filter(member => {
-      if (!member) return false
+  friends
+    ?.filter(friend => {
+      if (!friend) return false
+
+      // Loại bỏ nếu bạn bè đã là thành viên của nhóm
+      const isAlreadyMember = members.some(member => member.id === friend.id)
+      if (isAlreadyMember) return false
+
       const searchTerm = searchQuery.toLowerCase()
-      return member.name?.toLowerCase().includes(searchTerm) || member.phoneNumber?.includes(searchTerm)
+      return (
+        friend.name?.toLowerCase().includes(searchTerm) ||
+        friend.phoneNumber?.toLowerCase().includes(searchTerm)
+      )
     }) || []
+
 
   const handleAddMembersToGroup = async () => {
     if (!conversationId || !userId || !token) return

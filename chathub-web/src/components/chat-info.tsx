@@ -724,6 +724,7 @@ const ChatInfo = ({
           isOpen={isOpenAddMembers}
           setIsOpen={setIsOpenAddMembers}
           conversationId={selectedChat}
+          members={chatDetail?.members || []} // ✅ thêm dòng này
           onMembersAdded={() => {
             fetchChatDetails()
             onChatInfoUpdated()
