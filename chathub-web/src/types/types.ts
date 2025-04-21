@@ -12,6 +12,12 @@ export enum FriendStatus {
   OFFLINE = "OFFLINE",
 }
 
+export enum RoleGroup {
+  ADMIN = 0,
+  DEPUTY = 1,
+  MEMBER = 2,
+}
+
 export interface Friend {
   name: string
   dateOfBirth?: string | Date

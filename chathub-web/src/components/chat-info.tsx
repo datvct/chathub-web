@@ -4,21 +4,12 @@ import { useState, useEffect, Fragment } from "react"
 import { useRouter } from "next/navigation"
 import Image from "next/image"
 import { toast } from "react-toastify"
-import { useSelector } from "react-redux"
-import { RootState } from "~/lib/reudx/store"
-import {
-  ChatDetailSectionResponse,
-  ConversationResponse,
-  UpdateNickNameRequest,
-  UserDTO,
-  MemberDTO,
-  SuccessResponse,
-} from "~/codegen/data-contracts"
+import { ChatDetailSectionResponse, UserDTO, MemberDTO } from "~/codegen/data-contracts"
 import { getRecentConversationByUserID } from "~/lib/get-conversation"
 import { Images } from "~/constants/images"
 import { useConversation } from "~/hooks/use-converstation"
 import { useBlockUnblockUser } from "~/hooks/use-user"
-
+import { GrUserAdmin } from "react-icons/gr"
 import ModalLeaveGroup from "./modal/modal-leave-group"
 import ModalAddMembers from "./modal/modal-add-members"
 import ModalDissolveGroup from "./modal/modal-dissolve-group"
@@ -48,6 +39,9 @@ import { LuUserRoundPlus, LuShieldCheck } from "react-icons/lu"
 import { TbUserEdit } from "react-icons/tb"
 import { IoSettingsOutline, IoEllipsisVertical, IoClose } from "react-icons/io5"
 import { cn } from "~/lib/utils"
+import { RoleGroup } from "~/types/types"
+import ModalConfirmDeputy from "./modal/modal-confirm-deputy"
+import ModalLeaveGroupOwner from "./modal/modal-leave-group-with-owner"
 
 interface ChatInfoProps {
   isOpen?: boolean
@@ -82,17 +76,16 @@ const ChatInfo = ({
     pinConversation,
     leaveGroupConversation,
     dissolveGroupConversation,
+    grantDeputyGroup,
+    revokeDeputy,
     loading: conversationLoading,
     error: conversationError,
   } = useConversation(userId, token)
-
   const { blockUser, unblockUser, loading: blockUnblockLoading } = useBlockUnblockUser(userId, token)
-
   const [view, setView] = useState<"main" | "members">("main")
   const [chatDetail, setChatDetail] = useState<ChatDetailSectionResponse | null>(null)
   const [isPinned, setIsPinned] = useState(false)
   const [isBlocked, setIsBlocked] = useState(false)
-
   const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false)
   const [confirmModalProps, setConfirmModalProps] = useState({ title: "", message: "", onConfirm: () => {} })
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false)
@@ -105,13 +98,16 @@ const ChatInfo = ({
   const [selectedFriendForView, setSelectedFriendForView] = useState<UserDTO | null>(null)
   const [isImageViewerOpen, setIsImageViewerOpen] = useState(false)
   const [selectedImageUrlForInfo, setSelectedImageUrlForInfo] = useState<string | null>(null)
-
   const [memberToAction, setMemberToAction] = useState<MemberDTO | null>(null)
   const [actionType, setActionType] = useState<"remove" | "updateNickname" | null>(null)
+  const [isOpenGrantDeputyModalOpen, setIsOpenGrantDeputyModalOpen] = useState(false)
+  const [isOpenRevokeDeputyModalOpen, setIsOpenRevokeDeputyModalOpen] = useState(false)
+  const [selectDeputyId, setSelectDeputyId] = useState<number | null>(null)
+  const [isOpenLeaveGroupOwner, setIsOpenLeaveGroupOwner] = useState(false)
 
-  const isCurrentUserAdmin = chatDetail?.members?.find(m => m.id === userId)?.is_admin ?? true
+  const isCurrentUserAdmin = chatDetail?.members?.find(m => m.id === userId)?._admin ?? true
+  const isDeputy = chatDetail?.members?.find(m => m.id === userId)?.role === "DEPUTY"
   const otherMember = chatDetail?.members?.find(m => m.id !== userId)
-
   const [imagesAndVideos, setImagesAndVideos] = useState<any[]>([])
   const [files, setFiles] = useState<any[]>([])
   const [links, setLinks] = useState<any[]>([])
@@ -130,6 +126,7 @@ const ChatInfo = ({
       const details = await getChatDetailSection(selectedChat, userId, token)
 
       setChatDetail(details || null)
+
       const media = details.list_media || []
       setImagesAndVideos(media.filter(item => item.type === "IMAGE" || item.type === "VIDEO"))
       setFiles(media.filter(item => item.type === "DOCUMENT"))
@@ -208,12 +205,10 @@ const ChatInfo = ({
       try {
         const response = await removeParticipantFromGroup(selectedChat, userId, member.id, token)
         if (response?.statusCode === 200) {
-          handleReloadTrigger()
           toast.success("Member removed successfully!")
           setSuccessMessage("Member removed successfully!")
-
-          fetchChatDetails()
-          onChatInfoUpdated()
+          handleReloadViewMemeber()
+          setIsConfirmModalOpen(false)
         } else {
           toast.error(response?.message || "Failed to remove member.")
         }
@@ -238,23 +233,27 @@ const ChatInfo = ({
   }
 
   const handleLeaveGroupAction = () => {
-    openConfirmModal("Leave Group", "Are you sure you want to leave this group?", async () => {
-      if (!selectedChat || !userId || !token) return
-      try {
-        const response = await leaveGroupConversation(selectedChat, userId, token)
-        if (response?.statusCode === 200) {
-          handleReloadTrigger()
-          toast.success("Left group successfully!")
-          setIsChatInfoOpen(false)
-          onHistoryDeleted()
-          router.push("/")
-        } else {
-          toast.error(response?.message || "Failed to leave group.")
+    if (isCurrentUserAdmin && otherMember) {
+      setIsOpenLeaveGroupOwner(true)
+    } else {
+      openConfirmModal("Leave Group", "Are you sure you want to leave this group?", async () => {
+        if (!selectedChat || !userId || !token) return
+        try {
+          const response = await leaveGroupConversation(selectedChat, userId, token)
+          if (response?.statusCode === 200) {
+            handleReloadTrigger()
+            toast.success("Left group successfully!")
+            setIsChatInfoOpen(false)
+            onHistoryDeleted()
+            router.push("/")
+          } else {
+            toast.error(response?.message || "Failed to leave group.")
+          }
+        } catch (error: any) {
+          toast.error("Failed to leave group.")
         }
-      } catch (error: any) {
-        toast.error("Failed to leave group.")
-      }
-    })
+      })
+    }
   }
 
   const handleDissolveGroupAction = () => {
@@ -308,6 +307,25 @@ const ChatInfo = ({
     }
   }
 
+  const sortedMembers = [...(chatDetail?.members || [])].sort((a, b) => {
+    return RoleGroup[a.role] - RoleGroup[b.role]
+  })
+
+  const handleDeputy = (memberId: number, type: "grant" | "revoke") => {
+    if (type === "grant") {
+      setIsOpenGrantDeputyModalOpen(true)
+      setSelectDeputyId(memberId)
+    } else {
+      setIsOpenRevokeDeputyModalOpen(true)
+      setSelectDeputyId(memberId)
+    }
+  }
+
+  const handleReloadViewMemeber = () => {
+    setChatDetail(null)
+    fetchChatDetails()
+  }
+
   const renderMemberItem = (member: MemberDTO) => (
     <div key={member.id} className="flex items-center justify-between py-3 px-2 hover:bg-gray-700 rounded-lg">
       <div
@@ -323,11 +341,22 @@ const ChatInfo = ({
           className="rounded-full w-10 h-10 flex-shrink-0 object-cover"
         />
         <div className="flex-1 min-w-0">
-          <p className="text-sm font-medium text-white truncate flex items-center">
-            {member.name || "Unknown Member"}
-            {member.id === userId && <span className="text-xs text-gray-400 ml-1">(You)</span>}
-            {member.is_admin && (
-              <LuShieldCheck size={14} className="ml-1.5 text-green-400 flex-shrink-0" title="Admin" />
+          <p className="text-sm font-medium text-white truncate flex flex-col">
+            <span>
+              {member.name || "Unknown Member"}
+              {member.id === userId && <span className="text-xs text-gray-400 ml-1">(You)</span>}
+            </span>
+            {member._admin && (
+              <span className="flex items-center gap-1 text-xs text-gray-400">
+                <GrUserAdmin size={14} className="text-yellow-400 flex-shrink-0" title="Admin" />
+                <span className="text-xs text-gray-400">Admin</span>
+              </span>
+            )}
+            {member.role === "DEPUTY" && (
+              <span className="flex items-center gap-1 text-xs text-gray-400">
+                <GrUserAdmin size={14} className="text-gray-400 flex-shrink-0" title="Admin" />
+                <span className="text-xs text-gray-400">Deputy</span>
+              </span>
             )}
           </p>
         </div>
@@ -349,6 +378,40 @@ const ChatInfo = ({
           >
             <MenuItems className="absolute right-0 mt-2 w-48 origin-top-right divide-y divide-gray-600 rounded-md bg-[#3a3a3a] shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none z-10">
               <div className="px-1 py-1">
+                {isCurrentUserAdmin && member.role !== "DEPUTY" && (
+                  <MenuItem>
+                    {({ active }) => (
+                      <button
+                        onClick={() => handleDeputy(member.id, "grant")}
+                        className={`
+                        ${active ? "bg-gray-600" : ""}
+                        group flex w-full items-center rounded-md px-2 py-2 text-sm text-white
+                      `}
+                      >
+                        <GrUserAdmin size={14} className="text-white flex-shrink-0 mr-2" title="Admin" />
+                        Grant deputy
+                      </button>
+                    )}
+                  </MenuItem>
+                )}
+
+                {isCurrentUserAdmin && member.role === "DEPUTY" && (
+                  <MenuItem>
+                    {({ active }) => (
+                      <button
+                        onClick={() => handleDeputy(member.id, "revoke")}
+                        className={`
+                        ${active ? "bg-gray-600" : ""}
+                        group flex w-full items-center rounded-md px-2 py-2 text-sm text-white
+                      `}
+                      >
+                        <GrUserAdmin size={14} className="text-white flex-shrink-0 mr-2" title="Admin" />
+                        Revoke deputy
+                      </button>
+                    )}
+                  </MenuItem>
+                )}
+
                 <MenuItem>
                   {({ active }) => (
                     <button
@@ -363,6 +426,7 @@ const ChatInfo = ({
                     </button>
                   )}
                 </MenuItem>
+
                 <MenuItem>
                   {({ active }) => (
                     <button
@@ -378,7 +442,7 @@ const ChatInfo = ({
                   )}
                 </MenuItem>
               </div>
-              {isCurrentUserAdmin && (
+              {(isCurrentUserAdmin || isDeputy) && !member._admin && (
                 <div className="px-1 py-1">
                   <MenuItem>
                     {({ active }) => (
@@ -404,6 +468,12 @@ const ChatInfo = ({
   )
 
   if (!isOpen) return null
+
+  useEffect(() => {
+    if (isOpenGrantDeputyModalOpen !== false || isOpenRevokeDeputyModalOpen !== false) {
+      fetchChatDetails()
+    }
+  }, [isOpenGrantDeputyModalOpen, isOpenRevokeDeputyModalOpen])
 
   return (
     <div className="bg-[#292929] text-white h-screen overflow-hidden w-80 p-4 flex flex-col shadow-xl">
@@ -622,13 +692,12 @@ const ChatInfo = ({
                 onClick={handleDeleteConversationAction}
               >
                 <CgTrashEmpty size={20} />
-                <span className="text-sm">Delete Chat History</span>
+                <span className="text-sm">Delete Conversation</span>
               </button>
             </div>
           </>
         ) : (
           <>
-            {}
             {isGroupChat && (
               <Button
                 className="w-full mb-4 bg-gray-700 hover:bg-gray-600 text-white"
@@ -640,8 +709,8 @@ const ChatInfo = ({
             )}
 
             <div className="space-y-1">
-              {chatDetail?.members?.length ? (
-                chatDetail.members.map(renderMemberItem)
+              {sortedMembers.length ? (
+                sortedMembers.map(renderMemberItem)
               ) : (
                 <p className="text-center text-gray-400 text-sm py-4">No members found.</p>
               )}
@@ -722,6 +791,45 @@ const ChatInfo = ({
           setIsOpen={setIsImageViewerOpen}
           imageUrl={selectedImageUrlForInfo}
           imageAlt="Profile Avatar"
+        />
+      )}
+
+      {isOpenGrantDeputyModalOpen && (
+        <ModalConfirmDeputy
+          isOpen={isOpenGrantDeputyModalOpen}
+          setIsOpen={setIsOpenGrantDeputyModalOpen}
+          chatId={selectedChat}
+          isAdmin={isCurrentUserAdmin}
+          token={token}
+          userId={userId}
+          selectDeputyId={selectDeputyId}
+          type="grant"
+          handleReloadMemeber={handleReloadViewMemeber}
+        />
+      )}
+
+      {isOpenRevokeDeputyModalOpen && (
+        <ModalConfirmDeputy
+          isOpen={isOpenRevokeDeputyModalOpen}
+          setIsOpen={setIsOpenRevokeDeputyModalOpen}
+          chatId={selectedChat}
+          isAdmin={isCurrentUserAdmin}
+          token={token}
+          userId={userId}
+          selectDeputyId={selectDeputyId}
+          type="revoke"
+          handleReloadMemeber={handleReloadViewMemeber}
+        />
+      )}
+
+      {isOpenLeaveGroupOwner && (
+        <ModalLeaveGroupOwner
+          isOpen={isOpenLeaveGroupOwner}
+          setIsOpen={setIsOpenLeaveGroupOwner}
+          conversationId={selectedChat}
+          userId={userId}
+          token={token}
+          handleReload={handleReloadTrigger}
         />
       )}
     </div>

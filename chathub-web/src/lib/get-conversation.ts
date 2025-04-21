@@ -51,25 +51,6 @@ export async function createConversationAPI(data: ConversationRequest, token: st
   }
 }
 
-export async function leaveConversation(conversationId: number, userId: number, token?: string) {
-  try {
-    const response = (await conversationInstance
-      .leaveGroupConversation(
-        conversationId,
-        { userId: userId },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      )
-      .then(res => res.json())) as SuccessResponse
-    return response
-  } catch (error) {
-    return null
-  }
-}
-
 export async function putDissolveGroup(conversationId: number, userId: number, token?: string) {
   try {
     const response = (await conversationInstance
@@ -304,12 +285,17 @@ export const removeParticipantFromGroupConversationAPI = async (
   }
 }
 
-export const leaveGroupConversationAPI = async (conversationId: number, userId: number, token: string) => {
+export const leaveGroupConversationAPI = async (
+  conversationId: number,
+  userId: number,
+  token: string,
+  newOwnerId?: number,
+) => {
   try {
     const response = (await conversationInstance
       .leaveGroupConversation(
         conversationId,
-        { userId },
+        { userId, newOwnerId: newOwnerId ?? null },
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -367,6 +353,49 @@ export const findSingleChat = async (userId: number, friendId: number, token: st
         },
       )
       .then(res => res.json())) as ConversationResponse
+    return response
+  } catch (error) {
+    return null
+  }
+}
+
+export const updateGrantDeputyGroup = async (
+  conversationId: number,
+  userId: number,
+  adminId: number,
+  token: string,
+) => {
+  try {
+    const response = (await conversationInstance
+      .grantDeputy(
+        conversationId,
+        { userId, adminId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      )
+      .then(res => res.json())) as SuccessResponse
+    return response
+  } catch (error) {
+    return null
+  }
+}
+
+export const revokeDeputyGroup = async (conversationId: number, userId: number, adminId: number, token: string) => {
+  try {
+    const response = (await conversationInstance
+      .revokeDeputy(
+        conversationId,
+        { userId, adminId },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        },
+      )
+      .then(res => res.json())) as SuccessResponse
     return response
   } catch (error) {
     return null

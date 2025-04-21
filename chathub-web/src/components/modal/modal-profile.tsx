@@ -227,7 +227,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
                   </div>
                   <div className="mt-4 relative">
                     <label htmlFor="date-of-birth" className="block text-sm font-medium text-black">
-                      Number Phone
+                      Phone Number
                     </label>
 
                     <div className="mt-1">

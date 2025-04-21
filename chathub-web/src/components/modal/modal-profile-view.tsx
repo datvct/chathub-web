@@ -37,12 +37,12 @@ const ProfileViewModal: React.FC<ProfileViewModalProps> = ({ isOpen, setIsOpen, 
 
   const handleAvatarClick = () => {
     if (friend.avatar) {
-      setImageUrlToView(friend.avatar);
-      setIsImageViewerOpen(true);
+      setImageUrlToView(friend.avatar)
+      setIsImageViewerOpen(true)
     } else {
-      toast.info("This user doesn't have a profile picture set.");
+      toast.info("This user doesn't have a profile picture set.")
     }
-  };
+  }
 
   const [profileData, setProfileData] = useState<ProfileData>({
     displayName: friend?.name || "",
@@ -122,7 +122,6 @@ const ProfileViewModal: React.FC<ProfileViewModalProps> = ({ isOpen, setIsOpen, 
                       </label>
                     </div>
 
-
                     <div className="mt-4">
                       <label htmlFor="display-name" className="block text-sm font-medium text-black">
                         Display Name
@@ -198,14 +197,14 @@ const ProfileViewModal: React.FC<ProfileViewModalProps> = ({ isOpen, setIsOpen, 
             </div>
           </div>
         </Dialog>
-      </Transition >
+      </Transition>
 
       {imageUrlToView && (
         <ModalViewImage
           isOpen={isImageViewerOpen}
           setIsOpen={setIsImageViewerOpen}
           imageUrl={imageUrlToView}
-          imageAlt={`${friend.name || 'Profile'} Avatar - Full view`}
+          imageAlt={`${friend.name || "Profile"} Avatar - Full view`}
         />
       )}
     </>

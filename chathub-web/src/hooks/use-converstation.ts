@@ -9,7 +9,6 @@ import {
 import {
   getRecentConversationByUserID,
   createConversationAPI,
-  leaveConversation,
   putDissolveGroup,
   getGroupConversationsByUserId,
   getChatDetailSectionAPI,
@@ -23,6 +22,8 @@ import {
   removeParticipantFromGroupConversationAPI,
   leaveGroupConversationAPI,
   findGroupsAPI,
+  updateGrantDeputyGroup,
+  revokeDeputyGroup,
 } from "~/lib/get-conversation"
 
 export const useConversation = (userId: number, token: string) => {
@@ -105,18 +106,6 @@ export const useConversation = (userId: number, token: string) => {
     } catch (err: any) {
       setError(err.message || "Failed to create group chat")
       return null
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const leaveConversationById = async (conversationId: number, userId: number, token?: string) => {
-    setLoading(true)
-    setError(null)
-    try {
-      await leaveConversation(conversationId, userId, token)
-    } catch (err) {
-      setError("Failed to leave conversation")
     } finally {
       setLoading(false)
     }
@@ -281,11 +270,11 @@ export const useConversation = (userId: number, token: string) => {
     }
   }
 
-  const leaveGroupConversation = async (conversationId: number, userId: number, token: string) => {
+  const leaveGroupConversation = async (conversationId: number, userId: number, token: string, newOwnerId?: number) => {
     setLoading(true)
     setError(null)
     try {
-      const response = await leaveGroupConversationAPI(conversationId, userId, token)
+      const response = await leaveGroupConversationAPI(conversationId, userId, token, newOwnerId)
       return response
     } catch (err: any) {
       setError(err.message || "Failed to leave group conversation")
@@ -332,12 +321,39 @@ export const useConversation = (userId: number, token: string) => {
     }
   }
 
+  const grantDeputyGroup = async (conversationId: number, userId: number, adminId: number, token: string) => {
+    setLoading(true)
+    setError(null)
+    try {
+      const response = await updateGrantDeputyGroup(conversationId, userId, adminId, token)
+      return response
+    } catch (err: any) {
+      setError(err.message || "Failed to update nickname")
+      return null
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const revokeDeputy = async (conversationId: number, userId: number, adminId: number, token: string) => {
+    setLoading(true)
+    setError(null)
+    try {
+      const response = await revokeDeputyGroup(conversationId, userId, adminId, token)
+      return response
+    } catch (err: any) {
+      setError(err.message || "Failed to update nickname")
+      return null
+    } finally {
+      setLoading(false)
+    }
+  }
+
   return {
     groups,
     getRecentConversation,
     createConversation,
     createGroupConversation,
-    leaveConversationById,
     dissolveGroup,
     getGroupConversations,
     getChatDetailSection,
@@ -351,6 +367,8 @@ export const useConversation = (userId: number, token: string) => {
     removeParticipantFromGroup,
     leaveGroupConversation,
     findGroups,
+    grantDeputyGroup,
+    revokeDeputy,
     loading,
     error,
   }

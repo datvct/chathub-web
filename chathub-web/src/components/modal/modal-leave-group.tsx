@@ -19,13 +19,13 @@ interface ModalLeaveGroupProps {
 const ModalLeaveGroup = ({ isOpen, setIsOpen, chatId, setSelectedChatId }: ModalLeaveGroupProps) => {
   const userId = useSelector((state: RootState) => state.auth.userId)
   const token = useSelector((state: RootState) => state.auth.token)
-  const { leaveConversationById, loading, error } = useConversation(userId, token)
+  const { leaveGroupConversation, loading, error } = useConversation(userId, token)
   const router = useRouter()
 
   const handleLeaveGroup = async () => {
     if (!chatId || !userId || !token) return
     try {
-      await leaveConversationById(chatId, userId, token)
+      await leaveGroupConversation(chatId, userId, token)
       toast.success("Leaved group successfully!")
       setIsOpen(false)
     } catch (error) {
