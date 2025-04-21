@@ -9,7 +9,7 @@ import { IoIosDocument } from "react-icons/io"
 import moment from "moment"
 import { CiMenuKebab, CiFaceSmile } from "react-icons/ci"
 import { TiArrowBackOutline, TiArrowForwardOutline } from "react-icons/ti"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { unsendMessage, deleteMessage, forwardMessage } from "~/lib/get-message"
 import ForwardMessageModal from "./modal/modal-forward-message"
 import { IoReturnUpForward } from "react-icons/io5"
@@ -37,6 +37,12 @@ const ChatMessage = ({
   const [openMenuId, setOpenMenuId] = useState<number | null>(null)
   const [forwardingMessage, setForwardingMessage] = useState<MessageResponse | null>(null)
   const [isFriendListModalOpen, setIsFriendListModalOpen] = useState(false)
+
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" })
+    }
+  }, [messages])
 
   const handleUnsend = async (messageId: number) => {
     const res = await unsendMessage(userId, messageId, token)

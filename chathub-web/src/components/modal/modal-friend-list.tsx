@@ -66,7 +66,7 @@ const ModalFriendList: React.FC<ModalFriendListProps> = ({ isOpen, setIsOpen, us
     } catch (error: any) {
       toast.error("Failed to unfriend. Please try again.")
     } finally {
-      setIsOpen(!isOpen)
+      setIsOpen(false)
     }
   }
 

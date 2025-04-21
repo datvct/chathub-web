@@ -33,7 +33,7 @@ const ProfileViewModal: React.FC<ProfileViewModalProps> = ({ isOpen, setIsOpen, 
   const [isImageViewerOpen, setIsImageViewerOpen] = useState(false)
   const [imageUrlToView, setImageUrlToView] = useState<string | null>(null)
 
-  if (!friend) return null
+  
 
   const handleAvatarClick = () => {
     if (friend.avatar) {
@@ -69,6 +69,7 @@ const ProfileViewModal: React.FC<ProfileViewModalProps> = ({ isOpen, setIsOpen, 
     })
   }, [friend])
 
+  if (!friend) return null
   return (
     <>
       <Transition appear show={isOpen} as={React.Fragment}>
