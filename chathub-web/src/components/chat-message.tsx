@@ -75,7 +75,7 @@ const ChatMessage = ({
                 id={`message-${msg.id}`}
                 className={`message items-center gap-2 ${
                   msg.senderId === userId ? "justify-end" : "justify-start"
-                } ${msg.userDeleted == true ? "hidden" : "flex"}`}
+                } ${msg.userDeleted == true && userId === msg.deletedByUserId ? "hidden" : "flex"}`}
               >
                 {msg.senderId === userId && (
                   <div className="flex items-center gap-2">

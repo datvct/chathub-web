@@ -15,7 +15,7 @@ interface ModalImageViewerProps {
 }
 
 const ModalImageViewer: React.FC<ModalImageViewerProps> = ({ isOpen, setIsOpen, imageUrl, imageAlt }) => {
-  const [zoomLevel, setZoomLevel] = useState(1)
+  const [zoomLevel, setZoomLevel] = useState(0.5)
   const [rotation, setRotation] = useState(0)
 
   const MAX_ZOOM = 5
@@ -24,7 +24,7 @@ const ModalImageViewer: React.FC<ModalImageViewerProps> = ({ isOpen, setIsOpen, 
 
   useEffect(() => {
     if (isOpen) {
-      setZoomLevel(1)
+      setZoomLevel(0.5)
       setRotation(0)
     }
   }, [isOpen, imageUrl])
@@ -50,7 +50,7 @@ const ModalImageViewer: React.FC<ModalImageViewerProps> = ({ isOpen, setIsOpen, 
   }
 
   const handleReset = () => {
-    setZoomLevel(1)
+    setZoomLevel(0)
     setRotation(0)
   }
 
