@@ -150,10 +150,6 @@ const ChatScreen = ({
     }
   }
 
-  const handleRefreshMessage = () => {
-    setReloadTrigger(prev => !prev)
-  }
-
   return (
     <div className="flex-1 h-full w-full p-4 bg-[#3A3A3A] text-white flex flex-col relative transition-all">
       <ChatHeader

@@ -109,9 +109,9 @@ const ChatList = ({
       return `${sender} unsent a message`
     }
 
-    if (item.userDeleted) {
-      return "This message has been deleted"
-    }
+    // if (item.userDeleted && item.deletedByUserId !== userId) {
+    //   return "This message has been deleted"
+    // }
     const truncate = (text: string, maxLength = 38) => {
       return text.length > maxLength ? text.slice(0, maxLength) + "..." : text
     }
