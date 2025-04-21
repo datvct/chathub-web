@@ -230,7 +230,7 @@ export interface MemberDTO {
   name?: string
   avatar?: string
   role?: "ADMIN" | "DEPUTY" | "MEMBER"
-  is_admin?: boolean
+  _admin?: boolean
 }
 
 export interface MessageFindedResponse {

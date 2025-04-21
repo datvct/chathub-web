@@ -12,73 +12,65 @@ import { FaRegCircle } from "react-icons/fa"
 import { useFriends } from "~/hooks/use-friends"
 import { useSelector } from "react-redux"
 import { RootState } from "~/lib/reudx/store"
-import { UserDTO } from "~/codegen/data-contracts"
+import { ChatDetailSectionResponse, MemberDTO, UserDTO } from "~/codegen/data-contracts"
 import { toast } from "react-toastify"
 import { useConversation } from "~/hooks/use-converstation"
 
-interface ModalAddMembersProps {
+interface ModalLeaveGroupOwnerProps {
   isOpen: boolean
   setIsOpen: (open: boolean) => void
   conversationId: number
-  onMembersAdded: () => void
+  userId: number
+  token: string
+  handleReload: () => void
 }
 
-const ModalAddMembers: React.FC<ModalAddMembersProps> = ({ isOpen, setIsOpen, conversationId, onMembersAdded }) => {
+const ModalLeaveGroupOwner: React.FC<ModalLeaveGroupOwnerProps> = ({
+  isOpen,
+  setIsOpen,
+  conversationId,
+  userId,
+  token,
+  handleReload,
+}) => {
   const [searchQuery, setSearchQuery] = useState("")
-  const userId = useSelector((state: RootState) => state.auth.userId)
-  const token = useSelector((state: RootState) => state.auth.token)
-  const { friends, loading: friendsLoading, error: friendsError } = useFriends(userId!, token!)
-  const { addMembersToConversation, loading: addMembersLoading } = useConversation(userId, token)
-  const [selectedMembers, setSelectedMembers] = useState<UserDTO[]>([])
 
-  useEffect(() => {
-    setSelectedMembers([])
-  }, [isOpen])
+  const { getChatDetailSection, leaveGroupConversation, loading: loadChatDetail } = useConversation(userId, token)
+  const [selectedMembers, setSelectedMembers] = useState<MemberDTO>(null)
+  const [members, setMembers] = useState<MemberDTO[]>([])
 
-  const handleMemberToggle = (member: UserDTO) => {
-    setSelectedMembers(prevMembers => {
-      const isMemberSelected = prevMembers.some(m => m.id === member.id)
-      if (isMemberSelected) {
-        return prevMembers.filter(m => m.id !== member.id)
-      } else {
-        return [...prevMembers, member]
-      }
-    })
+  const fetchChatDetails = async () => {
+    if (conversationId && userId && token) {
+      const details = await getChatDetailSection(conversationId, userId, token)
+      const members = details?.members.filter(m => !m._admin) || []
+      setMembers(members)
+    }
   }
 
-  const filteredMembers =
-    friends?.filter(member => {
-      if (!member) return false
-      const searchTerm = searchQuery.toLowerCase()
-      return member.name?.toLowerCase().includes(searchTerm) || member.phoneNumber?.includes(searchTerm)
-    }) || []
+  useEffect(() => {
+    fetchChatDetails()
+  }, [conversationId, userId, token])
 
-  const handleAddMembersToGroup = async () => {
+  const handleTransferAdminAndLeaveGroup = async () => {
     if (!conversationId || !userId || !token) return
-    if (selectedMembers.length === 0) {
-      toast.warning("Please select members to add.")
+    if (!selectedMembers) {
+      toast.warning("Please select a member to transfer admin.")
       return
     }
-
     try {
       setLoading(true)
-      const memberIdsToAdd = selectedMembers.map(member => member.id || 0).filter(id => id !== 0)
-      if (memberIdsToAdd.length === 0) {
-        toast.warning("Please select valid members to add.")
-        return
-      }
 
-      const success = await addMembersToConversation(conversationId, memberIdsToAdd, token)
-
-      if (success) {
-        toast.success("Members added to group successfully!")
+      const response = await leaveGroupConversation(conversationId, userId, token, selectedMembers.id)
+      if (response.statusCode === 200) {
+        toast.success("Admin transferred successfully!")
         setIsOpen(false)
-        onMembersAdded()
+        setSelectedMembers(null)
+        handleReload()
       } else {
-        toast.error("Failed to add members to group.")
+        toast.error("Failed to transfer admin.")
       }
     } catch (error) {
-      toast.error("Failed to add members to group.")
+      toast.error("Failed to transfer admin.")
     } finally {
       setLoading(false)
     }
@@ -94,7 +86,7 @@ const ModalAddMembers: React.FC<ModalAddMembersProps> = ({ isOpen, setIsOpen, co
           <div className="flex min-h-full items-center justify-center p-4 text-center">
             <DialogPanel className="bg-white rounded-[5%] w-[80%] h-[95%] max-w-md max-h-screen transform overflow-hidden p-6 text-left align-middle shadow-xl transition-all">
               <DialogTitle as="h3" className="text-xl text-white text-left font-bold leading-6 mb-4 relative">
-                <span className="text-[25px] font-bold text-black">Add member</span>
+                <span className="text-[25px] font-bold text-black">Transfer Admin</span>
               </DialogTitle>
 
               <button onClick={() => setIsOpen(false)} className="absolute top-2 right-2 w-10 h-10">
@@ -114,26 +106,18 @@ const ModalAddMembers: React.FC<ModalAddMembersProps> = ({ isOpen, setIsOpen, co
                 <Search className="h-8 w-8 absolute top-1/2 left-4 -translate-y-1/2 text-gray-400 pr-2" />
               </div>
               <div className="mt-2 max-h-[50vh] overflow-y-auto custom-scrollbar rounded-lg p-2">
-                {friendsLoading ? (
+                {loadChatDetail ? (
                   <div>Loading friends...</div>
-                ) : friendsError ? (
-                  <div>Error loading friends: {friendsError}</div>
-                ) : filteredMembers.length === 0 ? (
-                  <div>No friends found.</div>
                 ) : (
                   <ul>
-                    {filteredMembers.map((member, index) => (
+                    {members.map((member, index) => (
                       <li
                         key={index}
                         className={`flex items-center justify-between rounded-lg px-3 py-3 space-x-3 transition duration-150 mb-1 cursor-pointer
-                          ${
-                            selectedMembers.some(m => m.id === member.id)
-                              ? "bg-[#93C1D2]"
-                              : "odd:bg-[#E4DEED] even:bg-[#AF9CC9]"
-                          }
-                          ${!selectedMembers.some(m => m.id === member.id) ? "hover:rounded-lg bg-[#7a99b8]/90" : ""}
+                          ${selectedMembers === member ? "bg-[#93C1D2]" : "odd:bg-[#E4DEED] even:bg-[#AF9CC9]"}
+                          ${selectedMembers !== member ? "hover:rounded-lg bg-[#7a99b8]/90" : ""}
                       `}
-                        onClick={() => handleMemberToggle(member)}
+                        onClick={() => setSelectedMembers(member)}
                       >
                         <div className="flex items-center gap-x-3">
                           <Image
@@ -145,12 +129,12 @@ const ModalAddMembers: React.FC<ModalAddMembersProps> = ({ isOpen, setIsOpen, co
                           />
                           <div className="text-[#282828]">
                             <p className="font-medium text-sm md:text-base">{member.name}</p>
-                            <p className="text-xs text-gray-700 font-normal leading-4">{member.phoneNumber}</p>
+                            <p className="text-xs text-gray-700 font-normal leading-4">{member.name}</p>
                           </div>
                         </div>
 
                         <div className="flex space-x-3 text-right font-semibold">
-                          {selectedMembers.some(m => m.id === member.id) ? (
+                          {selectedMembers === member ? (
                             <Image src={Images.IconCheckSmall} alt="check icon" width={20} height={20} />
                           ) : (
                             <FaRegCircle size={20} color="gray" />
@@ -168,13 +152,13 @@ const ModalAddMembers: React.FC<ModalAddMembersProps> = ({ isOpen, setIsOpen, co
                 </Button>
 
                 <Button
-                  onClick={handleAddMembersToGroup}
+                  onClick={handleTransferAdminAndLeaveGroup}
                   className={`bg-gradient-to-r from-[#501794] to-[#3E70A1] text-white rounded-[12px] px-4 py-2 hover:bg-gradient-to-l ${
                     loading ? "opacity-50 cursor-not-allowed" : ""
                   }`}
                   disabled={loading}
                 >
-                  {loading ? "Adding..." : "Add"}
+                  {loading ? "Transfer..." : "Transfer"}
                 </Button>
               </div>
             </DialogPanel>
@@ -185,4 +169,4 @@ const ModalAddMembers: React.FC<ModalAddMembersProps> = ({ isOpen, setIsOpen, co
   )
 }
 
-export default ModalAddMembers
+export default ModalLeaveGroupOwner
