@@ -743,6 +743,7 @@ const ChatInfo = ({
             fetchChatDetails()
             onChatInfoUpdated()
           }}
+          handleReload={handleReloadTrigger}
         />
       )}
 
