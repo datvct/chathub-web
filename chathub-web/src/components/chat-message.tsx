@@ -166,29 +166,43 @@ const ChatMessage = ({
                       </span>
                     </p>
                   ) : msg.messageType === MessageType.IMAGE ? (
-                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 max-w-xs">
-                      {msg.content?.split(",").map((imgUrl, index) => (
-                        <button
-                          key={index}
-                          onClick={() => onImageClick(imgUrl)}
-                          className="relative overflow-hidden rounded-lg cursor-pointer group"
-                        >
-                          <Image
-                            src={imgUrl}
-                            alt={`Sent image ${index + 1}`}
-                            className="rounded-lg object-cover transition-transform duration-200 group-hover:scale-105"
-                            width={160}
-                            height={160}
-                          />
-                          <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity duration-200"></div>
-                          {index === 0 && (
-                            <span className="text-[10px] text-white block mt-1 absolute bottom-1 right-1 bg-black bg-opacity-50 px-1 rounded">
-                              {formatTimeSendAt(msg.sentAt)}
-                            </span>
-                          )}
-                        </button>
-                      ))}
-                    </div>
+                    (() => {
+                      const images = msg.content?.split(",") || []
+                      const gridCols =
+                        images.length === 1
+                          ? "grid-cols-1"
+                          : images.length === 2
+                            ? "grid-cols-2"
+                            : images.length === 3
+                              ? "grid-cols-3"
+                              : "grid-cols-2 sm:grid-cols-3"
+
+                      return (
+                        <div className={`grid ${gridCols} gap-2 max-w-xs`}>
+                          {images.map((imgUrl, index) => (
+                            <button
+                              key={index}
+                              onClick={() => onImageClick(imgUrl)}
+                              className="relative overflow-hidden rounded-lg cursor-pointer group"
+                            >
+                              <Image
+                                src={imgUrl}
+                                alt={`Sent image ${index + 1}`}
+                                className="rounded-lg object-cover transition-transform duration-200 group-hover:scale-105"
+                                width={160}
+                                height={160}
+                              />
+                              <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity duration-200"></div>
+                              {index === 0 && (
+                                <span className="text-[10px] text-white block mt-1 absolute bottom-1 right-1 bg-black bg-opacity-50 px-1 rounded">
+                                  {formatTimeSendAt(msg.sentAt)}
+                                </span>
+                              )}
+                            </button>
+                          ))}
+                        </div>
+                      )
+                    })()
                   ) : msg.messageType === MessageType.LINK ? (
                     <>
                       <Link href={msg.content} target="_blank" rel="noopener noreferrer" className="text-[#1566A3]">
@@ -237,7 +251,93 @@ const ChatMessage = ({
                             <img src={msg.avatar} alt="" className="rounded-full w-[20px]" />
                             <p>{msg.senderName}</p>
                           </div>
-                          <p>{msg.forwardedMessage.originalContentSnapshot}</p>
+                          <div className="pt-2">
+                            {msg.forwardedMessage.messageType === MessageType.IMAGE ? (
+                              (() => {
+                                const images = msg.forwardedMessage.originalContentSnapshot?.split(",") || []
+                                const gridCols =
+                                  images.length === 1
+                                    ? "grid-cols-1"
+                                    : images.length === 2
+                                      ? "grid-cols-2"
+                                      : images.length === 3
+                                        ? "grid-cols-3"
+                                        : "grid-cols-2 sm:grid-cols-3"
+
+                                return (
+                                  <div className={`grid ${gridCols} gap-2 max-w-xs`}>
+                                    {images.map((imgUrl, index) => (
+                                      <button
+                                        key={index}
+                                        onClick={() => onImageClick(imgUrl)}
+                                        className="relative overflow-hidden rounded-lg cursor-pointer group"
+                                      >
+                                        <Image
+                                          src={imgUrl}
+                                          alt={`Sent image ${index + 1}`}
+                                          className="rounded-lg object-cover transition-transform duration-200 group-hover:scale-105"
+                                          width={160}
+                                          height={160}
+                                        />
+                                        <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity duration-200"></div>
+                                        {index === 0 && (
+                                          <span className="text-[10px] text-white block mt-1 absolute bottom-1 right-1 bg-black bg-opacity-50 px-1 rounded">
+                                            {formatTimeSendAt(msg.sentAt)}
+                                          </span>
+                                        )}
+                                      </button>
+                                    ))}
+                                  </div>
+                                )
+                              })()
+                            ) : msg.forwardedMessage.messageType === MessageType.LINK ? (
+                              <>
+                                <Link
+                                  href={msg.forwardedMessage.originalContentSnapshot}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-[#1566A3]"
+                                >
+                                  <p className="p-3 rounded-lg break-words whitespace-pre-wrap bg-[#F0F0F0] ">
+                                    <span className="hover:underline">
+                                      {msg.forwardedMessage.originalContentSnapshot}
+                                    </span>
+                                    <span className="text-[10px] text-black block mt-1">
+                                      {formatTimeSendAt(msg.sentAt)}
+                                    </span>
+                                  </p>
+                                </Link>
+                              </>
+                            ) : msg.forwardedMessage.messageType === MessageType.DOCUMENT ? (
+                              <Link
+                                href={msg.forwardedMessage.originalContentSnapshot}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-[#1566A3]"
+                              >
+                                <div className="p-3 rounded-lg break-words whitespace-pre-wrap bg-[#F0F0F0]">
+                                  <span>
+                                    <span className="hover:underline flex flex-row items-center flex-wrap">
+                                      <IoIosDocument size={25} color="#1566A3" />
+                                      <span className="whitespace-pre-wrap w-[80%]">
+                                        {getFileName(msg.forwardedMessage.originalContentSnapshot)}
+                                      </span>
+                                    </span>
+                                  </span>
+                                </div>
+                                <span className="text-[10px] text-white block mt-1">
+                                  {formatTimeSendAt(msg.sentAt)}
+                                </span>
+                              </Link>
+                            ) : msg.forwardedMessage.messageType === MessageType.VIDEO ? (
+                              <video controls className="rounded-lg w-40">
+                                <source src={msg.content} type="video/mp4" />
+                                Your browser does not support the video tag.
+                              </video>
+                            ) : (
+                              <></>
+                            )}
+                          </div>
                         </div>
                       )}
                       <span className={`text-xs block mt-1 ${msg.senderId === userId ? "text-white" : "text-black"}`}>

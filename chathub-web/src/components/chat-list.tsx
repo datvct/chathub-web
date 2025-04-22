@@ -383,7 +383,13 @@ const ChatList = ({
         token={token}
       />
       <ModalFriendRequests isOpen={isFriendRequestModalOpen} setIsOpen={setIsFriendRequestModalOpen} />
-      <ModalListGroup isOpen={modalListGroup} setIsOpen={setModalListGroup} isAdmin={true} />
+      <ModalListGroup
+        isOpen={modalListGroup}
+        setIsOpen={setModalListGroup}
+        isAdmin={true}
+        userId={userId}
+        token={token}
+      />
       <ModalConfirm
         isOpen={isConfirmLogoutOpen}
         setIsOpen={setIsConfirmLogoutOpen}

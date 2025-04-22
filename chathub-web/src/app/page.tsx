@@ -238,7 +238,7 @@ export default function Home() {
   }
   useEffect(() => {
     fetchDataConversation()
-  }, [])
+  }, [reloadTrigger])
 
   return (
     <>

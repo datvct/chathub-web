@@ -18,20 +18,17 @@ interface ModalListGroupProps {
   isOpen: boolean
   setIsOpen: (open: boolean) => void
   isAdmin: boolean
+  userId?: number
+  token?: string
 }
 
-const ModalListGroup: React.FC<ModalListGroupProps> = ({ isOpen, setIsOpen, isAdmin }) => {
-  const router = useRouter()
-
-  const userId = useSelector((state: RootState) => state.auth.userId)
-  const token = useSelector((state: RootState) => state.auth.token)
-
+const ModalListGroup: React.FC<ModalListGroupProps> = ({ isOpen, setIsOpen, isAdmin, userId, token }) => {
   const [dataGroup, setDataGroup] = useState<ConversationResponse[]>([])
   const [groupName, setGroupName] = useState<string>("")
   const [activeTab, setActiveTab] = useState<string>("all")
   const [searchTerm, setSearchTerm] = useState("")
 
-  const { groups: fetchedGroups,findGroups,getRecentConversation} = useConversation(userId, token)
+  const { groups: fetchedGroups, findGroups, getRecentConversation } = useConversation(userId, token)
 
   const groupRefs = useRef<(HTMLLIElement | null)[]>([])
 
@@ -50,7 +47,7 @@ const ModalListGroup: React.FC<ModalListGroupProps> = ({ isOpen, setIsOpen, isAd
       }
       init()
     }
-  }, [userId])
+  }, [isOpen])
 
   const handleEllipsisClick = (index: number) => {
     if (showOptionsForGroup === index) {
@@ -140,8 +137,9 @@ const ModalListGroup: React.FC<ModalListGroupProps> = ({ isOpen, setIsOpen, isAd
                     ref={el => {
                       groupRefs.current[index] = el
                     }}
-                    className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer mb-3 ${selectedGroup === index ? "bg-[#7a99b8]/90" : ""
-                      } bg-[#fff] hover:bg-[#93C1D2]`}
+                    className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer mb-3 ${
+                      selectedGroup === index ? "bg-[#7a99b8]/90" : ""
+                    } bg-[#fff] hover:bg-[#93C1D2]`}
                   >
                     <Image
                       src={group.groupAvatar ?? Images.AvatarDefault}
