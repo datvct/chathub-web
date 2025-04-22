@@ -249,7 +249,7 @@ const ChatMessage = ({
                           <div className="flex gap-1 items-center">
                             <IoReturnUpForward />
                             <img src={msg.avatar} alt="" className="rounded-full w-[20px]" />
-                            <p>{msg.senderName}</p>
+                            <p>{msg.forwardedMessage.originalSenderName}</p>
                           </div>
                           <div className="pt-2">
                             {msg.forwardedMessage.messageType === MessageType.IMAGE ? (
@@ -280,11 +280,6 @@ const ChatMessage = ({
                                           height={160}
                                         />
                                         <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-opacity duration-200"></div>
-                                        {index === 0 && (
-                                          <span className="text-[10px] text-white block mt-1 absolute bottom-1 right-1 bg-black bg-opacity-50 px-1 rounded">
-                                            {formatTimeSendAt(msg.sentAt)}
-                                          </span>
-                                        )}
                                       </button>
                                     ))}
                                   </div>
@@ -301,9 +296,6 @@ const ChatMessage = ({
                                   <p className="p-3 rounded-lg break-words whitespace-pre-wrap bg-[#F0F0F0] ">
                                     <span className="hover:underline">
                                       {msg.forwardedMessage.originalContentSnapshot}
-                                    </span>
-                                    <span className="text-[10px] text-black block mt-1">
-                                      {formatTimeSendAt(msg.sentAt)}
                                     </span>
                                   </p>
                                 </Link>
@@ -335,7 +327,17 @@ const ChatMessage = ({
                                 Your browser does not support the video tag.
                               </video>
                             ) : (
-                              <></>
+                              <div
+                                className={`p-3 rounded-lg w-max max-w-xs break-words text-black whitespace-pre-wrap ${
+                                  msg.senderId === userId ? "bg-[#1566A3] text-white" : "bg-[#F0F0F0]"
+                                } ${isOnlyEmoji(msg.forwardedMessage.originalContentSnapshot) && msg.content?.trim() && msg.unsent === false ? "text-4xl p-2 bg-transparent" : ""}`}
+                              >
+                                {msg.forwardedMessage.originalContentSnapshot?.trim() ||
+                                (msg.forwardedMessage.originalContentSnapshot != '" have forward this message"' &&
+                                  msg.forwarded === true)
+                                  ? msg.forwardedMessage.originalContentSnapshot.replace(/^"(.*)"$/, "$1")
+                                  : ""}
+                              </div>
                             )}
                           </div>
                         </div>
