@@ -42,7 +42,7 @@ interface ChatListProps {
   conversations: ConversationResponse[]
   userId: number
   token?: string
-  handleReloadTrigger: () => void
+  // handleReloadTrigger: () => void
 }
 
 const useGetUserById = (userId: number, token?: string) => {
@@ -67,7 +67,7 @@ const ChatList = ({
   conversations,
   userId,
   token,
-  handleReloadTrigger,
+  // handleReloadTrigger,
 }: ChatListProps) => {
   const [modalCreateChatOpen, setModalCreateNewChatOpen] = useState(false)
   const [modalCreateGroupChatOpen, setModalCreateNewGroupChatOpen] = useState(false)
@@ -343,8 +343,9 @@ const ChatList = ({
         userId={userId}
         token={token}
         onCreated={() => {
-          handleReloadTrigger?.()
+          // handleReloadTrigger?.()
         }}
+        handleSelectChat={handleSelectChat}
       />
       <ModalCreateNewGroupChat
         isOpen={modalCreateGroupChatOpen}
@@ -352,7 +353,7 @@ const ChatList = ({
         userId={userId}
         token={token}
         onCreated={() => {
-          handleReloadTrigger?.()
+          // handleReloadTrigger?.()
         }}
       />
       <ModalProfile

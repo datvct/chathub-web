@@ -10,6 +10,7 @@ class WebSocketService {
   private stompClient: Client | null = null
   private subscriptions: StompSubscription[] = []
   private eventEmitter = new EventEmitter()
+  private subscribedConversationIds: Set<number> = new Set()
 
   private constructor() {}
 
@@ -59,16 +60,17 @@ class WebSocketService {
 
     this.subscriptions.forEach(sub => sub.unsubscribe())
     this.subscriptions = []
-    this.eventEmitter.removeAllListeners()
+    this.subscribedConversationIds.clear()
 
     const topics = [
       TOPICS.STATUS,
       TOPICS.NOTIFICATIONS(userId),
+      TOPICS.USER(userId),
       ...conversationIds.map(id => TOPICS.CONVERSATION(id.toString())),
       ...conversationIds.map(id => TOPICS.MESSAGE(id.toString())),
-      ...conversationIds.map(id => TOPICS.TYPING_STATUS(id.toString())),
-      ...conversationIds.map(id => TOPICS.SEEN_MESSAGE(id.toString())),
-      ...conversationIds.map(id => TOPICS.REACT_MESSAGE(id.toString())),
+      // ...conversationIds.map(id => TOPICS.TYPING_STATUS(id.toString())),
+      // ...conversationIds.map(id => TOPICS.SEEN_MESSAGE(id.toString())),
+      // ...conversationIds.map(id => TOPICS.REACT_MESSAGE(id.toString())),
     ]
 
     topics.forEach(topic => {
@@ -79,10 +81,50 @@ class WebSocketService {
         this.eventEmitter.emit(topic, data)
       })
 
-      if (subscription) this.subscriptions.push(subscription)
+      if (subscription) {
+        this.subscriptions.push(subscription)
+        const conversationId = this.extractConversationId(topic)
+        if (conversationId) {
+          this.subscribedConversationIds.add(Number(conversationId))
+        }
+      }
     })
 
     console.log("✅ Subscribed to:", topics)
+  }
+
+  subscribeToConversation(conversationId: number) {
+    if (!this.stompClient || !this.stompClient.connected) {
+      console.error("WebSocket is not connected. Cannot subscribe to conversation.")
+      return
+    }
+
+    if (this.subscribedConversationIds.has(conversationId)) {
+      console.log(`Already subscribed to conversation ${conversationId}`)
+      return
+    }
+
+    const topics = [TOPICS.CONVERSATION(conversationId.toString()), TOPICS.MESSAGE(conversationId.toString())]
+
+    topics.forEach(topic => {
+      const subscription = this.stompClient?.subscribe(topic, message => {
+        const data = JSON.parse(message.body)
+        console.log(`📩 Received from ${topic}:`, data)
+        this.eventEmitter.emit(topic, data)
+      })
+
+      if (subscription) {
+        this.subscriptions.push(subscription)
+      }
+    })
+
+    this.subscribedConversationIds.add(conversationId)
+    console.log(`✅ Subscribed to conversation ${conversationId}:`, topics)
+  }
+
+  private extractConversationId(topic: string): string | null {
+    const match = topic.match(/\/topic\/(conversation|message|typing-status|seen-message|react-message)\/(\d+)/)
+    return match ? match[2] : null
   }
 
   disconnect() {
