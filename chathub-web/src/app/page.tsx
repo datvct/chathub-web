@@ -96,6 +96,57 @@ export default function Home() {
               websocket.subscribeToTopics(userId.toString(), conversationIds)
             }
 
+            websocket.subscribe(TOPICS.USER(userId.toString()), async notification => {
+              const newConv = typeof notification === "object" ? notification : { id: notification }
+              websocket.subscribeToConversation(newConv.id)
+
+              try {
+                const updatedData = await getRecentConversation(userId, token)
+                if (isMounted) {
+                  setConversations([...updatedData])
+                  const updatedConversationIds = updatedData.map(item => item.id)
+
+                  websocket.subscribeToTopics(userId.toString(), updatedConversationIds)
+
+                  updatedConversationIds.forEach(id => {
+                    websocket.subscribe(TOPICS.CONVERSATION(id.toString()), message => {
+                      const newConversation = message
+                      setConversations(prev => {
+                        const exists = prev.find(c => c.id === newConversation.id)
+                        return exists ? prev : [newConversation, ...prev]
+                      })
+                    })
+
+                    websocket.subscribe(TOPICS.MESSAGE(id.toString()), message => {
+                      const newMessage = message
+
+                      setConversations(prev =>
+                        prev.map(c => {
+                          if (c.id !== id) return c
+
+                          const isNew = !c.lastMessageAt || new Date(newMessage.sentAt) > new Date(c.lastMessageAt)
+                          const shouldUpdateTime = isNew && !newMessage.unsent && !newMessage.userDeleted
+
+                          return {
+                            ...c,
+                            lastMessage: newMessage.content,
+                            lastMessageType: newMessage.messageType,
+                            userDeleted: newMessage.userDeleted,
+                            unsent: newMessage.unsent,
+                            lastMessageAt: shouldUpdateTime ? newMessage.sentAt : c.lastMessageAt,
+                            senderId: newMessage.senderId ? newMessage.senderId : c.senderId,
+                            senderName: newMessage.senderName ? newMessage.senderName : c.senderName,
+                          }
+                        }),
+                      )
+                    })
+                  })
+                }
+              } catch (err) {
+                console.error("Error fetching updated conversations:", err)
+              }
+            })
+
             conversationIds.forEach(id => {
               WebSocketService.getInstance().subscribe(TOPICS.CONVERSATION(id.toString()), message => {
                 const newConversation = message
@@ -107,6 +158,7 @@ export default function Home() {
 
               WebSocketService.getInstance().subscribe(TOPICS.MESSAGE(id.toString()), message => {
                 const newMessage = message
+
                 setConversations(prev => {
                   return prev.map(c => {
                     if (c.id !== id) return c
@@ -129,37 +181,37 @@ export default function Home() {
                 })
               })
 
-              WebSocketService.getInstance().subscribe(TOPICS.TYPING_STATUS(id.toString()), message => {
-                const { userId, isTyping } = message
-                setTypingStatus(prev => {
-                  const updated = { ...prev, [id]: isTyping ? userId : null }
-                  return updated
-                })
-              })
+              // WebSocketService.getInstance().subscribe(TOPICS.TYPING_STATUS(id.toString()), message => {
+              //   const { userId, isTyping } = message
+              //   setTypingStatus(prev => {
+              //     const updated = { ...prev, [id]: isTyping ? userId : null }
+              //     return updated
+              //   })
+              // })
 
-              WebSocketService.getInstance().subscribe(TOPICS.SEEN_MESSAGE(id.toString()), message => {
-                const { userId, messageId } = message
-                setSeenMessages(prev => ({
-                  ...prev,
-                  [id]: { userId, messageId },
-                }))
-              })
+              // WebSocketService.getInstance().subscribe(TOPICS.SEEN_MESSAGE(id.toString()), message => {
+              //   const { userId, messageId } = message
+              //   setSeenMessages(prev => ({
+              //     ...prev,
+              //     [id]: { userId, messageId },
+              //   }))
+              // })
 
-              WebSocketService.getInstance().subscribe(TOPICS.REACT_MESSAGE(id.toString()), message => {
-                const { messageId, reactionEmoji, userId } = message
-                setConversations(prev =>
-                  prev.map(c =>
-                    c.id === id
-                      ? {
-                          ...c,
-                          messages: c.messages.map((m: any) =>
-                            m.id === messageId ? { ...m, reactions: [...m.reactions, { userId, reactionEmoji }] } : m,
-                          ),
-                        }
-                      : c,
-                  ),
-                )
-              })
+              // WebSocketService.getInstance().subscribe(TOPICS.REACT_MESSAGE(id.toString()), message => {
+              //   const { messageId, reactionEmoji, userId } = message
+              //   setConversations(prev =>
+              //     prev.map(c =>
+              //       c.id === id
+              //         ? {
+              //             ...c,
+              //             messages: c.messages.map((m: any) =>
+              //               m.id === messageId ? { ...m, reactions: [...m.reactions, { userId, reactionEmoji }] } : m,
+              //             ),
+              //           }
+              //         : c,
+              //     ),
+              //   )
+              // })
             })
           }
         } catch (error) {
@@ -174,18 +226,20 @@ export default function Home() {
         isMounted = false
         const websocket = WebSocketService.getInstance()
         conversations.forEach(c => {
+          websocket.unsubscribe(TOPICS.USER(userId.toString()), () => {})
           websocket.unsubscribe(TOPICS.CONVERSATION(c.id.toString()), () => {})
           websocket.unsubscribe(TOPICS.MESSAGE(c.id.toString()), () => {})
-          websocket.unsubscribe(TOPICS.TYPING_STATUS(c.id.toString()), () => {})
-          websocket.unsubscribe(TOPICS.SEEN_MESSAGE(c.id.toString()), () => {})
-          websocket.unsubscribe(TOPICS.REACT_MESSAGE(c.id.toString()), () => {})
+          // websocket.unsubscribe(TOPICS.TYPING_STATUS(c.id.toString()), () => {})
+          // websocket.unsubscribe(TOPICS.SEEN_MESSAGE(c.id.toString()), () => {})
+          // websocket.unsubscribe(TOPICS.REACT_MESSAGE(c.id.toString()), () => {})
         })
       }
     }
   }
   useEffect(() => {
     fetchDataConversation()
-  }, [reloadTrigger])
+  }, [])
+
   return (
     <>
       <div className="flex flex-row justify-between h-screen">
@@ -197,7 +251,7 @@ export default function Home() {
           conversations={conversations}
           userId={userId}
           token={token}
-          handleReloadTrigger={handleReloadTrigger}
+          // handleReloadTrigger={handleReloadTrigger}
         />
         {selectedChat ? (
           <ChatScreen
