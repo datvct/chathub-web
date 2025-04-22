@@ -19,6 +19,7 @@ interface ModalUpdateGroupInfoProps {
   currentGroupName?: string
   currentGroupAvatar?: string
   onGroupInfoUpdated: () => void
+  handleReload?: () => void
 }
 
 const ModalUpdateGroupInfo: React.FC<ModalUpdateGroupInfoProps> = ({
@@ -28,6 +29,7 @@ const ModalUpdateGroupInfo: React.FC<ModalUpdateGroupInfoProps> = ({
   currentGroupName,
   currentGroupAvatar,
   onGroupInfoUpdated,
+  handleReload,
 }) => {
   const token = useSelector((state: RootState) => state.auth.token)
   const userId = useSelector((state: RootState) => state.auth.userId)
@@ -78,6 +80,7 @@ const ModalUpdateGroupInfo: React.FC<ModalUpdateGroupInfoProps> = ({
       const response = await updateGroupInfo(conversationId, groupName, selectedAvatarFile)
 
       if (response) {
+        handleReload()
         toast.success("Group info updated successfully!")
         setIsOpen(false)
         onGroupInfoUpdated()

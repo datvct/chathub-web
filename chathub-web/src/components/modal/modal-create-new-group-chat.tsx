@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { use, useEffect, useState } from "react"
 import Image from "next/image"
 import { Button } from "../ui/button"
 import { Input } from "../ui/input"
@@ -81,6 +81,7 @@ const ModalCreateGroupChat: React.FC<ModalCreateGroupChatProps> = ({ isOpen, set
         setIsOpen(false)
         setGroupName("")
         setSelectedUsers([])
+        setSelectedImage(null)
         setSearchQuery("")
       } else {
         toast.error(error || "Failed to create group chat.")
@@ -89,6 +90,14 @@ const ModalCreateGroupChat: React.FC<ModalCreateGroupChatProps> = ({ isOpen, set
       toast.error(catchError.message || "Failed to create group chat.")
     }
   }
+
+  useEffect(() => {
+    setGroupName("")
+    setSelectedImage(null)
+    setSelectedFile(null)
+    setSelectedUsers([])
+    setSearchQuery("")
+  }, [isOpen])
 
   const filteredFriends =
     friends?.filter(user => {
