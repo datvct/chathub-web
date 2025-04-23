@@ -417,7 +417,7 @@ export class Conversation<SecurityDataType = unknown> extends HttpClient<Securit
       /** @format int64 */
       userId: number
       /** @format int64 */
-      newOwnerId: number
+      newOwnerId?: number
     },
     params: RequestParams = {},
   ) =>

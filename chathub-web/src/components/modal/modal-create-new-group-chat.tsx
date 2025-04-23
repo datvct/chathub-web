@@ -28,7 +28,7 @@ const ModalCreateGroupChat: React.FC<ModalCreateGroupChatProps> = ({ isOpen, set
 
   const [selectedUsers, setSelectedUsers] = useState<number[]>([])
   const [searchQuery, setSearchQuery] = useState<string>("")
-  const { friends, loading: friendsLoading, error } = useFriends(userId, token)
+  const { friends, loading: friendsLoading, error } = useFriends(userId, token, isOpen)
   const { createGroupConversation, loading: groupLoading } = useConversation(userId, token)
 
   const handleSelectUser = (userId: number) => {

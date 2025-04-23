@@ -295,7 +295,7 @@ export const leaveGroupConversationAPI = async (
     const response = (await conversationInstance
       .leaveGroupConversation(
         conversationId,
-        { userId, newOwnerId: newOwnerId ?? null },
+        { userId, newOwnerId },
         {
           headers: {
             Authorization: `Bearer ${token}`,

@@ -18,6 +18,7 @@ interface ProfileData {
   displayName: string
   dateOfBirth?: string | Date
   gender: string
+  phoneNumber?: string
 }
 
 interface ProfileViewModalProps {
@@ -27,13 +28,8 @@ interface ProfileViewModalProps {
 }
 
 const ProfileViewModal: React.FC<ProfileViewModalProps> = ({ isOpen, setIsOpen, friend }) => {
-  const userId = useSelector((state: RootState) => state.auth.userId)
-  const token = useSelector((state: RootState) => state.auth.token)
-
   const [isImageViewerOpen, setIsImageViewerOpen] = useState(false)
   const [imageUrlToView, setImageUrlToView] = useState<string | null>(null)
-
-  
 
   const handleAvatarClick = () => {
     if (friend.avatar) {
@@ -48,6 +44,7 @@ const ProfileViewModal: React.FC<ProfileViewModalProps> = ({ isOpen, setIsOpen, 
     displayName: friend?.name || "",
     dateOfBirth: friend?.dateOfBirth || new Date(),
     gender: friend?.gender || "MALE",
+    phoneNumber: friend?.phoneNumber || "",
   })
 
   const handleChange = (field: keyof ProfileData, value: string | Date | "MALE" | "FEMALE") => {
@@ -66,6 +63,7 @@ const ProfileViewModal: React.FC<ProfileViewModalProps> = ({ isOpen, setIsOpen, 
       displayName: friend?.name || "",
       dateOfBirth: friend?.dateOfBirth || new Date(),
       gender: friend?.gender || "MALE",
+      phoneNumber: friend?.phoneNumber || "",
     })
   }, [friend])
 
@@ -136,6 +134,22 @@ const ProfileViewModal: React.FC<ProfileViewModalProps> = ({ isOpen, setIsOpen, 
                           className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500"
                           onChange={e => handleChange("displayName", e.target.value)}
                         />
+                      </div>
+                    </div>
+
+                    <div className="mt-4 relative">
+                      <label htmlFor="date-of-birth" className="block text-sm font-medium text-black">
+                        Phone number
+                      </label>
+                      <div className="mt-1">
+                        <div className="mt-1">
+                          <Input
+                            type="text"
+                            value={profileData.phoneNumber}
+                            readOnly
+                            className="mt-1 block w-full px-3 py-2 bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400 focus:outline-none"
+                          />
+                        </div>
                       </div>
                     </div>
 

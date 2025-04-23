@@ -60,8 +60,8 @@ export interface MessageResponse {
   deletedByUserId?: number
   forwardedMessage?: ForwardedMessageInfo
   reactions?: ReactionDTO[]
-  unsent?: boolean
   forwarded?: boolean
+  unsent?: boolean
 }
 
 export interface ReactionDTO {
@@ -143,10 +143,10 @@ export interface ConversationResponse {
   /** @format date-time */
   createAt?: string
   participants?: ParticipantDTO[]
+  forwarded?: boolean
+  dissolved?: boolean
   pinned?: boolean
   unsent?: boolean
-  dissolved?: boolean
-  forwarded?: boolean
 }
 
 export interface ParticipantDTO {
@@ -231,6 +231,7 @@ export interface MemberDTO {
   id?: number
   name?: string
   avatar?: string
+  phoneNumber?: string
   role?: "ADMIN" | "DEPUTY" | "MEMBER"
   _admin?: boolean
 }
