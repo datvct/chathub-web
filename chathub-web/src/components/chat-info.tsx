@@ -227,6 +227,7 @@ const ChatInfo = ({
       id: member.id,
       name: member.name,
       avatar: member.avatar,
+      phoneNumber: member.phoneNumber,
     }
     setSelectedFriendForView(friendData)
     setIsProfileViewModalOpen(true)

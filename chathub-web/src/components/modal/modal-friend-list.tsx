@@ -37,7 +37,6 @@ const ModalFriendList: React.FC<ModalFriendListProps> = ({ isOpen, setIsOpen, us
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false)
   const [friendIdToUnfriend, setFriendIdToUnfriend] = useState<number | null>(null)
   const [successMessage, setSuccessMessage] = useState<string>("")
-
   const handleOpenProfile = (friend: UserDTO) => {
     setSelectedFriend({ ...friend, gender: friend.gender as "Male" | "Female" })
     setIsProfileViewModalOpen(true)
