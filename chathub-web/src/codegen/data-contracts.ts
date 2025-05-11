@@ -42,6 +42,16 @@ export interface ForwardedMessageInfo {
   originalContentSnapshot?: string
 }
 
+export interface MediaDTO {
+  /** @format int64 */
+  id?: number
+  fileName?: string
+  url?: string
+  type?: "IMAGE" | "VIDEO" | "DOCUMENT" | "LINK"
+  /** @format date-time */
+  sent_at?: string
+}
+
 export interface MessageResponse {
   /** @format int64 */
   id?: number
@@ -60,8 +70,9 @@ export interface MessageResponse {
   deletedByUserId?: number
   forwardedMessage?: ForwardedMessageInfo
   reactions?: ReactionDTO[]
-  forwarded?: boolean
+  media?: MediaDTO
   unsent?: boolean
+  forwarded?: boolean
 }
 
 export interface ReactionDTO {
@@ -143,10 +154,10 @@ export interface ConversationResponse {
   /** @format date-time */
   createAt?: string
   participants?: ParticipantDTO[]
-  forwarded?: boolean
-  dissolved?: boolean
   pinned?: boolean
   unsent?: boolean
+  forwarded?: boolean
+  dissolved?: boolean
 }
 
 export interface ParticipantDTO {
@@ -219,13 +230,6 @@ export interface ChatDetailSectionResponse {
   members?: MemberDTO[]
 }
 
-export interface MediaDTO {
-  url?: string
-  type?: "IMAGE" | "VIDEO" | "DOCUMENT" | "LINK"
-  /** @format date-time */
-  sent_at?: string
-}
-
 export interface MemberDTO {
   /** @format int64 */
   id?: number
@@ -233,7 +237,7 @@ export interface MemberDTO {
   avatar?: string
   phoneNumber?: string
   role?: "ADMIN" | "DEPUTY" | "MEMBER"
-  _admin?: boolean
+  is_admin?: boolean
 }
 
 export interface MessageFindedResponse {

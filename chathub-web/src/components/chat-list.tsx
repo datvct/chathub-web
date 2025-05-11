@@ -82,6 +82,7 @@ const ChatList = ({
   const [isLoggingOut, setIsLoggingOut] = useState(false)
   const router = useRouter()
   const dispatch = useDispatch()
+  const [selectedChatId, setSelectedChatId] = useState(null)
 
   const dataProfile = useGetUserById(userId, token)
 
@@ -99,6 +100,7 @@ const ChatList = ({
     setSelectedChat(id)
     setConversationData(converstation)
     setIsGroupChat(isGroup || false)
+    setSelectedChatId(id)
   }
 
   const getDislayMessage = (item: ConversationResponse) => {
@@ -246,7 +248,8 @@ const ChatList = ({
             .map((chat, index) => (
               <li
                 key={`${chat.id}-${index}`}
-                className={`flex items-center gap-3 p-2 rounded-lg hover:cursor-pointer`}
+                tabIndex={0}
+                className={`flex items-center gap-3 p-2 rounded-lg hover:cursor-pointer ${selectedChatId === chat.id ? "bg-[#24313e]" : "hover:bg-[#c2c5cb08]"}`}
                 onClick={() => handleSelectChat(chat.id, chat, chat.chatType === "GROUP")}
               >
                 <div className="w-12 h-12 rounded-full bg-gray-500 flex items-center justify-center">

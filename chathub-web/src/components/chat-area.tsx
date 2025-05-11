@@ -170,6 +170,7 @@ const ChatScreen = ({
           token={token}
           refetchMessages={refetchMessages}
           onImageClick={handleImageClickInMessage}
+          conversationId={conversationId}
         />
       </div>
 

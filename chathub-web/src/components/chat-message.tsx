@@ -10,13 +10,16 @@ import moment from "moment"
 import { CiMenuKebab, CiFaceSmile } from "react-icons/ci"
 import { TiArrowBackOutline, TiArrowForwardOutline } from "react-icons/ti"
 import { useEffect, useState } from "react"
-import { unsendMessage, deleteMessage, forwardMessage } from "~/lib/get-message"
+import { unsendMessage, deleteMessage, forwardMessage, reactToMessage } from "~/lib/get-message"
 import ForwardMessageModal from "./modal/modal-forward-message"
 import { IoReturnUpForward } from "react-icons/io5"
+import { Popover, PopoverContent, PopoverTrigger } from "../components/ui/popover"
+import { Modal } from "@mui/material"
 
 interface ChatMessageProps {
   messages: MessageResponse[]
   userId: number
+  conversationId: number
   isGroupChat: boolean
   messagesEndRef: React.RefObject<HTMLDivElement>
   token: string
@@ -32,11 +35,20 @@ const ChatMessage = ({
   token,
   refetchMessages,
   onImageClick,
+  conversationId,
 }: ChatMessageProps) => {
   let lastMessageDate: string | null = null
   const [openMenuId, setOpenMenuId] = useState<number | null>(null)
   const [forwardingMessage, setForwardingMessage] = useState<MessageResponse | null>(null)
   const [isFriendListModalOpen, setIsFriendListModalOpen] = useState(false)
+  const emojis = ["👍", "❤️", "😂", "😮", "😢", "😡"]
+  const [open, setOpen] = useState(false)
+  const [openModal, setOpenModal] = useState(false)
+  const handleOpen = () => {
+    setOpenModal(true)
+    console.log()
+  }
+  const handleClose = () => setOpenModal(false)
 
   useEffect(() => {
     if (messagesEndRef.current) {
@@ -54,6 +66,24 @@ const ChatMessage = ({
     if (res) {
       refetchMessages()
       setForwardingMessage(null)
+    }
+  }
+
+  const handleReact = async (emoji: string, messageId: number) => {
+    const success = await reactToMessage(
+      {
+        conversationId,
+        messageId,
+        userId,
+        reactionEmoji: emoji,
+      },
+      token,
+    )
+
+    if (success) {
+      setOpen(false)
+    } else {
+      console.error("Failed to react with:", emoji)
     }
   }
 
@@ -134,9 +164,30 @@ const ChatMessage = ({
                       </button>
                     )}
                     {msg.unsent === false && (
-                      <button className="hover:bg-[#333334] p-2 rounded-full">
-                        <CiFaceSmile />
-                      </button>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <button className="hover:bg-[#333334] p-2 rounded-full" onClick={() => setOpen(!open)}>
+                            <CiFaceSmile size={20} />
+                          </button>
+                        </PopoverTrigger>
+                        <PopoverContent
+                          side="top"
+                          sideOffset={8}
+                          className={`bg-[#252728] border-0 rounded-3xl py-2 justify-center ${open === true ? "flex" : "hidden"}`}
+                        >
+                          <div className="flex items-center space-x-2 w-full justify-between px-5">
+                            {emojis.map((emoji, index) => (
+                              <button
+                                key={index}
+                                className="text-xl hover:scale-125 transition-transform duration-150"
+                                onClick={() => handleReact(emoji, msg.id)}
+                              >
+                                {emoji}
+                              </button>
+                            ))}
+                          </div>
+                        </PopoverContent>
+                      </Popover>
                     )}
                   </div>
                 )}
@@ -149,7 +200,7 @@ const ChatMessage = ({
                     className="w-8 h-8 mr-2 rounded-[20px] mt-4"
                   />
                 )}
-                <div>
+                <div className="relative">
                   {isGroupChat && msg.senderId !== userId && (
                     <span className="text-xs text-white">{msg.senderName}</span>
                   )}
@@ -347,12 +398,57 @@ const ChatMessage = ({
                       </span>
                     </div>
                   )}
+                  {/* UI thể hiện emote */}
+                  {msg.reactions.length != 0 && (
+                    <div className="absolute bg-[#252728] -bottom-3 -left-1 rounded-full">
+                      <button className="flex" onClick={handleOpen}>
+                        {msg.reactions.map((react, index) => (
+                          <span key={index}>{react.reactionEmoji}</span>
+                        ))}
+                        {msg.reactions.length > 1 && <span>{msg.reactions.length}</span>}
+                      </button>
+                      <Modal open={openModal} onClose={handleClose}>
+                        <div className="bg-[#252728] text-white absolute top-1/2 left-1/2">
+                          <div>Reaction Of Message</div>
+                          <div>
+                            {msg.reactions.map((react, index) => (
+                              <div key={index}>
+                                <span>{react.senderName}</span>
+                                <span>{react.reactionEmoji}</span>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </Modal>
+                    </div>
+                  )}
                 </div>
                 {msg.senderId != userId && (
                   <div className="flex items-center gap-2">
-                    <button className="hover:bg-[#333334] p-2 rounded-full">
-                      <CiFaceSmile />
-                    </button>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <button className="hover:bg-[#333334] p-2 rounded-full" onClick={() => setOpen(!open)}>
+                          <CiFaceSmile size={20} />
+                        </button>
+                      </PopoverTrigger>
+                      <PopoverContent
+                        side="top"
+                        sideOffset={8}
+                        className={`bg-[#252728] border-0 rounded-3xl py-2 justify-center ${open === true ? "flex" : "hidden"}`}
+                      >
+                        <div className="flex items-center space-x-2 w-full justify-between px-5">
+                          {emojis.map((emoji, index) => (
+                            <button
+                              key={index}
+                              className="text-xl hover:scale-125 transition-transform duration-150"
+                              onClick={() => handleReact(emoji, msg.id)}
+                            >
+                              {emoji}
+                            </button>
+                          ))}
+                        </div>
+                      </PopoverContent>
+                    </Popover>
                     {msg.unsent === false && msg.content != '" have forward this message"' && (
                       <button
                         className="hover:bg-[#333334] p-2 rounded-full"
