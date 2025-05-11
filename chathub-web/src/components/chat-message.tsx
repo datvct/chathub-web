@@ -44,7 +44,9 @@ const ChatMessage = ({
   const emojis = ["👍", "❤️", "😂", "😮", "😢", "😡"]
   const [open, setOpen] = useState(false)
   const [openModal, setOpenModal] = useState(false)
-  const handleOpen = () => {
+  const [selectedMessage, setSelectedMessage] = useState<MessageResponse>(null)
+  const handleOpen = message => {
+    setSelectedMessage(message)
     setOpenModal(true)
     console.log()
   }
@@ -400,26 +402,84 @@ const ChatMessage = ({
                   )}
                   {/* UI thể hiện emote */}
                   {msg.reactions.length != 0 && (
-                    <div className="absolute bg-[#252728] -bottom-3 -left-1 rounded-full">
-                      <button className="flex" onClick={handleOpen}>
-                        {msg.reactions.map((react, index) => (
-                          <span key={index}>{react.reactionEmoji}</span>
-                        ))}
-                        {msg.reactions.length > 1 && <span>{msg.reactions.length}</span>}
+                    <div className="absolute bg-[#252728] -bottom-3 -left-1 rounded-full flex">
+                      <button className="flex items-center px-2" onClick={() => handleOpen(msg)}>
+                        {Array.from(new Set(msg.reactions.map(r => r.reactionEmoji)))
+                          .slice(0, 3)
+                          .map((emoji, index) => (
+                            <span key={index}>{emoji}</span>
+                          ))}
+                        {msg.reactions.length > 1 && (
+                          <span className="ml-1 text-xs text-gray-400">{msg.reactions.length}</span>
+                        )}
                       </button>
-                      <Modal open={openModal} onClose={handleClose}>
-                        <div className="bg-[#252728] text-white absolute top-1/2 left-1/2">
-                          <div>Reaction Of Message</div>
-                          <div>
-                            {msg.reactions.map((react, index) => (
-                              <div key={index}>
-                                <span>{react.senderName}</span>
-                                <span>{react.reactionEmoji}</span>
+                      {selectedMessage != null && (
+                        <Modal open={openModal} onClose={handleClose}>
+                          <div
+                            className="bg-gray-700 text-gray-100 rounded-lg shadow-xl w-full max-w-sm absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col"
+                            style={{ maxHeight: "80vh" }}
+                          >
+                            {/* Header của Modal */}
+                            <div className="flex-shrink-0 px-5 py-4 border-b border-gray-600">
+                              <div className="flex justify-between items-center">
+                                <h2 className="text-base font-semibold text-gray-50">Message Reactions</h2>
+                                <button
+                                  onClick={handleClose}
+                                  className="p-1.5 bg-gray-500 hover:bg-gray-400 rounded-full text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-700 focus:ring-blue-500"
+                                  aria-label="Đóng"
+                                >
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="h-4 w-4"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                    strokeWidth={2.5}
+                                  >
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                  </svg>
+                                </button>
                               </div>
-                            ))}
+                            </div>
+
+                            {/* Phần Tabs hoặc Filter */}
+                            <div className="flex-shrink-0 px-5 pt-3 pb-2 border-b border-gray-600">
+                              <div className="flex items-baseline space-x-5">
+                                {/* Tab đang active: "Tất cả 1" */}
+                                <button className="pb-2 border-b-2 border-blue-400 text-blue-400 focus:outline-none">
+                                  <span className="text-sm font-medium">Tất cả</span>
+                                  <span className="ml-1 text-sm font-medium">{msg.reactions.length}</span>
+                                </button>
+                              </div>
+                            </div>
+
+                            {/* Danh sách các lượt bày tỏ cảm xúc (có thể cuộn) */}
+                            <div className="flex-grow overflow-y-auto p-5">
+                              <div className="space-y-3">
+                                {" "}
+                                {/* Khoảng cách giữa các item */}
+                                {/* Một item bày tỏ cảm xúc của người dùng */}
+                                {selectedMessage.reactions.map((react, index) => {
+                                  console.log(react) // 👈 In ra mỗi reaction
+
+                                  return (
+                                    <div key={index} className="flex items-center justify-between">
+                                      <div className="flex items-center min-w-0 mr-2">
+                                        <div className="min-w-0">
+                                          <p className="font-medium text-sm text-gray-50 truncate">
+                                            {react.senderName}
+                                          </p>
+                                        </div>
+                                      </div>
+                                      <span className="text-2xl ml-2 flex-shrink-0">{react.reactionEmoji}</span>
+                                    </div>
+                                  )
+                                })}
+                              </div>
+                            </div>
                           </div>
-                        </div>
-                      </Modal>
+                        </Modal>
+                      )}
                     </div>
                   )}
                 </div>
