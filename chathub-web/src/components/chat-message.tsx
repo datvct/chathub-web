@@ -10,13 +10,16 @@ import moment from "moment"
 import { CiMenuKebab, CiFaceSmile } from "react-icons/ci"
 import { TiArrowBackOutline, TiArrowForwardOutline } from "react-icons/ti"
 import { useEffect, useState } from "react"
-import { unsendMessage, deleteMessage, forwardMessage } from "~/lib/get-message"
+import { unsendMessage, deleteMessage, forwardMessage, reactToMessage } from "~/lib/get-message"
 import ForwardMessageModal from "./modal/modal-forward-message"
 import { IoReturnUpForward } from "react-icons/io5"
+import { Popover, PopoverContent, PopoverTrigger } from "../components/ui/popover"
+import { Modal } from "@mui/material"
 
 interface ChatMessageProps {
   messages: MessageResponse[]
   userId: number
+  conversationId: number
   isGroupChat: boolean
   messagesEndRef: React.RefObject<HTMLDivElement>
   token: string
@@ -32,11 +35,22 @@ const ChatMessage = ({
   token,
   refetchMessages,
   onImageClick,
+  conversationId,
 }: ChatMessageProps) => {
   let lastMessageDate: string | null = null
   const [openMenuId, setOpenMenuId] = useState<number | null>(null)
   const [forwardingMessage, setForwardingMessage] = useState<MessageResponse | null>(null)
   const [isFriendListModalOpen, setIsFriendListModalOpen] = useState(false)
+  const emojis = ["👍", "❤️", "😂", "😮", "😢", "😡"]
+  const [open, setOpen] = useState(false)
+  const [openModal, setOpenModal] = useState(false)
+  const [selectedMessage, setSelectedMessage] = useState<MessageResponse>(null)
+  const handleOpen = message => {
+    setSelectedMessage(message)
+    setOpenModal(true)
+    console.log()
+  }
+  const handleClose = () => setOpenModal(false)
 
   useEffect(() => {
     if (messagesEndRef.current) {
@@ -54,6 +68,24 @@ const ChatMessage = ({
     if (res) {
       refetchMessages()
       setForwardingMessage(null)
+    }
+  }
+
+  const handleReact = async (emoji: string, messageId: number) => {
+    const success = await reactToMessage(
+      {
+        conversationId,
+        messageId,
+        userId,
+        reactionEmoji: emoji,
+      },
+      token,
+    )
+
+    if (success) {
+      setOpen(false)
+    } else {
+      console.error("Failed to react with:", emoji)
     }
   }
 
@@ -134,9 +166,30 @@ const ChatMessage = ({
                       </button>
                     )}
                     {msg.unsent === false && (
-                      <button className="hover:bg-[#333334] p-2 rounded-full">
-                        <CiFaceSmile />
-                      </button>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <button className="hover:bg-[#333334] p-2 rounded-full" onClick={() => setOpen(!open)}>
+                            <CiFaceSmile size={20} />
+                          </button>
+                        </PopoverTrigger>
+                        <PopoverContent
+                          side="top"
+                          sideOffset={8}
+                          className={`bg-[#252728] border-0 rounded-3xl py-2 justify-center ${open === true ? "flex" : "hidden"}`}
+                        >
+                          <div className="flex items-center space-x-2 w-full justify-between px-5">
+                            {emojis.map((emoji, index) => (
+                              <button
+                                key={index}
+                                className="text-xl hover:scale-125 transition-transform duration-150"
+                                onClick={() => handleReact(emoji, msg.id)}
+                              >
+                                {emoji}
+                              </button>
+                            ))}
+                          </div>
+                        </PopoverContent>
+                      </Popover>
                     )}
                   </div>
                 )}
@@ -149,7 +202,7 @@ const ChatMessage = ({
                     className="w-8 h-8 mr-2 rounded-[20px] mt-4"
                   />
                 )}
-                <div>
+                <div className="relative">
                   {isGroupChat && msg.senderId !== userId && (
                     <span className="text-xs text-white">{msg.senderName}</span>
                   )}
@@ -347,12 +400,115 @@ const ChatMessage = ({
                       </span>
                     </div>
                   )}
+                  {/* UI thể hiện emote */}
+                  {msg.reactions.length != 0 && (
+                    <div className="absolute bg-[#252728] -bottom-3 -left-1 rounded-full flex">
+                      <button className="flex items-center px-2" onClick={() => handleOpen(msg)}>
+                        {Array.from(new Set(msg.reactions.map(r => r.reactionEmoji)))
+                          .slice(0, 3)
+                          .map((emoji, index) => (
+                            <span key={index}>{emoji}</span>
+                          ))}
+                        {msg.reactions.length > 1 && (
+                          <span className="ml-1 text-xs text-gray-400">{msg.reactions.length}</span>
+                        )}
+                      </button>
+                      {selectedMessage != null && (
+                        <Modal open={openModal} onClose={handleClose}>
+                          <div
+                            className="bg-gray-700 text-gray-100 rounded-lg shadow-xl w-full max-w-sm absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex flex-col"
+                            style={{ maxHeight: "80vh" }}
+                          >
+                            {/* Header của Modal */}
+                            <div className="flex-shrink-0 px-5 py-4 border-b border-gray-600">
+                              <div className="flex justify-between items-center">
+                                <h2 className="text-base font-semibold text-gray-50">Message Reactions</h2>
+                                <button
+                                  onClick={handleClose}
+                                  className="p-1.5 bg-gray-500 hover:bg-gray-400 rounded-full text-gray-300 hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-gray-700 focus:ring-blue-500"
+                                  aria-label="Đóng"
+                                >
+                                  <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    className="h-4 w-4"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke="currentColor"
+                                    strokeWidth={2.5}
+                                  >
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                  </svg>
+                                </button>
+                              </div>
+                            </div>
+
+                            {/* Phần Tabs hoặc Filter */}
+                            <div className="flex-shrink-0 px-5 pt-3 pb-2 border-b border-gray-600">
+                              <div className="flex items-baseline space-x-5">
+                                {/* Tab đang active: "Tất cả 1" */}
+                                <button className="pb-2 border-b-2 border-blue-400 text-blue-400 focus:outline-none">
+                                  <span className="text-sm font-medium">Tất cả</span>
+                                  <span className="ml-1 text-sm font-medium">{msg.reactions.length}</span>
+                                </button>
+                              </div>
+                            </div>
+
+                            {/* Danh sách các lượt bày tỏ cảm xúc (có thể cuộn) */}
+                            <div className="flex-grow overflow-y-auto p-5">
+                              <div className="space-y-3">
+                                {" "}
+                                {/* Khoảng cách giữa các item */}
+                                {/* Một item bày tỏ cảm xúc của người dùng */}
+                                {selectedMessage.reactions.map((react, index) => {
+                                  console.log(react) // 👈 In ra mỗi reaction
+
+                                  return (
+                                    <div key={index} className="flex items-center justify-between">
+                                      <div className="flex items-center min-w-0 mr-2">
+                                        <div className="min-w-0">
+                                          <p className="font-medium text-sm text-gray-50 truncate">
+                                            {react.senderName}
+                                          </p>
+                                        </div>
+                                      </div>
+                                      <span className="text-2xl ml-2 flex-shrink-0">{react.reactionEmoji}</span>
+                                    </div>
+                                  )
+                                })}
+                              </div>
+                            </div>
+                          </div>
+                        </Modal>
+                      )}
+                    </div>
+                  )}
                 </div>
                 {msg.senderId != userId && (
                   <div className="flex items-center gap-2">
-                    <button className="hover:bg-[#333334] p-2 rounded-full">
-                      <CiFaceSmile />
-                    </button>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <button className="hover:bg-[#333334] p-2 rounded-full" onClick={() => setOpen(!open)}>
+                          <CiFaceSmile size={20} />
+                        </button>
+                      </PopoverTrigger>
+                      <PopoverContent
+                        side="top"
+                        sideOffset={8}
+                        className={`bg-[#252728] border-0 rounded-3xl py-2 justify-center ${open === true ? "flex" : "hidden"}`}
+                      >
+                        <div className="flex items-center space-x-2 w-full justify-between px-5">
+                          {emojis.map((emoji, index) => (
+                            <button
+                              key={index}
+                              className="text-xl hover:scale-125 transition-transform duration-150"
+                              onClick={() => handleReact(emoji, msg.id)}
+                            >
+                              {emoji}
+                            </button>
+                          ))}
+                        </div>
+                      </PopoverContent>
+                    </Popover>
                     {msg.unsent === false && msg.content != '" have forward this message"' && (
                       <button
                         className="hover:bg-[#333334] p-2 rounded-full"

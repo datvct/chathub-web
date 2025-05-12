@@ -1,4 +1,4 @@
-import { MessageResponse } from "~/codegen/data-contracts"
+import { MessageResponse, ReactionRequest } from "~/codegen/data-contracts"
 import { Message } from "~/codegen/Message"
 
 const messageInstance = new Message({ baseUrl: process.env.API_URL })
@@ -77,5 +77,28 @@ export const forwardMessage = async (
     return await res.json()
   } catch (error) {
     return null
+  }
+}
+
+export const reactToMessage = async (payload: ReactionRequest, token: string): Promise<boolean> => {
+  try {
+    const res = await fetch(`${process.env.API_URL}/reaction/react-message`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(payload),
+    })
+
+    if (!res.ok) {
+      console.error("Failed to react:", await res.text())
+      return false
+    }
+
+    return true
+  } catch (error) {
+    console.error("Error reacting to message:", error)
+    return false
   }
 }
