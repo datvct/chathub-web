@@ -9,7 +9,7 @@ import { IoIosDocument } from "react-icons/io"
 import moment from "moment"
 import { CiMenuKebab, CiFaceSmile } from "react-icons/ci"
 import { TiArrowBackOutline, TiArrowForwardOutline } from "react-icons/ti"
-import { useEffect, useState } from "react"
+import { SetStateAction, useEffect, useState } from "react"
 import { unsendMessage, deleteMessage, forwardMessage, reactToMessage } from "~/lib/get-message"
 import ForwardMessageModal from "./modal/modal-forward-message"
 import { IoReturnUpForward } from "react-icons/io5"
@@ -45,7 +45,7 @@ const ChatMessage = ({
   const [open, setOpen] = useState(false)
   const [openModal, setOpenModal] = useState(false)
   const [selectedMessage, setSelectedMessage] = useState<MessageResponse>(null)
-  const handleOpen = message => {
+  const handleOpen = (message: SetStateAction<MessageResponse>) => {
     setSelectedMessage(message)
     setOpenModal(true)
     console.log()
@@ -166,7 +166,7 @@ const ChatMessage = ({
                       </button>
                     )}
                     {msg.unsent === false && (
-                      <Popover>
+                      <Popover onOpenChange={setOpen}>
                         <PopoverTrigger asChild>
                           <button className="hover:bg-[#333334] p-2 rounded-full" onClick={() => setOpen(!open)}>
                             <CiFaceSmile size={20} />
@@ -447,8 +447,8 @@ const ChatMessage = ({
                               <div className="flex items-baseline space-x-5">
                                 {/* Tab đang active: "Tất cả 1" */}
                                 <button className="pb-2 border-b-2 border-blue-400 text-blue-400 focus:outline-none">
-                                  <span className="text-sm font-medium">Tất cả</span>
-                                  <span className="ml-1 text-sm font-medium">{msg.reactions.length}</span>
+                                  <span className="text-sm font-medium">Total</span>
+                                  <span className="ml-1 text-sm font-medium">{selectedMessage.reactions.length}</span>
                                 </button>
                               </div>
                             </div>
@@ -460,8 +460,6 @@ const ChatMessage = ({
                                 {/* Khoảng cách giữa các item */}
                                 {/* Một item bày tỏ cảm xúc của người dùng */}
                                 {selectedMessage.reactions.map((react, index) => {
-                                  console.log(react) // 👈 In ra mỗi reaction
-
                                   return (
                                     <div key={index} className="flex items-center justify-between">
                                       <div className="flex items-center min-w-0 mr-2">
