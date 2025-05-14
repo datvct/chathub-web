@@ -401,15 +401,15 @@ const ChatMessage = ({
                     </div>
                   )}
                   {/* UI thể hiện emote */}
-                  {msg.reactions.length != 0 && (
+                  {msg?.reactions?.length != 0 && (
                     <div className="absolute bg-[#252728] -bottom-3 -left-1 rounded-full flex">
                       <button className="flex items-center px-2" onClick={() => handleOpen(msg)}>
-                        {Array.from(new Set(msg.reactions.map(r => r.reactionEmoji)))
+                        {Array.from(new Set(msg?.reactions?.map(r => r.reactionEmoji)))
                           .slice(0, 3)
                           .map((emoji, index) => (
                             <span key={index}>{emoji}</span>
                           ))}
-                        {msg.reactions.length > 1 && (
+                        {msg?.reactions?.length > 1 && (
                           <span className="ml-1 text-xs text-gray-400">{msg.reactions.length}</span>
                         )}
                       </button>
@@ -448,7 +448,7 @@ const ChatMessage = ({
                                 {/* Tab đang active: "Tất cả 1" */}
                                 <button className="pb-2 border-b-2 border-blue-400 text-blue-400 focus:outline-none">
                                   <span className="text-sm font-medium">Total</span>
-                                  <span className="ml-1 text-sm font-medium">{selectedMessage.reactions.length}</span>
+                                  <span className="ml-1 text-sm font-medium">{selectedMessage?.reactions?.length}</span>
                                 </button>
                               </div>
                             </div>

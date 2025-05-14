@@ -73,6 +73,19 @@ const ChatScreen = ({
     }
   }
 
+  const updateReactions = (reactions: any[], userId: number, reactionEmoji: string, senderName: string) => {
+    const index = reactions.findIndex(r => r.senderName === senderName)
+    if (index !== -1) {
+      // Cập nhật emoji nếu user đã reaction trước đó
+      const updated = [...reactions]
+      updated[index] = { ...updated[index], reactionEmoji }
+      return updated
+    } else {
+      // Thêm mới nếu chưa có
+      return [...reactions, { senderName, reactionEmoji }]
+    }
+  }
+
   useEffect(() => {
     const fetchMessage = async () => {
       if (conversationId) {
@@ -88,6 +101,7 @@ const ChatScreen = ({
   useEffect(() => {
     if (!conversationId) return
     const messageTopic = TOPICS.MESSAGE(conversationId.toString())
+    const reactionTopic = TOPICS.REACT_MESSAGE(conversationId.toString())
 
     const handleNewMessage = (message: MessageResponse) => {
       setMessages(prev => {
@@ -101,10 +115,29 @@ const ChatScreen = ({
         }
       })
     }
+    const handleReaction = (message: any) => {
+      const { messageId, reactionEmoji, userId, senderName } = message
+      console.log(message, "reactionEmoji")
 
+      setMessages(prev =>
+        prev.map(c =>
+          c.id === messageId
+            ? {
+                ...c,
+                reactions: c.reactions
+                  ? updateReactions(c.reactions, userId, reactionEmoji, senderName)
+                  : [{ userId, reactionEmoji }],
+              }
+            : c,
+        ),
+      )
+    }
     ws.subscribe(messageTopic, handleNewMessage)
+    ws.subscribe(reactionTopic, handleReaction)
+
     return () => {
       ws.unsubscribe(messageTopic, handleNewMessage)
+      ws.unsubscribe(reactionTopic, handleReaction)
     }
   }, [conversationId, ws])
 
@@ -149,6 +182,7 @@ const ChatScreen = ({
       }, 100)
     }
   }
+  console.log(messages)
 
   return (
     <div className="flex-1 h-full w-full p-4 bg-[#3A3A3A] text-white flex flex-col relative transition-all">

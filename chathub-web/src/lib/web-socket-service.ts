@@ -70,7 +70,7 @@ class WebSocketService {
       ...conversationIds.map(id => TOPICS.MESSAGE(id.toString())),
       // ...conversationIds.map(id => TOPICS.TYPING_STATUS(id.toString())),
       // ...conversationIds.map(id => TOPICS.SEEN_MESSAGE(id.toString())),
-      // ...conversationIds.map(id => TOPICS.REACT_MESSAGE(id.toString())),
+      ...conversationIds.map(id => TOPICS.REACT_MESSAGE(id.toString())),
     ]
 
     topics.forEach(topic => {

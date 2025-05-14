@@ -99,7 +99,6 @@ export default function Home() {
             websocket.subscribe(TOPICS.USER(userId.toString()), async notification => {
               const newConv = typeof notification === "object" ? notification : { id: notification }
               websocket.subscribeToConversation(newConv.id)
-
               try {
                 const updatedData = await getRecentConversation(userId, token)
                 if (isMounted) {
@@ -199,6 +198,7 @@ export default function Home() {
 
               // WebSocketService.getInstance().subscribe(TOPICS.REACT_MESSAGE(id.toString()), message => {
               //   const { messageId, reactionEmoji, userId } = message
+
               //   setConversations(prev =>
               //     prev.map(c =>
               //       c.id === id
@@ -231,7 +231,7 @@ export default function Home() {
           websocket.unsubscribe(TOPICS.MESSAGE(c.id.toString()), () => {})
           // websocket.unsubscribe(TOPICS.TYPING_STATUS(c.id.toString()), () => {})
           // websocket.unsubscribe(TOPICS.SEEN_MESSAGE(c.id.toString()), () => {})
-          // websocket.unsubscribe(TOPICS.REACT_MESSAGE(c.id.toString()), () => {})
+          websocket.unsubscribe(TOPICS.REACT_MESSAGE(c.id.toString()), () => {})
         })
       }
     }
