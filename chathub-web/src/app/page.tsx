@@ -231,7 +231,7 @@ export default function Home() {
           websocket.unsubscribe(TOPICS.MESSAGE(c.id.toString()), () => {})
           // websocket.unsubscribe(TOPICS.TYPING_STATUS(c.id.toString()), () => {})
           // websocket.unsubscribe(TOPICS.SEEN_MESSAGE(c.id.toString()), () => {})
-          websocket.unsubscribe(TOPICS.REACT_MESSAGE(c.id.toString()), () => {})
+          // websocket.unsubscribe(TOPICS.REACT_MESSAGE(c.id.toString()), () => {})
         })
       }
     }

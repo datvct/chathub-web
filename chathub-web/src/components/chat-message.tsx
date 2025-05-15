@@ -48,7 +48,6 @@ const ChatMessage = ({
   const handleOpen = (message: SetStateAction<MessageResponse>) => {
     setSelectedMessage(message)
     setOpenModal(true)
-    console.log()
   }
   const handleClose = () => setOpenModal(false)
 
@@ -220,6 +219,32 @@ const ChatMessage = ({
                     </p>
                   ) : msg.messageType === MessageType.IMAGE ? (
                     (() => {
+                      const checkImageText = msg?.media && msg?.media?.fileName && msg.media.fileName
+                      if (checkImageText) {
+                        return (
+                          <div
+                            className={`p-3 flex flex-col rounded-lg w-max max-w-xs break-words text-black whitespace-pre-wrap ${
+                              msg.senderId === userId ? "bg-[#1566A3] text-white" : "bg-[#F0F0F0]"
+                            }`}
+                          >
+                            <button onClick={() => onImageClick(msg.media.url)}>
+                              <Image
+                                src={msg.media.url}
+                                alt="Sent image"
+                                className="rounded-lg object-cover"
+                                width={160}
+                                height={160}
+                              />
+                            </button>
+                            {msg.content}
+                            <span
+                              className={`text-xs block mt-1 ${msg.senderId === userId ? "text-white" : "text-black"}`}
+                            >
+                              {formatTimeSendAt(msg.sentAt)}
+                            </span>
+                          </div>
+                        )
+                      }
                       const images = msg.content?.split(",") || []
                       const gridCols =
                         images.length === 1
@@ -266,23 +291,77 @@ const ChatMessage = ({
                       </Link>
                     </>
                   ) : msg.messageType === MessageType.DOCUMENT ? (
-                    <Link href={msg.content} target="_blank" rel="noopener noreferrer" className="text-[#1566A3]">
-                      <div className="p-3 rounded-lg w-max max-w-xs break-words whitespace-pre-wrap bg-[#F0F0F0]">
-                        <span>
-                          <span className="hover:underline flex flex-row items-center">
-                            <IoIosDocument size={25} color="#1566A3" />
+                    <>
+                      {msg.media && msg.media.fileName ? (
+                        <div
+                          className={`p-3 flex flex-col rounded-lg w-max max-w-xs break-words text-black whitespace-pre-wrap ${
+                            msg.senderId === userId ? "bg-[#1566A3] text-white" : "bg-[#F0F0F0]"
+                          }`}
+                        >
+                          <Link
+                            href={msg.media.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-[#1566A3]"
+                          >
+                            <div
+                              className={`p-3 rounded-lg w-max max-w-xs break-words whitespace-pre-wrap ${msg.senderId === userId ? "bg-[#F0F0F0] text-black" : "bg-[#1566A3] text-white"}`}
+                            >
+                              <span>
+                                <span className="hover:underline flex flex-row items-center">
+                                  <IoIosDocument
+                                    size={25}
+                                    color={`${msg.senderId === userId ? "#1566A3" : "#ffffff"}`}
+                                  />
+                                  {msg.media.fileName}
+                                </span>
+                              </span>
+                            </div>
+                          </Link>
+                          {msg.content}
+                          <span className="text-[12px] text-black block mt-1">{formatTimeSendAt(msg.sentAt)}</span>
+                        </div>
+                      ) : (
+                        <Link href={msg.content} target="_blank" rel="noopener noreferrer" className="text-[#1566A3]">
+                          <div className="p-3 rounded-lg w-max max-w-xs break-words whitespace-pre-wrap bg-[#F0F0F0]">
+                            <span>
+                              <span className="hover:underline flex flex-row items-center">
+                                <IoIosDocument size={25} color="#1566A3" />
 
-                            {getFileName(msg.content)}
-                          </span>
-                        </span>
-                      </div>
-                      <span className="text-[10px] text-white block mt-1">{formatTimeSendAt(msg.sentAt)}</span>
-                    </Link>
+                                {getFileName(msg.content)}
+                              </span>
+                            </span>
+                          </div>
+                          <span className="text-[10px] text-white block mt-1">{formatTimeSendAt(msg.sentAt)}</span>
+                        </Link>
+                      )}
+                    </>
                   ) : msg.messageType === MessageType.VIDEO ? (
-                    <video controls className="rounded-lg w-40">
-                      <source src={msg.content} type="video/mp4" />
-                      Your browser does not support the video tag.
-                    </video>
+                    <>
+                      {msg.media ? (
+                        <div
+                          className={`p-3 flex flex-col rounded-lg w-max max-w-xs break-words text-black whitespace-pre-wrap ${
+                            msg.senderId === userId ? "bg-[#1566A3] text-white" : "bg-[#F0F0F0]"
+                          }`}
+                        >
+                          <video controls className="rounded-lg w-40">
+                            <source src={msg.media.url} type="video/mp4" />
+                            Your browser does not support the video tag.
+                          </video>
+                          {msg.content && <p className="mt-2">{msg.content}</p>}
+                          <span
+                            className={`text-xs block mt-1 ${msg.senderId === userId ? "text-white" : "text-black"}`}
+                          >
+                            {formatTimeSendAt(msg.sentAt)}
+                          </span>
+                        </div>
+                      ) : (
+                        <video controls className="rounded-lg w-40">
+                          <source src={msg.content} type="video/mp4" />
+                          Your browser does not support the video tag.
+                        </video>
+                      )}
+                    </>
                   ) : (
                     <div
                       className={`p-3 rounded-lg w-max max-w-xs break-words text-black whitespace-pre-wrap ${

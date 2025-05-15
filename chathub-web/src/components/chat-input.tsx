@@ -5,13 +5,19 @@ import { FaPaperclip, FaSmile, FaImage } from "react-icons/fa"
 import { AiOutlineLike } from "react-icons/ai"
 import { IoSend } from "react-icons/io5"
 import EmojiPicker from "emoji-picker-react"
-import { MessageType } from "~/types/types"
+import { MediaType, MessageType } from "~/types/types"
 import { LiaFileVideo } from "react-icons/lia"
 import { useSelector } from "react-redux"
 import { RootState } from "~/lib/reudx/store"
 import Image from "next/image"
 
-const ChatInput = ({ onSendMessage }: { onSendMessage: (msg: string, messageType: string) => void }) => {
+const ChatInput = ({
+  onSendMessage,
+  onSendFileAndText,
+}: {
+  onSendMessage: (msg: string, messageType: string) => void
+  onSendFileAndText: (msg: string, messageType: string, fileName: string, filePath: string) => void
+}) => {
   const [message, setMessage] = useState("")
   const [showEmojiPicker, setShowEmojiPicker] = useState(false)
   const [files, setFiles] = useState<File[]>([])
@@ -100,7 +106,7 @@ const ChatInput = ({ onSendMessage }: { onSendMessage: (msg: string, messageType
       if (fileType === MessageType.IMAGE) {
         // ✅ Xử lý nhiều ảnh
         const uploadedUrls: string[] = []
-  
+
         for (const file of files) {
           try {
             const response = await fetch(
@@ -108,40 +114,39 @@ const ChatInput = ({ onSendMessage }: { onSendMessage: (msg: string, messageType
               {
                 method: "GET",
                 headers: { Authorization: `Bearer ${token}` },
-              }
+              },
             )
-  
+
             if (!response.ok) throw new Error("Failed to get presigned URL")
-  
+
             const data = await response.json()
             await fetch(data.url, {
               method: "PUT",
               body: file,
               headers: { "Content-Type": file.type },
             })
-  
+
             uploadedUrls.push(data.url.split("?")[0])
           } catch (err) {
             alert("Upload failed for some images.")
           }
         }
-  
+
         if (uploadedUrls.length > 0) {
           const combinedUrlString = uploadedUrls.join(",")
-          onSendMessage(combinedUrlString, MessageType.IMAGE)
+          const file = files[0]
 
           // Nếu có nội dung text kèm theo => gửi text nữa
           if (message.trim()) {
-            const isLink = /^(https?:\/\/[^\s]+)$/.test(message.trim())
-            const messageType = isLink ? MessageType.LINK : MessageType.TEXT
-            onSendMessage(message, messageType)
+            onSendFileAndText(message, MediaType.IMAGE, file.name, uploadedUrls[0])
             setFiles([])
             setPreviewFiles([])
             setFileType(null)
-            setMessage('')
+            setMessage("")
+          } else {
+            onSendMessage(combinedUrlString, MessageType.IMAGE)
           }
         }
-  
       } else {
         // ✅ Xử lý video hoặc document: chỉ 1 file
         const file = files[0]
@@ -151,28 +156,34 @@ const ChatInput = ({ onSendMessage }: { onSendMessage: (msg: string, messageType
             {
               method: "GET",
               headers: { Authorization: `Bearer ${token}` },
-            }
+            },
           )
-  
+
           if (!response.ok) throw new Error("Failed to get presigned URL")
-  
+
           const data = await response.json()
           await fetch(data.url, {
             method: "PUT",
             body: file,
             headers: { "Content-Type": file.type },
           })
-  
-          const type =
-            file.type.startsWith("video/") ? MessageType.VIDEO :
-            MessageType.DOCUMENT
-  
-          onSendMessage(data.url.split("?")[0], type)
+
+          const type = file.type.startsWith("video/") ? MessageType.VIDEO : MessageType.DOCUMENT
+
+          if (message.trim()) {
+            onSendFileAndText(message, type, file.name, data.url.split("?")[0])
+            setFiles([])
+            setPreviewFiles([])
+            setFileType(null)
+            setMessage("")
+          } else {
+            onSendMessage(data.url.split("?")[0], type)
+          }
         } catch (err) {
           alert("Upload failed for the file.")
         }
       }
-  
+
       // ✅ Reset lại
       setFiles([])
       setPreviewFiles([])
@@ -183,7 +194,7 @@ const ChatInput = ({ onSendMessage }: { onSendMessage: (msg: string, messageType
       onSendMessage(message, messageType)
       setMessage("")
     }
-  }  
+  }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
@@ -218,9 +229,7 @@ const ChatInput = ({ onSendMessage }: { onSendMessage: (msg: string, messageType
                 <source src={previewFiles[0]} type={files[0]?.type} />
               </video>
             )}
-            {fileType === MessageType.DOCUMENT && (
-              <div className="text-white">📄 {files[0]?.name}</div>
-            )}
+            {fileType === MessageType.DOCUMENT && <div className="text-white">📄 {files[0]?.name}</div>}
             <button
               onClick={() => {
                 setFiles([])
@@ -247,9 +256,22 @@ const ChatInput = ({ onSendMessage }: { onSendMessage: (msg: string, messageType
             <FaPaperclip className="text-[#8A8A8A] text-xl" />
           </button>
 
-          <input type="file" ref={imageInputRef} className="hidden" accept="image/*" multiple onChange={handleFileChange} />
+          <input
+            type="file"
+            ref={imageInputRef}
+            className="hidden"
+            accept="image/*"
+            multiple
+            onChange={handleFileChange}
+          />
           <input type="file" ref={videoInputRef} className="hidden" accept="video/*" onChange={handleFileChange} />
-          <input type="file" ref={documentInputRef} className="hidden" accept="application/*,text/*" onChange={handleFileChange} />
+          <input
+            type="file"
+            ref={documentInputRef}
+            className="hidden"
+            accept="application/*,text/*"
+            onChange={handleFileChange}
+          />
 
           <input
             type="text"
@@ -264,7 +286,7 @@ const ChatInput = ({ onSendMessage }: { onSendMessage: (msg: string, messageType
             <FaSmile className="text-[#8A8A8A] text-xl" />
           </button>
 
-          {(message.trim() || previewFiles.length > 0) ? (
+          {message.trim() || previewFiles.length > 0 ? (
             <button onClick={handleSendMessage}>
               <IoSend className="text-blue-500 text-xl" />
             </button>
