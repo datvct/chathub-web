@@ -105,7 +105,7 @@ const ChatList = ({
 
   const getDislayMessage = (item: ConversationResponse) => {
     if (!item.lastMessage || !item.lastMessageType) return "No messages"
-    const sender = item.senderId == userId ? "You" : item.senderName
+    const sender = item.senderId !== userId ? item.senderName : "You"
     if (item.unsent) {
       // const sender = item.senderId == userId ? "You" : item.senderName.split(" ")[0]
       return `${sender} unsent a message`
@@ -133,7 +133,6 @@ const ChatList = ({
         return truncate(`${sender} has sent a file`)
     }
   }
-
   const handleConfirmLogout = async () => {
     setIsLoggingOut(true)
     try {
@@ -235,7 +234,6 @@ const ChatList = ({
           className="w-full p-2 pl-4 bg-white bg-opacity-15 text-white placeholder-gray-400 rounded-lg"
         />
       </div>
-
       {/* Chat List */}
       <ul className="space-y-3 overflow-y-auto custom-scrollbar h-[calc(100%-150px)]">
         {conversations.length > 0 &&

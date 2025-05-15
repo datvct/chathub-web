@@ -7,6 +7,12 @@ export enum MessageType {
   LINK = "LINK",
 }
 
+export enum MediaType {
+  IMAGE = "IMAGE",
+  VIDEO = "VIDEO",
+  DOCUMENT = "DOCUMENT",
+  LINK = "LINK",
+}
 export enum FriendStatus {
   ONLINE = "ONLINE",
   OFFLINE = "OFFLINE",

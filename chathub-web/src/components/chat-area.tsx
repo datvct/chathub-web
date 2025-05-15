@@ -117,7 +117,6 @@ const ChatScreen = ({
     }
     const handleReaction = (message: any) => {
       const { messageId, reactionEmoji, userId, senderName } = message
-      console.log(message, "reactionEmoji")
 
       setMessages(prev =>
         prev.map(c =>
@@ -163,6 +162,30 @@ const ChatScreen = ({
     [conversationId, userId],
   )
 
+  const onSendFileAndText = useCallback(
+    (content: string, messageType: MessageType, fileName: string, filePath: string) => {
+      if (!conversationId) return
+
+      const ws = WebSocketService.getInstance()
+      const stompClient = ws.getStompClient()
+      if (!stompClient) return
+      const messageSend = {
+        senderId: userId,
+        content,
+        messageType,
+        conversationId,
+        fileName,
+        filePath,
+      }
+
+      stompClient?.publish({
+        destination: `/app/sendFileMessage/${conversationId}`,
+        body: JSON.stringify(messageSend),
+      })
+    },
+    [conversationId, userId],
+  )
+
   useEffect(() => {
     if (highlightMessageId) {
       const messageElement = document.getElementById(`message-${highlightMessageId}`)
@@ -182,7 +205,6 @@ const ChatScreen = ({
       }, 100)
     }
   }
-  console.log(messages)
 
   return (
     <div className="flex-1 h-full w-full p-4 bg-[#3A3A3A] text-white flex flex-col relative transition-all">
@@ -208,7 +230,7 @@ const ChatScreen = ({
         />
       </div>
 
-      <ChatInput onSendMessage={handleSendMessage} />
+      <ChatInput onSendMessage={handleSendMessage} onSendFileAndText={onSendFileAndText} />
 
       {isImageViewerOpen && selectedImageUrl && (
         <ModalImageViewer isOpen={isImageViewerOpen} setIsOpen={setIsImageViewerOpen} imageUrl={selectedImageUrl} />
