@@ -8,7 +8,9 @@ import { Images } from "~/constants/images"
 import { hangupCall, makeVideoCall, muteCall } from "../utils/stringee"
 import { callEventEmitter } from "../utils/callEvents"
 import { ImPhoneHangUp } from "react-icons/im"
-import { FaVolumeMute } from "react-icons/fa";
+import { FaVolumeMute } from "react-icons/fa"
+import { useSelector } from "react-redux"
+import { RootState } from "../lib/reudx/store"
 
 interface ChatHeaderProps {
   name: string
@@ -18,6 +20,7 @@ interface ChatHeaderProps {
   setIsChatSearchOpen?: (isOpen: boolean) => void
   isChatSearchOpen?: boolean
   isUserOnline?: boolean
+  userId?: string
 }
 
 const ChatHeader = ({
@@ -28,11 +31,13 @@ const ChatHeader = ({
   setIsChatSearchOpen,
   isChatSearchOpen,
   isUserOnline,
+  userId,
 }: ChatHeaderProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
   const [openModal, setOpenModal] = useState(false)
   const [mute, setMute] = useState(true)
+  const userSenderId = useSelector((state: RootState) => state.auth.userId)
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -58,8 +63,10 @@ const ChatHeader = ({
   }, [setOpenModal])
 
   const handleCall = (isCallVideo: boolean) => {
+    console.log("user2:"+userId)
+    console.log("user1:"+userSenderId.toString())
     setOpenModal(true)
-    makeVideoCall("1", "2", isCallVideo)
+    if (userId != "0") makeVideoCall(userSenderId.toString(), userId, isCallVideo)
   }
 
   const hangup = () => {
@@ -100,10 +107,16 @@ const ChatHeader = ({
           >
             <IoSearch size={20} color="white" className="text-white" />
           </button>
-          <button className="bg-[#484848] h-10 w-10 rounded-full flex items-center justify-center" onClick={()=>handleCall(false)}>
+          <button
+            className="bg-[#484848] h-10 w-10 rounded-full flex items-center justify-center"
+            onClick={() => handleCall(false)}
+          >
             <FaPhoneAlt size={20} color="white" className="text-white" />
           </button>
-          <button className="bg-[#484848] h-10 w-10 rounded-full flex items-center justify-center" onClick={()=>handleCall(true)}>
+          <button
+            className="bg-[#484848] h-10 w-10 rounded-full flex items-center justify-center"
+            onClick={() => handleCall(true)}
+          >
             <IoMdVideocam size={20} color="white" className="text-white" />
           </button>
           {/* Nút mở ChatInfo */}
