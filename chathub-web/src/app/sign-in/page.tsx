@@ -10,6 +10,8 @@ import { useRouter } from "next/navigation"
 import { useDispatch } from "react-redux"
 import { setUser } from "~/lib/reudx/authSlice"
 import { setCookie } from "cookies-next"
+import { connectToStringee } from "../../utils/stringee"
+import { loadStringeeSdk } from "../../utils/loadStringeeSdk"
 const SignInPage: React.FC = () => {
   const [phoneNumber, setPhoneNumber] = useState("")
   const [password, setPassword] = useState("")
@@ -54,9 +56,25 @@ const SignInPage: React.FC = () => {
     try {
       const response = await submitSignUp(data)
       if (response.status === 200) {
-        dispatch(setUser({ userId: response?.response?.userId, token: response?.response?.token }))
+        dispatch(
+          setUser({
+            userId: response?.response?.userId,
+            token: response?.response?.token,
+            phone: response?.response?.phoneNumber,
+          }),
+        )
         setCookie("authToken", response?.response?.token, { maxAge: 60 * 60 * 24 * 7 })
         setCookie("userId", response?.response?.userId, { maxAge: 60 * 60 * 24 * 7 })
+        setCookie("phone", response?.response?.phoneNumber, { maxAge: 60 * 60 * 24 * 7 })
+        const res = await fetch(`http://localhost:8080/call/stringee-token?userId=${response?.response?.userId}`, {
+          headers: {
+            Authorization: `Bearer ${response?.response?.token}`,
+          },
+        })
+        const data = await res.json()
+        const stringeeToken = data.message
+        await loadStringeeSdk()
+        connectToStringee(stringeeToken)
         router.push("/")
       } else {
         setErrorMessage("Invalid phone number or password.")

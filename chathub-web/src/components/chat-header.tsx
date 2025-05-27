@@ -5,6 +5,10 @@ import { FaPhoneAlt } from "react-icons/fa"
 import { IoSearch } from "react-icons/io5"
 import { IoMdVideocam, IoMdMore } from "react-icons/io"
 import { Images } from "~/constants/images"
+import { hangupCall, makeVideoCall, muteCall } from "../utils/stringee"
+import { callEventEmitter } from "../utils/callEvents"
+import { ImPhoneHangUp } from "react-icons/im"
+import { FaVolumeMute } from "react-icons/fa";
 
 interface ChatHeaderProps {
   name: string
@@ -27,6 +31,8 @@ const ChatHeader = ({
 }: ChatHeaderProps) => {
   const [isOpen, setIsOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
+  const [openModal, setOpenModal] = useState(false)
+  const [mute, setMute] = useState(true)
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -37,6 +43,38 @@ const ChatHeader = ({
     document.addEventListener("mousedown", handleClickOutside)
     return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [])
+
+  useEffect(() => {
+    const handler = (incomingCall: any) => {
+      console.log("📞 Received call in component!", incomingCall)
+      setOpenModal(true)
+    }
+
+    callEventEmitter.on("incoming-call", handler)
+
+    return () => {
+      callEventEmitter.off("incoming-call", handler) // cleanup
+    }
+  }, [setOpenModal])
+
+  const handleCall = () => {
+    setOpenModal(true)
+    makeVideoCall("1", "2")
+  }
+
+  const hangup = () => {
+    hangupCall()
+    setOpenModal(false)
+  }
+
+  const muteFunction = () => {
+    setMute(!mute)
+    muteCall(mute)
+  }
+
+  const handleCancel = () => {
+    setOpenModal(false)
+  }
 
   return (
     <div className="flex items-center justify-between space-x-3 mb-4 border-b border-white pb-4">
@@ -65,7 +103,7 @@ const ChatHeader = ({
           <button className="bg-[#484848] h-10 w-10 rounded-full flex items-center justify-center">
             <FaPhoneAlt size={20} color="white" className="text-white" />
           </button>
-          <button className="bg-[#484848] h-10 w-10 rounded-full flex items-center justify-center">
+          <button className="bg-[#484848] h-10 w-10 rounded-full flex items-center justify-center" onClick={handleCall}>
             <IoMdVideocam size={20} color="white" className="text-white" />
           </button>
           {/* Nút mở ChatInfo */}
@@ -77,12 +115,48 @@ const ChatHeader = ({
           </button>
         </div>
       </div>
-      {/*
-      {isOpen && (
-        <div ref={menuRef} className="absolute right-0 top-16 z-50 w-full max-w-xs">
-          <ChatInfo isOpen={isOpen} setIsOpen={setIsOpen} />
+      {/* <div className="flex gap-4 mt-4">
+        <video
+          id="localVideo"
+          muted
+          playsInline
+          autoPlay
+          className="w-48 h-36 bg-black rounded-lg"
+        />
+        <video
+          id="remoteVideo"
+          playsInline
+          autoPlay
+          className="w-48 h-36 bg-black rounded-lg"
+        />
+        <button onClick={hangup}>Hang up</button>
+      </div> */}
+      {openModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-[#1a1a1a] p-6 rounded-lg w-[600px]">
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-white text-lg font-semibold">Video Call</h2>
+              <button onClick={handleCancel} className="text-white text-2xl hover:text-red-500">
+                ×
+              </button>
+            </div>
+
+            <div className="flex gap-4 justify-center">
+              <video id="localVideo" muted playsInline autoPlay className="w-48 h-36 bg-black rounded-lg" />
+              <video id="remoteVideo" playsInline autoPlay className="w-48 h-36 bg-black rounded-lg" />
+            </div>
+
+            <div className="flex justify-center mt-4 gap-4">
+              <button onClick={hangup} className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded">
+                <ImPhoneHangUp />
+              </button>
+              <button onClick={muteFunction} className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded">
+                <FaVolumeMute />
+              </button>
+            </div>
+          </div>
         </div>
-      )} */}
+      )}
     </div>
   )
 }
