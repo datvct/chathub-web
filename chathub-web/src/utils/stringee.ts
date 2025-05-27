@@ -47,14 +47,14 @@ export function connectToStringee(token: string) {
   })
 }
 
-export function makeVideoCall(fromUserId: string, toUserId: string) {
+export function makeVideoCall(fromUserId: string, toUserId: string, isVideoCall: boolean) {
   if (!client) {
     console.error("Client not initialized")
     return
   }
 
-  currentCall = new window.StringeeCall(client, fromUserId, toUserId, true) // video = true
-  console.log("🎥 Making video call to", toUserId)
+  currentCall = new window.StringeeCall(client, fromUserId, toUserId, isVideoCall)
+  console.log(`${isVideoCall ? "🎥" : "📞"} Making ${isVideoCall ? "video" : "audio"} call to`, toUserId)
   setupCallEvents(currentCall)
 
   currentCall.makeCall((res: any) => {

@@ -57,9 +57,9 @@ const ChatHeader = ({
     }
   }, [setOpenModal])
 
-  const handleCall = () => {
+  const handleCall = (isCallVideo: boolean) => {
     setOpenModal(true)
-    makeVideoCall("1", "2")
+    makeVideoCall("1", "2", isCallVideo)
   }
 
   const hangup = () => {
@@ -100,10 +100,10 @@ const ChatHeader = ({
           >
             <IoSearch size={20} color="white" className="text-white" />
           </button>
-          <button className="bg-[#484848] h-10 w-10 rounded-full flex items-center justify-center">
+          <button className="bg-[#484848] h-10 w-10 rounded-full flex items-center justify-center" onClick={()=>handleCall(false)}>
             <FaPhoneAlt size={20} color="white" className="text-white" />
           </button>
-          <button className="bg-[#484848] h-10 w-10 rounded-full flex items-center justify-center" onClick={handleCall}>
+          <button className="bg-[#484848] h-10 w-10 rounded-full flex items-center justify-center" onClick={()=>handleCall(true)}>
             <IoMdVideocam size={20} color="white" className="text-white" />
           </button>
           {/* Nút mở ChatInfo */}
