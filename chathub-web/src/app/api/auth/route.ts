@@ -5,6 +5,6 @@ export async function GET() {
   const cookieStore =await cookies();
   const token = cookieStore.get("authToken")?.value || null;
   const userId = cookieStore.get("userId")?.value || null;
-
-  return NextResponse.json({ userId, token });
+  const phone = cookieStore.get("phone")?.value || null;
+  return NextResponse.json({ userId, token, phone });
 }

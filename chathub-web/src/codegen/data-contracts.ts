@@ -76,6 +76,8 @@ export interface MessageResponse {
 }
 
 export interface ReactionDTO {
+  /** @format int64 */
+  userId?: number
   senderName?: string
   reactionEmoji?: string
 }
@@ -154,6 +156,9 @@ export interface ConversationResponse {
   /** @format date-time */
   createAt?: string
   participants?: ParticipantDTO[]
+  /** @format int64 */
+  anotherParticipantId?: number
+  anotherParticipantName?: string
   pinned?: boolean
   unsent?: boolean
   forwarded?: boolean

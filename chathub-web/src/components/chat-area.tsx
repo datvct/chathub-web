@@ -209,12 +209,13 @@ const ChatScreen = ({
   return (
     <div className="flex-1 h-full w-full p-4 bg-[#3A3A3A] text-white flex flex-col relative transition-all">
       <ChatHeader
-        name={conversationData?.groupName ?? conversationData?.senderName}
+        name={conversationData?.groupName ?? conversationData?.anotherParticipantName}
         setIsChatInfoOpen={setIsChatInfoOpen}
         isChatInfoOpen={isChatInfoOpen}
         avatar={conversationData?.chatType === "GROUP" ? conversationData?.groupAvatar : conversationData?.senderAvatar}
         isChatSearchOpen={isChatSearchOpen}
         setIsChatSearchOpen={setIsChatSearchOpen}
+        userId={conversationData?.anotherParticipantId != null ? conversationData.anotherParticipantId.toString() : "0"}
       />
 
       <div className="flex flex-col-reverse overflow-y-auto h-[75vh] custom-scrollbar">

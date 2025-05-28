@@ -13,9 +13,9 @@ export function ReduxProvider({ children }: { children: React.ReactNode }) {
       try {
         const response = await fetch("/api/auth", { credentials: "include" })
         if (response.ok) {
-          const data = await response.json()
+          const data = await response.json()  
           if (data.token) {
-            store.dispatch(setUser({ userId: data.userId ? Number(data.userId) : null, token: data.token }))
+            store.dispatch(setUser({ userId: data.userId ? Number(data.userId) : null, token: data.token, phone: data.phoneNumber }))
           }
         }
       } catch (error) {
