@@ -96,7 +96,16 @@ const ChatHeader = ({
           />
           <div>
             <h2 className="text-lg font-bold">{name}</h2>
-            <p className="text-sm text-gray-400">{isUserOnline}</p>
+            <p className="text-sm text-gray-400">
+              {isUserOnline ? (
+                <>
+                  <span className="inline-block w-[12px] h-[12px] rounded-full bg-green-500 mr-1" />
+                  <span>Online</span>
+                </>
+              ) : (
+                ""
+              )}
+            </p>
           </div>
         </div>
         {/* Các nút chức năng */}

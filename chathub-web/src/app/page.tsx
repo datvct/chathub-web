@@ -24,7 +24,9 @@ export default function Home() {
   const [selectedChat, setSelectedChat] = useState<number | null>(null)
   const [isChatInfoOpen, setIsChatInfoOpen] = useState(false)
   const [isGroupChat, setIsGroupChat] = useState(false)
-  const [conversationData, setConversationData] = useState<ConversationResponse | null>(null)
+  const [conversationData, setConversationData] = useState<(ConversationResponse & { onlineStatus: string }) | null>(
+    null,
+  )
   const [isChatSearchOpen, setIsChatSearchOpen] = useState(false)
   const [highlightMessageId, setHighlightMessageId] = useState<number | null>(null)
   const [needRefetchConversations, setNeedRefetchConversations] = useState(false)
@@ -95,6 +97,24 @@ export default function Home() {
               await websocket.connect(userId.toString(), token, conversationIds)
               websocket.subscribeToTopics(userId.toString(), conversationIds)
             }
+
+            websocket.subscribe(TOPICS.STATUS, message => {
+              // ví dụ message = { id: 2, name: 'Johnathan', status: 'ONLINE', lastSeen: '...' }
+
+              setConversations(prev =>
+                prev.map(conv => {
+                  // cập nhật online status cho từng participant
+                  if (conv.id === message.id) {
+                    return {
+                      ...conv,
+                      onlineStatus: message.status,
+                      lastSeen: message.lastSeen,
+                    }
+                  }
+                  return conv
+                }),
+              )
+            })
 
             websocket.subscribe(TOPICS.USER(userId.toString()), async notification => {
               const newConv = typeof notification === "object" ? notification : { id: notification }
@@ -180,13 +200,13 @@ export default function Home() {
                 })
               })
 
-              // WebSocketService.getInstance().subscribe(TOPICS.TYPING_STATUS(id.toString()), message => {
-              //   const { userId, isTyping } = message
-              //   setTypingStatus(prev => {
-              //     const updated = { ...prev, [id]: isTyping ? userId : null }
-              //     return updated
-              //   })
-              // })
+              WebSocketService.getInstance().subscribe(TOPICS.TYPING_STATUS(id.toString()), message => {
+                const { userId, isTyping } = message
+                setTypingStatus(prev => {
+                  const updated = { ...prev, [id]: isTyping ? userId : null }
+                  return updated
+                })
+              })
 
               // WebSocketService.getInstance().subscribe(TOPICS.SEEN_MESSAGE(id.toString()), message => {
               //   const { userId, messageId } = message
@@ -194,23 +214,6 @@ export default function Home() {
               //     ...prev,
               //     [id]: { userId, messageId },
               //   }))
-              // })
-
-              // WebSocketService.getInstance().subscribe(TOPICS.REACT_MESSAGE(id.toString()), message => {
-              //   const { messageId, reactionEmoji, userId } = message
-
-              //   setConversations(prev =>
-              //     prev.map(c =>
-              //       c.id === id
-              //         ? {
-              //             ...c,
-              //             messages: c.messages.map((m: any) =>
-              //               m.id === messageId ? { ...m, reactions: [...m.reactions, { userId, reactionEmoji }] } : m,
-              //             ),
-              //           }
-              //         : c,
-              //     ),
-              //   )
               // })
             })
           }
@@ -229,7 +232,7 @@ export default function Home() {
           websocket.unsubscribe(TOPICS.USER(userId.toString()), () => {})
           websocket.unsubscribe(TOPICS.CONVERSATION(c.id.toString()), () => {})
           websocket.unsubscribe(TOPICS.MESSAGE(c.id.toString()), () => {})
-          // websocket.unsubscribe(TOPICS.TYPING_STATUS(c.id.toString()), () => {})
+          websocket.unsubscribe(TOPICS.TYPING_STATUS(c.id.toString()), () => {})
           // websocket.unsubscribe(TOPICS.SEEN_MESSAGE(c.id.toString()), () => {})
           // websocket.unsubscribe(TOPICS.REACT_MESSAGE(c.id.toString()), () => {})
         })

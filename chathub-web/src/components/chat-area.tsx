@@ -17,7 +17,7 @@ interface ChatScreenProps {
   setIsChatInfoOpen: (isOpen: boolean) => void
   isChatInfoOpen: boolean
   isGroupChat: boolean
-  conversationData?: ConversationResponse | null
+  conversationData?: (ConversationResponse & { onlineStatus: string }) | null
   isChatSearchOpen?: boolean
   setIsChatSearchOpen?: (isOpen: boolean) => void
   highlightMessageId?: number
@@ -205,7 +205,6 @@ const ChatScreen = ({
       }, 100)
     }
   }
-
   return (
     <div className="flex-1 h-full w-full p-4 bg-[#3A3A3A] text-white flex flex-col relative transition-all">
       <ChatHeader
@@ -216,6 +215,9 @@ const ChatScreen = ({
         isChatSearchOpen={isChatSearchOpen}
         setIsChatSearchOpen={setIsChatSearchOpen}
         userId={conversationData?.anotherParticipantId != null ? conversationData.anotherParticipantId.toString() : "0"}
+        isUserOnline={
+          conversationData?.onlineStatus === "ONLINE" || conversationData.chatType === "GROUP" ? true : false
+        }
       />
 
       <div className="flex flex-col-reverse overflow-y-auto h-[75vh] custom-scrollbar">

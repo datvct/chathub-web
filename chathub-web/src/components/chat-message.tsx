@@ -50,6 +50,7 @@ const ChatMessage = ({
     setOpenModal(true)
   }
   const handleClose = () => setOpenModal(false)
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null)
 
   useEffect(() => {
     if (messagesEndRef.current) {
@@ -87,7 +88,12 @@ const ChatMessage = ({
       console.error("Failed to react with:", emoji)
     }
   }
-
+  function isOnlyEmoji(str: string): boolean {
+    if (!str) return false
+    // regex chỉ cho emoji thôi
+    const emojiRegex = /^(?:\p{Emoji_Presentation}|\p{Emoji}\uFE0F|\p{Emoji_Modifier_Base})+$/u
+    return emojiRegex.test(str.trim())
+  }
   return (
     <div className="flex flex-col space-y-3 key={messages[0]?.id}">
       {messages
@@ -97,6 +103,9 @@ const ChatMessage = ({
           const currentMessageDate = moment(msg.sentAt).format("YYYY-MM-DD")
           const isNewDate = currentMessageDate !== lastMessageDate
           lastMessageDate = currentMessageDate
+          const contentStr = String(msg.content ?? "").trim()
+          const isOnlyEmojiMessage = isOnlyEmoji(contentStr) && msg.unsent === false
+
           return (
             <div key={msg.id}>
               {isNewDate && (
@@ -298,38 +307,41 @@ const ChatMessage = ({
                             msg.senderId === userId ? "bg-[#1566A3] text-white" : "bg-[#F0F0F0]"
                           }`}
                         >
-                          <Link
-                            href={msg.media.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-[#1566A3]"
+                          <button
+                            onClick={() => {
+                              const fileUrl = msg.media.url
+                              const extension = fileUrl.split(".").pop()?.toLowerCase()
+                              const officePreview = ["doc", "docx", "xls", "xlsx", "ppt", "pptx", "pdf"]
+
+                              if (extension && officePreview.includes(extension)) {
+                                const previewLink = `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(fileUrl)}`
+                                setPreviewUrl(previewLink)
+                              } else {
+                                window.open(fileUrl, "_blank")
+                              }
+                            }}
+                            className="text-left"
                           >
                             <div
-                              className={`p-3 rounded-lg w-max max-w-xs break-words whitespace-pre-wrap ${msg.senderId === userId ? "bg-[#F0F0F0] text-black" : "bg-[#1566A3] text-white"}`}
+                              className={`p-3 rounded-lg w-max max-w-xs break-words whitespace-pre-wrap ${
+                                msg.senderId === userId ? "bg-[#F0F0F0] text-black" : "bg-[#1566A3] text-white"
+                              }`}
                             >
-                              <span>
-                                <span className="hover:underline flex flex-row items-center">
-                                  <IoIosDocument
-                                    size={25}
-                                    color={`${msg.senderId === userId ? "#1566A3" : "#ffffff"}`}
-                                  />
-                                  {msg.media.fileName}
-                                </span>
+                              <span className="hover:underline flex flex-row items-center">
+                                <IoIosDocument size={25} color={`${msg.senderId === userId ? "#1566A3" : "#ffffff"}`} />
+                                {msg.media.fileName}
                               </span>
                             </div>
-                          </Link>
+                          </button>
                           {msg.content}
                           <span className="text-[12px] text-black block mt-1">{formatTimeSendAt(msg.sentAt)}</span>
                         </div>
                       ) : (
                         <Link href={msg.content} target="_blank" rel="noopener noreferrer" className="text-[#1566A3]">
                           <div className="p-3 rounded-lg w-max max-w-xs break-words whitespace-pre-wrap bg-[#F0F0F0]">
-                            <span>
-                              <span className="hover:underline flex flex-row items-center">
-                                <IoIosDocument size={25} color="#1566A3" />
-
-                                {getFileName(msg.content)}
-                              </span>
+                            <span className="hover:underline flex flex-row items-center">
+                              <IoIosDocument size={25} color="#1566A3" />
+                              {getFileName(msg.content)}
                             </span>
                           </div>
                           <span className="text-[10px] text-white block mt-1">{formatTimeSendAt(msg.sentAt)}</span>
@@ -364,14 +376,13 @@ const ChatMessage = ({
                     </>
                   ) : (
                     <div
-                      className={`p-3 rounded-lg w-max max-w-xs break-words text-black whitespace-pre-wrap ${
-                        msg.senderId === userId ? "bg-[#1566A3] text-white" : "bg-[#F0F0F0]"
-                      } ${isOnlyEmoji(msg.content) && msg.content?.trim() && msg.unsent === false ? "text-4xl p-2 bg-transparent" : ""}`}
+                      className={`p-3 rounded-lg w-max max-w-xs break-words whitespace-pre-wrap
+                      ${msg.senderId === userId ? "text-white" : "text-black"}
+                      ${isOnlyEmojiMessage ? "text-4xl p-2 bg-transparent" : msg.senderId === userId ? "bg-[#1566A3]" : "bg-[#F0F0F0]"}
+                    `}
                     >
-                      {(msg.content?.trim() && msg.forwarded === false) ||
-                      (msg.content != '" have forward this message"' && msg.forwarded === true)
-                        ? msg.content.replace(/^"(.*)"$/, "$1")
-                        : ""}
+                      {msg.forwarded === false && contentStr !== '" have forward this message"' && contentStr}
+
                       {msg.forwarded === true && (
                         <div
                           className={`flex flex-col mt-1 p-2 border-l-4 ${
@@ -467,7 +478,7 @@ const ChatMessage = ({
                                 {msg.forwardedMessage.originalContentSnapshot?.trim() ||
                                 (msg.forwardedMessage.originalContentSnapshot != '" have forward this message"' &&
                                   msg.forwarded === true)
-                                  ? msg.forwardedMessage.originalContentSnapshot.replace(/^"(.*)"$/, "$1")
+                                  ? String(`${msg.forwardedMessage.originalContentSnapshot}`.replace(/^"(.*)"$/, "$1"))
                                   : ""}
                               </div>
                             )}
@@ -532,12 +543,8 @@ const ChatMessage = ({
                               </div>
                             </div>
 
-                            {/* Danh sách các lượt bày tỏ cảm xúc (có thể cuộn) */}
                             <div className="flex-grow overflow-y-auto p-5">
                               <div className="space-y-3">
-                                {" "}
-                                {/* Khoảng cách giữa các item */}
-                                {/* Một item bày tỏ cảm xúc của người dùng */}
                                 {selectedMessage.reactions.map((react, index) => {
                                   return (
                                     <div key={index} className="flex items-center justify-between">
@@ -640,6 +647,43 @@ const ChatMessage = ({
             </div>
           )
         })}
+      {previewUrl && (
+        <Modal open={!!previewUrl} onClose={() => setPreviewUrl(null)}>
+          <div className="bg-white rounded-lg shadow-xl w-full max-w-5xl h-[85vh] absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 overflow-hidden flex flex-col">
+            {/* Header */}
+            <div className="flex justify-between items-center bg-gray-100 px-4 py-2 border-b">
+              <p className="text-sm font-medium text-gray-800">Tài liệu đính kèm</p>
+              <div className="flex items-center gap-2">
+                <a
+                  href={previewUrl.replace("https://view.officeapps.live.com/op/embed.aspx?src=", "")}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  download
+                  className="text-sm text-blue-600 hover:underline"
+                >
+                  Tải xuống
+                </a>
+                <button onClick={() => setPreviewUrl(null)} className="p-1 hover:bg-gray-200 rounded">
+                  ❌
+                </button>
+              </div>
+            </div>
+
+            {/* Iframe */}
+            <div className="flex-1">
+              <iframe
+                src={previewUrl}
+                width="100%"
+                height="100%"
+                frameBorder="0"
+                allowFullScreen
+                className="w-full h-full"
+              />
+            </div>
+          </div>
+        </Modal>
+      )}
+
       <ForwardMessageModal
         isOpen={isFriendListModalOpen}
         onClose={() => {
