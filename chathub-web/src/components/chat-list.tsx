@@ -37,9 +37,9 @@ import { RiUnpinFill } from "react-icons/ri"
 interface ChatListProps {
   setSelectedChat: (id: number) => void
   setIsGroupChat: (isGroup: boolean) => void
-  setConversationData?: (data: ConversationResponse) => void
+  setConversationData?: (data: ConversationResponse & { onlineStatus: string }) => void
   onPinChange: () => void
-  conversations: ConversationResponse[]
+  conversations: (ConversationResponse & { onlineStatus: string })[]
   userId: number
   token?: string
   // handleReloadTrigger: () => void
@@ -96,7 +96,11 @@ const ChatList = ({
     setIsProfileModalOpen(true)
   }
 
-  const handleSelectChat = (id: number, converstation: ConversationResponse, isGroup?: boolean) => {
+  const handleSelectChat = (
+    id: number,
+    converstation: ConversationResponse & { onlineStatus: string },
+    isGroup?: boolean,
+  ) => {
     setSelectedChat(id)
     setConversationData(converstation)
     setIsGroupChat(isGroup || false)
@@ -155,6 +159,8 @@ const ChatList = ({
   const confirmLogoutCancel = () => {
     setIsConfirmLogoutOpen(false)
   }
+
+  console.log(conversations)
 
   return (
     <div className="bg-[#202020] text-white w-1/4 h-screen p-4 relative z-50">
@@ -250,7 +256,7 @@ const ChatList = ({
                 className={`flex items-center gap-3 p-2 rounded-lg hover:cursor-pointer ${selectedChatId === chat.id ? "bg-[#24313e]" : "hover:bg-[#c2c5cb08]"}`}
                 onClick={() => handleSelectChat(chat.id, chat, chat.chatType === "GROUP")}
               >
-                <div className="w-12 h-12 rounded-full bg-gray-500 flex items-center justify-center">
+                <div className="w-12 h-12 relative rounded-full bg-gray-500 flex items-center justify-center">
                   <Image
                     src={chat.chatType === "GROUP" ? chat.groupAvatar : chat.senderAvatar || Images.AvatarDefault}
                     alt={chat.chatType === "GROUP" ? chat.groupName : chat.senderName || "Avatar"}
@@ -258,11 +264,14 @@ const ChatList = ({
                     height={48}
                     className="rounded-full object-cover"
                   />
+                  {(chat.onlineStatus === "ONLINE" || chat.chatType === "GROUP") && (
+                    <span className="absolute bottom-[2px] right-[2px] w-[12px] h-[12px] rounded-full bg-green-500 border-2 border-[#202020]" />
+                  )}
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center justify-between">
                     <span className="font-semibold">
-                      {chat.chatType === "GROUP" ? chat.groupName : chat.senderName}
+                      {chat.chatType === "GROUP" ? chat.groupName : chat.anotherParticipantName}
                     </span>
                     <div className="flex items-center">
                       <span className="text-[14px] text-[#838383] mr-2">
