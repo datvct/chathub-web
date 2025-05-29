@@ -63,8 +63,8 @@ const ChatHeader = ({
   }, [setOpenModal])
 
   const handleCall = (isCallVideo: boolean) => {
-    console.log("user2:"+userId)
-    console.log("user1:"+userSenderId.toString())
+    console.log("user2:" + userId)
+    console.log("user1:" + userSenderId.toString())
     setOpenModal(true)
     if (userId != "0") makeVideoCall(userSenderId.toString(), userId, isCallVideo)
   }

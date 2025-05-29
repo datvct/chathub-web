@@ -102,6 +102,135 @@ const ChatInput = ({
   }
 
   const handleSendMessage = async () => {
+    const isGenerateImageCommand = message.trim().startsWith("@image ")
+
+    if (isGenerateImageCommand) {
+      const description = message.trim().substring(7).trim() // Lấy phần mô tả
+      onSendMessage(message.trim().trim(), MessageType.TEXT)
+
+      if (description) {
+        try {
+          const geminiResponse = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-preview-image-generation:generateContent?key=${process.env.API_KEY_GEMINI}`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                contents: [
+                  {
+                    parts: [{ text: description }],
+                  },
+                ],
+                generationConfig: {
+                  responseModalities: ["TEXT", "IMAGE"],
+                },
+              }),
+            },
+          )
+
+          if (!geminiResponse.ok) onSendMessage("Failed to generate image from Gemini", MessageType.TEXT)
+
+          const geminiJson = await geminiResponse.json()
+
+          const imagePart = geminiJson?.candidates?.[0]?.content?.parts?.find(
+            (part: { inlineData: { mimeType: string } }) =>
+              part.inlineData && part.inlineData.mimeType.startsWith("image/"),
+          )
+
+          if (!imagePart) throw new Error("No image data returned from Gemini")
+
+          const base64Image = imagePart.inlineData.data
+          const mimeType = imagePart.inlineData.mimeType || "image/png"
+          const fileName = `gemini-image-${Date.now()}.png`
+
+          const blob = await fetch(`data:${mimeType};base64,${base64Image}`).then(res => res.blob())
+          const file = new File([blob], fileName, { type: mimeType })
+
+          // Lấy presigned URL từ server
+          const response = await fetch(
+            `http://localhost:8080/aws/s3/presigned-url?fileName=${file.name}&contentType=${file.type}`,
+            {
+              method: "GET",
+              headers: { Authorization: `Bearer ${token}` },
+            },
+          )
+
+          if (!response.ok) throw new Error("Failed to get presigned URL")
+
+          const data = await response.json()
+
+          // Upload ảnh lên S3
+          await fetch(data.url, {
+            method: "PUT",
+            body: file,
+            headers: { "Content-Type": file.type },
+          })
+
+          const imageUrl = data.url.split("?")[0]
+
+          // Gửi tin nhắn
+          onSendMessage(imageUrl, MessageType.IMAGE)
+          setMessage("")
+          return
+        } catch (err) {
+          console.error(err)
+          alert("Failed to generate or send AI image.")
+          return
+        }
+      }
+    }
+
+    const isGenerateTextCommand = message.trim().startsWith("@text ")
+
+    if (isGenerateTextCommand) {
+      const prompt = message.trim().substring(6).trim() // Lấy nội dung sau @text
+      onSendMessage(message.trim().trim(), MessageType.TEXT)
+
+      if (prompt) {
+        try {
+          const geminiResponse = await fetch(
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.API_KEY_GEMINI}`,
+            {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                contents: [
+                  {
+                    parts: [{ text: prompt }],
+                  },
+                ],
+              }),
+            },
+          )
+
+          if (!geminiResponse.ok) onSendMessage("Failed to generate text from Gemini", MessageType.TEXT)
+
+          const geminiData = await geminiResponse.json()
+          const textResponse = geminiData?.candidates?.[0]?.content?.parts?.find((p: { text: any }) => p.text)?.text
+
+          if (!textResponse) throw new Error("No text returned")
+
+          const cleanedText = textResponse
+            .replace(/\*\*(.*?)\*\*/g, "$1") // remove bold markdown
+            .replace(/\* /g, "- ") // replace * with -
+            .trim()
+
+          const safeText = cleanedText.replace(/\n+/g, " | ")
+
+          onSendMessage(safeText, MessageType.TEXT) // Gửi trả lời dạng text
+          setMessage("")
+          return
+        } catch (err) {
+          console.error(err)
+          alert("Failed to generate AI reply.")
+          return
+        }
+      }
+    }
     if (files.length > 0) {
       if (fileType === MessageType.IMAGE) {
         // ✅ Xử lý nhiều ảnh
