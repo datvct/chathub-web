@@ -111,7 +111,7 @@ const ChatInput = ({
       if (description) {
         try {
           const geminiResponse = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-preview-image-generation:generateContent?key=${process.env.NEXT_PUBLIC_API_KEY_GEMINI}`,
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-preview-image-generation:generateContent?key=${process.env.API_KEY_GEMINI}`,
             {
               method: "POST",
               headers: {
@@ -191,7 +191,7 @@ const ChatInput = ({
       if (prompt) {
         try {
           const geminiResponse = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.NEXT_PUBLIC_API_KEY_GEMINI}`,
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.API_KEY_GEMINI}`,
             {
               method: "POST",
               headers: {
