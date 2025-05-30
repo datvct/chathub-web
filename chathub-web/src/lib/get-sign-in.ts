@@ -1,7 +1,7 @@
 import { Auth } from "~/codegen/Auth"
 import { AuthRequest, AuthResponse } from "~/codegen/data-contracts"
 
-const signInInstance = new Auth({ baseUrl: process.env.API_URL })
+const signInInstance = new Auth({ baseUrl: process.env.NEXT_PUBLIC_API_URL })
 
 export async function signIn(data?: AuthRequest) {
   try {

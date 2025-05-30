@@ -66,11 +66,14 @@ const SignInPage: React.FC = () => {
         setCookie("authToken", response?.response?.token, { maxAge: 60 * 60 * 24 * 7 })
         setCookie("userId", response?.response?.userId, { maxAge: 60 * 60 * 24 * 7 })
         setCookie("phone", response?.response?.phoneNumber, { maxAge: 60 * 60 * 24 * 7 })
-        const res = await fetch(`${process.env.API_URL}/call/stringee-token?userId=${response?.response?.userId}`, {
-          headers: {
-            Authorization: `Bearer ${response?.response?.token}`,
+        const res = await fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/call/stringee-token?userId=${response?.response?.userId}`,
+          {
+            headers: {
+              Authorization: `Bearer ${response?.response?.token}`,
+            },
           },
-        })
+        )
         const data = await res.json()
         const stringeeToken = data.message
         await loadStringeeSdk()

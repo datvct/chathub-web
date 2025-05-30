@@ -2,9 +2,9 @@ import type { NextConfig } from "next"
 
 const nextConfig: NextConfig = {
   env: {
-    API_URL: process.env.API_URL,
-    WS_URL: process.env.WS_URL,
-    API_KEY_GEMINI: process.env.API_KEY_GEMINI
+    NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL,
+    NEXT_PUBLIC_WS_URL: process.env.NEXT_PUBLIC_WS_URL,
+    API_KEY_GEMINI: process.env.API_KEY_GEMINI,
   },
   images: {
     remotePatterns: [

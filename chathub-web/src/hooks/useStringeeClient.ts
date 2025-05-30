@@ -33,7 +33,7 @@ export const useStringee = (
 
     const init = async () => {
       try {
-        const res = await fetch(`${process.env.API_URL}/call/stringee-token`, {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/call/stringee-token`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

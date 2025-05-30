@@ -1,7 +1,7 @@
 import { MessageResponse, ReactionRequest } from "~/codegen/data-contracts"
 import { Message } from "~/codegen/Message"
 
-const messageInstance = new Message({ baseUrl: process.env.API_URL })
+const messageInstance = new Message({ baseUrl: process.env.NEXT_PUBLIC_API_URL })
 
 export const getMessageByConversationId = async (conversationId: number, userId: number, token: string) => {
   try {
@@ -25,12 +25,15 @@ export const getMessageByConversationId = async (conversationId: number, userId:
 
 export const unsendMessage = async (userId: number, messageId: number, token: string): Promise<string | null> => {
   try {
-    const res = await fetch(`${process.env.API_URL}/message/unsent?userId=${userId}&messageId=${messageId}`, {
-      method: "PUT",
-      headers: {
-        Authorization: `Bearer ${token}`,
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/message/unsent?userId=${userId}&messageId=${messageId}`,
+      {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       },
-    })
+    )
     const text = await res.text()
     return text // "Message unsent successfully."
   } catch (error) {
@@ -40,12 +43,15 @@ export const unsendMessage = async (userId: number, messageId: number, token: st
 
 export const deleteMessage = async (userId: number, messageId: number, token: string): Promise<string | null> => {
   try {
-    const res = await fetch(`${process.env.API_URL}/message/delete?userId=${userId}&messageId=${messageId}`, {
-      method: "PUT",
-      headers: {
-        Authorization: `Bearer ${token}`,
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/message/delete?userId=${userId}&messageId=${messageId}`,
+      {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
       },
-    })
+    )
     const text = await res.text()
     return text // "Message deleted successfully."
   } catch (error) {
@@ -62,7 +68,7 @@ export const forwardMessage = async (
 ): Promise<MessageResponse[] | null> => {
   try {
     const res = await fetch(
-      `${process.env.API_URL}/message/forward?senderId=${senderId}&originalMessageId=${originalMessageId}&` +
+      `${process.env.NEXT_PUBLIC_API_URL}/message/forward?senderId=${senderId}&originalMessageId=${originalMessageId}&` +
         conversationIds.map(id => `conversationIds=${id}`).join("&"),
       {
         method: "POST",
@@ -82,7 +88,7 @@ export const forwardMessage = async (
 
 export const reactToMessage = async (payload: ReactionRequest, token: string): Promise<boolean> => {
   try {
-    const res = await fetch(`${process.env.API_URL}/reaction/react-message`, {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/reaction/react-message`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

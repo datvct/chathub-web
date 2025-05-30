@@ -111,7 +111,7 @@ const ChatInput = ({
       if (description) {
         try {
           const geminiResponse = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-preview-image-generation:generateContent?key=${process.env.API_KEY_GEMINI}`,
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-preview-image-generation:generateContent?key=${process.env.NEXT_PUBLIC_API_KEY_GEMINI}`,
             {
               method: "POST",
               headers: {
@@ -150,7 +150,7 @@ const ChatInput = ({
 
           // Lấy presigned URL từ server
           const response = await fetch(
-            `${process.env.API_URL}/aws/s3/presigned-url?fileName=${file.name}&contentType=${file.type}`,
+            `${process.env.NEXT_PUBLIC_API_URL}/aws/s3/presigned-url?fileName=${file.name}&contentType=${file.type}`,
             {
               method: "GET",
               headers: { Authorization: `Bearer ${token}` },
@@ -191,7 +191,7 @@ const ChatInput = ({
       if (prompt) {
         try {
           const geminiResponse = await fetch(
-            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.API_KEY_GEMINI}`,
+            `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.NEXT_PUBLIC_API_KEY_GEMINI}`,
             {
               method: "POST",
               headers: {
@@ -239,7 +239,7 @@ const ChatInput = ({
         for (const file of files) {
           try {
             const response = await fetch(
-              `${process.env.API_URL}/aws/s3/presigned-url?fileName=${file.name}&contentType=${file.type}`,
+              `${process.env.NEXT_PUBLIC_API_URL}/aws/s3/presigned-url?fileName=${file.name}&contentType=${file.type}`,
               {
                 method: "GET",
                 headers: { Authorization: `Bearer ${token}` },
@@ -281,7 +281,7 @@ const ChatInput = ({
         const file = files[0]
         try {
           const response = await fetch(
-            `${process.env.API_URL}/aws/s3/presigned-url?fileName=${file.name}&contentType=${file.type}`,
+            `${process.env.NEXT_PUBLIC_API_URL}/aws/s3/presigned-url?fileName=${file.name}&contentType=${file.type}`,
             {
               method: "GET",
               headers: { Authorization: `Bearer ${token}` },

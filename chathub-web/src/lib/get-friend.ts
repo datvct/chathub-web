@@ -1,7 +1,7 @@
 import { Friend } from "~/codegen/Friend"
 import { FriendRequestResponse, FriendshipRequest, SuccessResponse, UserDTO } from "~/codegen/data-contracts"
 
-const friendInstance = new Friend({ baseUrl: process.env.API_URL })
+const friendInstance = new Friend({ baseUrl: process.env.NEXT_PUBLIC_API_URL })
 
 export async function getListFriendRequest(userId: number, token: string) {
   try {

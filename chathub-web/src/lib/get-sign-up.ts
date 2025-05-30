@@ -1,7 +1,7 @@
 import { Auth } from "~/codegen/Auth"
 import { RegistrationRequest, SuccessResponse } from "~/codegen/data-contracts"
 
-const authInstance = new Auth({ baseUrl: process.env.API_URL })
+const authInstance = new Auth({ baseUrl: process.env.NEXT_PUBLIC_API_URL })
 
 export async function signUp(data: RegistrationRequest) {
   try {

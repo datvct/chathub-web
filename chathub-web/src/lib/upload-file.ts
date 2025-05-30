@@ -1,6 +1,6 @@
 import { Aws } from "~/codegen/Aws"
 
-const UploadFileInstance = new Aws({ baseUrl: process.env.API_URL })
+const UploadFileInstance = new Aws({ baseUrl: process.env.NEXT_PUBLIC_API_URL })
 
 export async function uploadFile(fileName: string, contentType: string, token?: string) {
   try {

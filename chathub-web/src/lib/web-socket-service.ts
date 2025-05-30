@@ -27,7 +27,7 @@ class WebSocketService {
 
   connect(userId: string, token: string, conversationIds: number[]) {
     this.stompClient = new Client({
-      webSocketFactory: () => new SockJS(process.env.WS_URL),
+      webSocketFactory: () => new SockJS(process.env.NEXT_PUBLIC_WS_URL),
       debug: str => console.log("[WebSocket Debug]", str),
       reconnectDelay: 5000,
       connectHeaders: {

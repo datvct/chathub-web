@@ -1,7 +1,7 @@
 import { User } from "~/codegen/User"
 import { UserDTO, BlockRequest, ChangeProfileRequest, SuccessResponse } from "../codegen/data-contracts"
 
-const userInstance = new User({ baseUrl: process.env.API_URL })
+const userInstance = new User({ baseUrl: process.env.NEXT_PUBLIC_API_URL })
 
 export async function updateProfile(data: ChangeProfileRequest, token: string) {
   try {

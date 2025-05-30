@@ -9,7 +9,7 @@ import {
   UpdateNickNameRequest,
 } from "~/codegen/data-contracts"
 
-const conversationInstance = new Conversation({ baseUrl: process.env.API_URL })
+const conversationInstance = new Conversation({ baseUrl: process.env.NEXT_PUBLIC_API_URL })
 
 export async function getRecentConversationByUserID(userId: number, token: string) {
   try {
@@ -143,7 +143,7 @@ export const updateGroupInfoAPI = async (
       formData.append("avatar", avatarFile)
     }
 
-    const response = await fetch(`${process.env.API_URL}/conversation/${conversationId}/updateGroupInfo`, {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/conversation/${conversationId}/updateGroupInfo`, {
       method: "PUT",
       headers: {
         Authorization: `Bearer ${token}`,

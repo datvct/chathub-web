@@ -1,7 +1,7 @@
 import { User } from "../codegen/User"
 import { ChangePasswordRequest, SuccessResponse } from "../codegen/data-contracts"
 
-const userInstance = new User({ baseUrl: process.env.API_URL })
+const userInstance = new User({ baseUrl: process.env.NEXT_PUBLIC_API_URL })
 
 export async function changePassword(data: ChangePasswordRequest) {
   try {
