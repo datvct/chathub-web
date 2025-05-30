@@ -1,71 +1,311 @@
+"use client"
+
+import { useEffect, useState, useCallback } from "react"
+import ChatList from "../components/chat-list"
+import ChatScreen from "~/components/chat-area"
 import Image from "next/image"
-import { Images } from "~/constants/images"
+import { Images } from "../constants/images"
+import ChatInfo from "~/components/chat-info"
+import { ToastContainer } from "react-toastify"
+import { ConversationResponse } from "~/codegen/data-contracts"
+import ChatSearch from "~/components/chat-search"
+import { useSelector } from "react-redux"
+import { RootState } from "~/lib/reudx/store"
+import { useConversation } from "~/hooks/use-converstation"
+import WebSocketService from "~/lib/web-socket-service"
+import { TOPICS } from "~/constants/Topics"
+import { MessageType } from "~/types/types"
+import { send } from "process"
 
 export default function Home() {
-  return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image className="dark:invert" src={Images.Next} alt="Next.js logo" width={180} height={38} priority />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+  const userId = useSelector((state: RootState) => state.auth.userId)
+  const token = useSelector((state: RootState) => state.auth.token)
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image className="dark:invert" src={Images.Vercel} alt="Vercel logomark" width={20} height={20} />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image aria-hidden src={Images.File} alt="File icon" width={16} height={16} />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image aria-hidden src={Images.Window} alt="Window icon" width={16} height={16} />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image aria-hidden src={Images.Globe} alt="Globe icon" width={16} height={16} />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+  const [selectedChat, setSelectedChat] = useState<number | null>(null)
+  const [isChatInfoOpen, setIsChatInfoOpen] = useState(false)
+  const [isGroupChat, setIsGroupChat] = useState(false)
+  const [conversationData, setConversationData] = useState<(ConversationResponse & { onlineStatus: string }) | null>(
+    null,
+  )
+  const [isChatSearchOpen, setIsChatSearchOpen] = useState(false)
+  const [highlightMessageId, setHighlightMessageId] = useState<number | null>(null)
+  const [needRefetchConversations, setNeedRefetchConversations] = useState(false)
+  const { getRecentConversation } = useConversation(userId, token)
+  const [conversations, setConversations] = useState([])
+  const [typingStatus, setTypingStatus] = useState({})
+  const [seenMessages, setSeenMessages] = useState({})
+  const [reloadTrigger, setReloadTrigger] = useState(false)
+
+  const handleReloadTrigger = () => {
+    setReloadTrigger(prevState => !prevState)
+  }
+
+  const handlePinChangeSuccess = useCallback(() => {
+    setNeedRefetchConversations(prevState => !prevState)
+    return true
+  }, [])
+
+  const handleHistoryDeletedSuccess = useCallback(() => {
+    setSelectedChat(null)
+    setConversationData(null)
+    setNeedRefetchConversations(prev => !prev)
+  }, [])
+
+  const handleChatInfoUpdate = useCallback(() => {
+    setNeedRefetchConversations(prev => !prev)
+  }, [])
+
+  useEffect(() => {
+    if (selectedChat) {
+      setIsChatInfoOpen(false)
+      setIsChatSearchOpen(false)
+    }
+  }, [selectedChat])
+
+  useEffect(() => {
+    if (selectedChat) {
+      setIsChatInfoOpen(false)
+      setIsChatSearchOpen(false)
+    }
+  }, [selectedChat])
+
+  const fetchDataConversation = async () => {
+    if (userId) {
+      let isMounted = true
+
+      const websocket = WebSocketService.getInstance()
+      if (websocket.isConnected()) {
+        websocket.disconnect()
+        setConversationData(null)
+        setSelectedChat(null)
+        setConversations([])
+        setTypingStatus({})
+        setSeenMessages({})
+        setReloadTrigger(false)
+        setNeedRefetchConversations(false)
+      }
+
+      const init = async () => {
+        try {
+          const response = await getRecentConversation(userId, token)
+          if (response) {
+            setConversations(response)
+            const conversationIds = response.map(item => item.id)
+            const websocket = WebSocketService.getInstance()
+
+            if (!websocket.isConnected()) {
+              await websocket.connect(userId.toString(), token, conversationIds)
+              websocket.subscribeToTopics(userId.toString(), conversationIds)
+            }
+
+            websocket.subscribe(TOPICS.STATUS, message => {
+              // ví dụ message = { id: 2, name: 'Johnathan', status: 'ONLINE', lastSeen: '...' }
+
+              setConversations(prev =>
+                prev.map(conv => {
+                  // cập nhật online status cho từng participant
+                  if (conv.id === message.id) {
+                    return {
+                      ...conv,
+                      onlineStatus: message.status,
+                      lastSeen: message.lastSeen,
+                    }
+                  }
+                  return conv
+                }),
+              )
+            })
+
+            websocket.subscribe(TOPICS.USER(userId.toString()), async notification => {
+              const newConv = typeof notification === "object" ? notification : { id: notification }
+              websocket.subscribeToConversation(newConv.id)
+              try {
+                const updatedData = await getRecentConversation(userId, token)
+                if (isMounted) {
+                  setConversations([...updatedData])
+                  const updatedConversationIds = updatedData.map(item => item.id)
+
+                  websocket.subscribeToTopics(userId.toString(), updatedConversationIds)
+
+                  updatedConversationIds.forEach(id => {
+                    websocket.subscribe(TOPICS.CONVERSATION(id.toString()), message => {
+                      const newConversation = message
+                      setConversations(prev => {
+                        const exists = prev.find(c => c.id === newConversation.id)
+                        return exists ? prev : [newConversation, ...prev]
+                      })
+                    })
+
+                    websocket.subscribe(TOPICS.MESSAGE(id.toString()), message => {
+                      const newMessage = message
+
+                      setConversations(prev =>
+                        prev.map(c => {
+                          if (c.id !== id) return c
+
+                          const isNew = !c.lastMessageAt || new Date(newMessage.sentAt) > new Date(c.lastMessageAt)
+                          const shouldUpdateTime = isNew && !newMessage.unsent && !newMessage.userDeleted
+
+                          return {
+                            ...c,
+                            lastMessage: newMessage.content,
+                            lastMessageType: newMessage.messageType,
+                            userDeleted: newMessage.userDeleted,
+                            unsent: newMessage.unsent,
+                            lastMessageAt: shouldUpdateTime ? newMessage.sentAt : c.lastMessageAt,
+                            senderId: newMessage.senderId ? newMessage.senderId : c.senderId,
+                            senderName: newMessage.senderName ? newMessage.senderName : c.senderName,
+                          }
+                        }),
+                      )
+                    })
+                  })
+                }
+              } catch (err) {
+                console.error("Error fetching updated conversations:", err)
+              }
+            })
+
+            conversationIds.forEach(id => {
+              WebSocketService.getInstance().subscribe(TOPICS.CONVERSATION(id.toString()), message => {
+                const newConversation = message
+                setConversations(prev => {
+                  const exists = prev.find(c => c.id === newConversation.id)
+                  return exists ? prev : [newConversation, ...prev]
+                })
+              })
+
+              WebSocketService.getInstance().subscribe(TOPICS.MESSAGE(id.toString()), message => {
+                const newMessage = message
+
+                setConversations(prev => {
+                  return prev.map(c => {
+                    if (c.id !== id) return c
+
+                    const isNew = !c.lastMessageAt || new Date(newMessage.sentAt) > new Date(c.lastMessageAt)
+
+                    const shouldUpdateTime = isNew && !newMessage.unsent && !newMessage.userDeleted
+
+                    return {
+                      ...c,
+                      lastMessage: newMessage.content,
+                      lastMessageType: newMessage.messageType,
+                      userDeleted: newMessage.userDeleted,
+                      unsent: newMessage.unsent,
+                      lastMessageAt: shouldUpdateTime ? newMessage.sentAt : c.lastMessageAt,
+                      senderId: newMessage.senderId ? newMessage.senderId : c.senderId,
+                      senderName: newMessage.senderName ? newMessage.senderName : c.senderName,
+                    }
+                  })
+                })
+              })
+
+              WebSocketService.getInstance().subscribe(TOPICS.TYPING_STATUS(id.toString()), message => {
+                const { userId, isTyping } = message
+                setTypingStatus(prev => {
+                  const updated = { ...prev, [id]: isTyping ? userId : null }
+                  return updated
+                })
+              })
+
+              // WebSocketService.getInstance().subscribe(TOPICS.SEEN_MESSAGE(id.toString()), message => {
+              //   const { userId, messageId } = message
+              //   setSeenMessages(prev => ({
+              //     ...prev,
+              //     [id]: { userId, messageId },
+              //   }))
+              // })
+            })
+          }
+        } catch (error) {
+        } finally {
+          if (isMounted) {
+            setNeedRefetchConversations(false)
+          }
+        }
+      }
+      init()
+      return () => {
+        isMounted = false
+        const websocket = WebSocketService.getInstance()
+        conversations.forEach(c => {
+          websocket.unsubscribe(TOPICS.USER(userId.toString()), () => {})
+          websocket.unsubscribe(TOPICS.CONVERSATION(c.id.toString()), () => {})
+          websocket.unsubscribe(TOPICS.MESSAGE(c.id.toString()), () => {})
+          websocket.unsubscribe(TOPICS.TYPING_STATUS(c.id.toString()), () => {})
+          // websocket.unsubscribe(TOPICS.SEEN_MESSAGE(c.id.toString()), () => {})
+          // websocket.unsubscribe(TOPICS.REACT_MESSAGE(c.id.toString()), () => {})
+        })
+      }
+    }
+  }
+  useEffect(() => {
+    fetchDataConversation()
+  }, [reloadTrigger])
+
+  return (
+    <>
+      <div className="flex flex-row justify-between h-screen">
+        <ChatList
+          setSelectedChat={setSelectedChat}
+          setIsGroupChat={setIsGroupChat}
+          setConversationData={setConversationData}
+          onPinChange={handlePinChangeSuccess}
+          conversations={conversations}
+          userId={userId}
+          token={token}
+          // handleReloadTrigger={handleReloadTrigger}
+        />
+        {selectedChat ? (
+          <ChatScreen
+            conversationId={selectedChat}
+            isChatInfoOpen={isChatInfoOpen}
+            setIsChatInfoOpen={setIsChatInfoOpen}
+            isGroupChat={isGroupChat}
+            conversationData={conversationData}
+            isChatSearchOpen={isChatSearchOpen}
+            setIsChatSearchOpen={setIsChatSearchOpen}
+            highlightMessageId={highlightMessageId}
+            onRefetchConversations={handlePinChangeSuccess}
+            userId={userId}
+            token={token}
+          />
+        ) : (
+          <>
+            <Image
+              src={Images.Background}
+              alt="background-image"
+              layout="fill"
+              objectFit="cover"
+              className="absolute inset-0"
+            />
+            <div className="absolute inset-0 bg-black opacity-30" />
+          </>
+        )}
+
+        {isChatSearchOpen && (
+          <ChatSearch
+            setIsOpen={setIsChatSearchOpen}
+            conversationId={conversationData.id}
+            setHighlightMessageId={setHighlightMessageId}
+          />
+        )}
+
+        {isChatInfoOpen && selectedChat && (
+          <ChatInfo
+            isOpen={isChatInfoOpen}
+            isGroupChat={isGroupChat}
+            selectedChat={selectedChat}
+            setIsChatInfoOpen={setIsChatInfoOpen}
+            onPinChange={handlePinChangeSuccess}
+            onHistoryDeleted={handleHistoryDeletedSuccess}
+            onChatInfoUpdated={handleChatInfoUpdate}
+            handleReloadTrigger={handleReloadTrigger}
+            userId={userId}
+            token={token}
+          />
+        )}
+      </div>
+    </>
   )
 }

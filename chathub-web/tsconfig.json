@@ -1,10 +1,10 @@
 {
   "compilerOptions": {
-    "target": "ES2017",
+    "target": "es6",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
-    "strict": true,
+    "strict": false,
     "noEmit": true,
     "esModuleInterop": true,
     "module": "esnext",
@@ -12,6 +12,12 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "jsx": "preserve",
+    "allowSyntheticDefaultImports": true,
+    "allowImportingTsExtensions": true,
+    "forceConsistentCasingInFileNames": true,
+    "noImplicitAny": true,
+    "strictFunctionTypes": false,
+    "composite": true,
     "incremental": true,
     "plugins": [
       {
