@@ -43,16 +43,6 @@ const ChatScreen = ({
   const messagesEndRef = useRef<HTMLDivElement | null>(null)
   const [reloadTrigger, setReloadTrigger] = useState(false)
 
-  // const refetchMessages = async () => {
-  //   if (conversationId) {
-  //     const response = await getMessageByConversationId(conversationId, userId, token)
-  //     if (response) {
-  //       const uniqueMessages = Array.from(new Map(response.map(m => [m.id, m])).values())
-  //       setMessages(response)
-  //     }
-  //   }
-  // }
-
   const [isImageViewerOpen, setIsImageViewerOpen] = useState(false)
   const [selectedImageUrl, setSelectedImageUrl] = useState<string | null>(null)
 
@@ -76,12 +66,10 @@ const ChatScreen = ({
   const updateReactions = (reactions: any[], userId: number, reactionEmoji: string, senderName: string) => {
     const index = reactions.findIndex(r => r.senderName === senderName)
     if (index !== -1) {
-      // Cập nhật emoji nếu user đã reaction trước đó
       const updated = [...reactions]
       updated[index] = { ...updated[index], reactionEmoji }
       return updated
     } else {
-      // Thêm mới nếu chưa có
       return [...reactions, { senderName, reactionEmoji }]
     }
   }
@@ -197,14 +185,27 @@ const ChatScreen = ({
     }
   }, [highlightMessageId])
 
-  const handleSendMessage = (content: string, messageType: MessageType) => {
-    if (content.trim()) {
-      onSend(content, messageType)
+  // Handle message sending: uses onSendFileAndText if a file is provided, otherwise uses onSend
+  // ChatInput should pass file: { fileName: string, filePath: string } when a file is selected
+  const handleSendMessage = (
+    content: string,
+    messageType: MessageType,
+    file?: { fileName: string; filePath: string },
+  ) => {
+    if (content.trim() || file) {
+      if (file) {
+        // Use sendFileMessage for any file (image, document, etc.)
+        onSendFileAndText(content, messageType, file.fileName, file.filePath)
+      } else {
+        // Use sendMessage for text-only messages
+        onSend(content, messageType)
+      }
       setTimeout(() => {
         messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
       }, 100)
     }
   }
+
   return (
     <div className="flex-1 h-full w-full p-4 bg-[#3A3A3A] text-white flex flex-col relative transition-all">
       <ChatHeader

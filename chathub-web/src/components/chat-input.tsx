@@ -106,7 +106,7 @@ const ChatInput = ({
 
     if (isGenerateImageCommand) {
       const description = message.trim().substring(7).trim() // Lấy phần mô tả
-      onSendMessage(message.trim().trim(), MessageType.TEXT)
+      onSendMessage(message.trim(), MessageType.TEXT)
 
       if (description) {
         try {
@@ -130,7 +130,10 @@ const ChatInput = ({
             },
           )
 
-          if (!geminiResponse.ok) onSendMessage("Failed to generate image from Gemini", MessageType.TEXT)
+          if (!geminiResponse.ok) {
+            onSendMessage("Failed to generate image from Gemini", MessageType.TEXT)
+            return
+          }
 
           const geminiJson = await geminiResponse.json()
 
@@ -150,7 +153,7 @@ const ChatInput = ({
 
           // Lấy presigned URL từ server
           const response = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/aws/s3/presigned-url?fileName=${file.name}&contentType=${file.type}`,
+            `http://localhost:8080/aws/s3/presigned-url?fileName=${file.name}&contentType=${file.type}`,
             {
               method: "GET",
               headers: { Authorization: `Bearer ${token}` },
@@ -170,8 +173,8 @@ const ChatInput = ({
 
           const imageUrl = data.url.split("?")[0]
 
-          // Gửi tin nhắn
-          onSendMessage(imageUrl, MessageType.IMAGE)
+          // Gửi tin nhắn với file qua onSendFileAndText
+          onSendFileAndText("", MessageType.IMAGE, fileName, imageUrl)
           setMessage("")
           return
         } catch (err) {
@@ -186,7 +189,7 @@ const ChatInput = ({
 
     if (isGenerateTextCommand) {
       const prompt = message.trim().substring(6).trim() // Lấy nội dung sau @text
-      onSendMessage(message.trim().trim(), MessageType.TEXT)
+      onSendMessage(message.trim(), MessageType.TEXT)
 
       if (prompt) {
         try {
@@ -207,7 +210,10 @@ const ChatInput = ({
             },
           )
 
-          if (!geminiResponse.ok) onSendMessage("Failed to generate text from Gemini", MessageType.TEXT)
+          if (!geminiResponse.ok) {
+            onSendMessage("Failed to generate text from Gemini", MessageType.TEXT)
+            return
+          }
 
           const geminiData = await geminiResponse.json()
           const textResponse = geminiData?.candidates?.[0]?.content?.parts?.find((p: { text: any }) => p.text)?.text
@@ -231,15 +237,13 @@ const ChatInput = ({
         }
       }
     }
+
     if (files.length > 0) {
       if (fileType === MessageType.IMAGE) {
-        // ✅ Xử lý nhiều ảnh
-        const uploadedUrls: string[] = []
-
         for (const file of files) {
           try {
             const response = await fetch(
-              `${process.env.NEXT_PUBLIC_API_URL}/aws/s3/presigned-url?fileName=${file.name}&contentType=${file.type}`,
+              `http://localhost:8080/aws/s3/presigned-url?fileName=${file.name}&contentType=${file.type}`,
               {
                 method: "GET",
                 headers: { Authorization: `Bearer ${token}` },
@@ -255,33 +259,19 @@ const ChatInput = ({
               headers: { "Content-Type": file.type },
             })
 
-            uploadedUrls.push(data.url.split("?")[0])
+            const fileUrl = data.url.split("?")[0]
+            onSendFileAndText(message, MessageType.IMAGE, file.name, fileUrl)
           } catch (err) {
-            alert("Upload failed for some images.")
-          }
-        }
-
-        if (uploadedUrls.length > 0) {
-          const combinedUrlString = uploadedUrls.join(",")
-          const file = files[0]
-
-          // Nếu có nội dung text kèm theo => gửi text nữa
-          if (message.trim()) {
-            onSendFileAndText(message, MediaType.IMAGE, file.name, uploadedUrls[0])
-            setFiles([])
-            setPreviewFiles([])
-            setFileType(null)
-            setMessage("")
-          } else {
-            onSendMessage(combinedUrlString, MessageType.IMAGE)
+            console.error(err)
+            alert(`Upload failed for file: ${file.name}`)
           }
         }
       } else {
-        // ✅ Xử lý video hoặc document: chỉ 1 file
+        // Xử lý video hoặc document: chỉ 1 file
         const file = files[0]
         try {
           const response = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/aws/s3/presigned-url?fileName=${file.name}&contentType=${file.type}`,
+            `http://localhost:8080/aws/s3/presigned-url?fileName=${file.name}&contentType=${file.type}`,
             {
               method: "GET",
               headers: { Authorization: `Bearer ${token}` },
@@ -298,25 +288,21 @@ const ChatInput = ({
           })
 
           const type = file.type.startsWith("video/") ? MessageType.VIDEO : MessageType.DOCUMENT
+          const fileUrl = data.url.split("?")[0]
 
-          if (message.trim()) {
-            onSendFileAndText(message, type, file.name, data.url.split("?")[0])
-            setFiles([])
-            setPreviewFiles([])
-            setFileType(null)
-            setMessage("")
-          } else {
-            onSendMessage(data.url.split("?")[0], type)
-          }
+          // Gửi file qua onSendFileAndText, kèm text nếu có
+          onSendFileAndText(message, type, file.name, fileUrl)
         } catch (err) {
-          alert("Upload failed for the file.")
+          console.error(err)
+          alert(`Upload failed for file: ${file.name}`)
         }
       }
 
-      // ✅ Reset lại
+      // Reset states
       setFiles([])
       setPreviewFiles([])
       setFileType(null)
+      setMessage("")
     } else if (message.trim()) {
       const isLink = /^(https?:\/\/[^\s]+)$/.test(message.trim())
       const messageType = isLink ? MessageType.LINK : MessageType.TEXT
