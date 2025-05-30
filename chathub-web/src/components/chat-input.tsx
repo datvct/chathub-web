@@ -150,7 +150,7 @@ const ChatInput = ({
 
           // Lấy presigned URL từ server
           const response = await fetch(
-            `http://localhost:8080/aws/s3/presigned-url?fileName=${file.name}&contentType=${file.type}`,
+            `${process.env.API_URL}/aws/s3/presigned-url?fileName=${file.name}&contentType=${file.type}`,
             {
               method: "GET",
               headers: { Authorization: `Bearer ${token}` },
@@ -239,7 +239,7 @@ const ChatInput = ({
         for (const file of files) {
           try {
             const response = await fetch(
-              `http://localhost:8080/aws/s3/presigned-url?fileName=${file.name}&contentType=${file.type}`,
+              `${process.env.API_URL}/aws/s3/presigned-url?fileName=${file.name}&contentType=${file.type}`,
               {
                 method: "GET",
                 headers: { Authorization: `Bearer ${token}` },
@@ -281,7 +281,7 @@ const ChatInput = ({
         const file = files[0]
         try {
           const response = await fetch(
-            `http://localhost:8080/aws/s3/presigned-url?fileName=${file.name}&contentType=${file.type}`,
+            `${process.env.API_URL}/aws/s3/presigned-url?fileName=${file.name}&contentType=${file.type}`,
             {
               method: "GET",
               headers: { Authorization: `Bearer ${token}` },

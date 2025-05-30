@@ -68,7 +68,7 @@ const ModalCreateGroupChat: React.FC<ModalCreateGroupChatProps> = ({ isOpen, set
     }
 
     try {
-      const response = await fetch("http://localhost:8080/conversation/create", {
+      const response = await fetch(`${process.env.API_URL}/conversation/create`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
@@ -203,7 +203,9 @@ const ModalCreateGroupChat: React.FC<ModalCreateGroupChatProps> = ({ isOpen, set
                       <li
                         key={user.id}
                         className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer mb-3 transition-colors duration-150
-                                ${selectedUsers.includes(user.id!) ? "bg-[#7a99b8]/90" : "bg-[#fff] hover:bg-[#93C1D2]"}`}
+                                ${
+                                  selectedUsers.includes(user.id!) ? "bg-[#7a99b8]/90" : "bg-[#fff] hover:bg-[#93C1D2]"
+                                }`}
                         onClick={() => handleSelectUser(user.id!)}
                       >
                         <Image

@@ -56,7 +56,7 @@ export enum ContentType {
 }
 
 export class HttpClient<SecurityDataType = unknown> {
-  public baseUrl: string = "http://localhost:8080"
+  public baseUrl: string = process.env.API_URL
   private securityData: SecurityDataType | null = null
   private securityWorker?: ApiConfig<SecurityDataType>["securityWorker"]
   private abortControllers = new Map<CancelToken, AbortController>()
@@ -116,8 +116,8 @@ export class HttpClient<SecurityDataType = unknown> {
           property instanceof Blob
             ? property
             : typeof property === "object" && property !== null
-              ? JSON.stringify(property)
-              : `${property}`,
+            ? JSON.stringify(property)
+            : `${property}`,
         )
         return formData
       }, new FormData()),

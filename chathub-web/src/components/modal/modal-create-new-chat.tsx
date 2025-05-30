@@ -59,7 +59,7 @@ const ModalCreateNewChat: React.FC<ModalCreateNewChatProps> = ({
     formData.append("participantIds", selectedUser.toString())
 
     try {
-      const response = await fetch("http://localhost:8080/conversation/create", {
+      const response = await fetch(`${process.env.API_URL}/conversation/create`, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
