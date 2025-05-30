@@ -15,6 +15,9 @@
         "ignoreRestSiblings": true
       }
     ],
-    "react/no-unescaped-entities": "off"
+    "react/no-unescaped-entities": "off",
+    "rules": {
+      "@typescript-eslint/no-unused-vars": ["warn"]
+    }
   }
 }

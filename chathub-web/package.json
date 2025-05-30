@@ -24,10 +24,10 @@
     "@reduxjs/toolkit": "^2.6.1",
     "@stomp/stompjs": "^7.1.0",
     "@types/sockjs-client": "^1.5.4",
-    "chathub-web": "0.1.0",
     "class-variance-authority": "^0.7.1",
     "cookies-next": "^5.1.0",
     "dayjs": "^1.11.13",
+
     "emoji-picker-react": "^4.12.2",
     "events": "^3.3.0",
     "firebase": "^11.5.0",

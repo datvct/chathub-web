@@ -242,7 +242,7 @@ export interface MemberDTO {
   avatar?: string
   phoneNumber?: string
   role?: "ADMIN" | "DEPUTY" | "MEMBER"
-  is_admin?: boolean
+  _admin?: boolean
 }
 
 export interface MessageFindedResponse {
